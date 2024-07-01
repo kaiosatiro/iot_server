@@ -31,7 +31,7 @@ Whether developing a home automation system, industrial monitoring solution, or 
 **Functional Requirements**
 1. Receive status updates from IOT devices
 2. Store the updates for future use
-3. Allow end users to vizualize data thgouht a dashboard
+3. Allow end users to vizualize data through a dashboard
 
 **\*Fictional Non-Functional Requirements\***
 1. Data Volume: 54GB Annually
