@@ -25,7 +25,9 @@ def puller(msg_handler: Handler):
 
     logger.debug("Connecting to RabbitMQ server")
     connection = pika.BlockingConnection(
-        pika.ConnectionParameters(host='localhost')
+        pika.ConnectionParameters(
+            host='rabbitmq', port=5672
+        )
     )
 
     channel = connection.channel()

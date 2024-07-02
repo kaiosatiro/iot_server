@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+
+  logging:
+    build: ./logging
+    ports:
+      - "80:80"
+    environment:
+      - NAME=World
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+        restart: true
+
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 5s
+      timeout: 5s
+      retries: 3

@@ -1,17 +1,13 @@
-FROM python:3.10-slim
+FROM python:3.12-slim
 
-WORKDIR /service/
+WORKDIR /app/
 
-# COPY requirements.txt ./
-
-# COPY logger-config.json ./
-
-COPY . /service
+COPY . /app
 
 RUN pip install --no-cache-dir -r requirements.txt
 
 EXPOSE 80
 
-ENV NAME World
+# ENV NAME World
 
 CMD ["python", "src/main.py"]
