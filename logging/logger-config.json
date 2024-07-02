@@ -18,7 +18,7 @@
         "class": "logging.handlers.RotatingFileHandler",
         "level": "DEBUG",
         "formatter": "simple",
-        "filename": "logs/logging_service_logs.log",
+        "filename": "src/logs/logging_service_logs.log",
         "maxBytes": 10000,
         "backupCount": 3
         },
@@ -33,7 +33,7 @@
     },
     "loggers": {
         "root": {
-            "level": "DEBUG",
+            "level": "INFO",
             "handlers": [
                 "queue_handler"
             ]

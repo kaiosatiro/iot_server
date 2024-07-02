@@ -1,39 +1,48 @@
-import atexit
-import json
+# Description: Main entry point for the logging service
+
+from sys import exit as sysexit
+from os import _exit as os_exit
+
+from atexit import register as atexitregister
+from json import load as json_load
 import logging.config
 import logging.handlers
-import pathlib
+from pathlib import Path
+
+from puller import puller
+from handler import get_handler_manager
+from data import get_db_manager
 
 logger = logging.getLogger(__name__)
 
 # Function to setup logging configuration from a JSON
 def setup_logging():
-    config_file = pathlib.Path("logger-config.json")
+    config_file = Path("logger-config.json")
     with open(config_file) as f_init:
-        config = json.load(f_init)
-    
+        config = json_load(f_init)
+
     logging.config.dictConfig(config)
 
     # get the queue handler
     queue_handler = logging.getHandlerByName("queue_handler")
     if queue_handler is not None:
         queue_handler.listener.start()
-        atexit.register(queue_handler.listener.stop)
-    
+        atexitregister(queue_handler.listener.stop)
 
-def test():
+
+if __name__ == '__main__':
     setup_logging()
-    logging.basicConfig(level="INFO")
-    logger.debug("debug message", extra={"x": "hello"})
-    logger.info("info message")
-    logger.warning("warning message")
-    logger.error("error message")
-    logger.critical("critical message")
+    logger.info("Starting the logging service")
+
+    db = get_db_manager()
+    handler_mng = get_handler_manager(db)
     try:
-        1 / 0
-    except ZeroDivisionError:
-        logger.exception("exception message")
+        logger.debug("Initializing puller")
+        puller(handler_mng)
 
-
-if __name__ == "__main__":
-    test()
+    except KeyboardInterrupt:
+        logger.info("Shutting down the logging service")
+        try:
+            sysexit(0)
+        except SystemExit:
+            os_exit(0)
