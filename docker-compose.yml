@@ -1,25 +1,35 @@
-version: '3.8'
-
 services:
-
   logging:
     build: ./logging
-    ports:
-      - "80:80"
+    networks:
+      - internal_network
+    # ports:
+      # - "80:80"
     environment:
-      - NAME=World
+      - LOG_INFO_LOCAL_PATH=${LOG_INFO_LOCAL_PATH}
     depends_on:
       rabbitmq:
         condition: service_healthy
         restart: true
+    volumes:
+      - db-data:${LOG_INFO_LOCAL_PATH}
 
   rabbitmq:
     image: rabbitmq:3.13-management
+    networks:
+      - internal_network
     ports:
       - "5672:5672"
-      - "15672:15672"
+    #   - "15672:15672"
     healthcheck:
       test: ["CMD", "rabbitmqctl", "status"]
       interval: 5s
       timeout: 5s
       retries: 3
+
+networks:
+  internal_network:
+    driver: bridge
+
+volumes:
+  db-data:

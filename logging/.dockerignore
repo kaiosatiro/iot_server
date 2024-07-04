@@ -1,0 +1,7 @@
+__pycache__
+tests/__pycache__/
+.venv
+src/logs/*
+.pytest_cache
+.dockerignore
+.gitignore

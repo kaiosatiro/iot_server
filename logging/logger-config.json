@@ -8,7 +8,7 @@
         }
     },
     "handlers": {
-        "stderr": {
+    "stderr": {
             "class": "logging.StreamHandler",
             "level": "WARNING",
             "formatter": "simple",

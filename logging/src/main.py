@@ -9,17 +9,19 @@ import logging.config
 import logging.handlers
 from pathlib import Path
 
-from puller import puller
-from handler import get_handler_manager
-from data import get_db_manager
+from src.puller import puller
+from src.handler import get_handler
+from src.data import get_db_manager
 
 logger = logging.getLogger(__name__)
 
 # Function to setup logging configuration from a JSON
 def setup_logging():
-    config_file = Path("src/logger-config.json")
+    config_file = Path("logger-config.json")
     with open(config_file) as f_init:
         config = json_load(f_init)
+    
+    #TODO: Add the basic config in case the JSON file does not have it
 
     logging.config.dictConfig(config)
 
@@ -32,10 +34,11 @@ def setup_logging():
 
 if __name__ == '__main__':
     setup_logging()
+    logging.basicConfig()
     logger.info("Starting the logging service")
 
     db = get_db_manager()
-    handler_mng = get_handler_manager(db)
+    handler_mng = get_handler(db)
     try:
         logger.debug("Initializing puller")
         puller(handler_mng)

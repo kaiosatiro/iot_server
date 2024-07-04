@@ -3,6 +3,9 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 
+from os import getenv
+from datetime import datetime
+
 from logging import getLogger
 
 
@@ -12,6 +15,10 @@ logger = getLogger(__name__)
 class DB(ABC):
     @abstractmethod
     def save(self, data, *args, **kwargs):
+        pass
+    
+    @abstractmethod
+    def set_origin(self, origin):
         pass
 
 
@@ -24,26 +31,50 @@ class DBManager(ABC):
     def get_remote(self) -> DB:
         pass
 
-
-class DataSaverManager(DBManager):    
+# DB Object Factory
+class DataManager(DBManager):    
     def get_local(self) -> DB:
-        return LocalSaver()
+        return LocalData()
     
     def get_remote(self) -> DB:
-        return RemoteSaver()
+        return RemoteData()
 
 
-class LocalSaver(DB):
-    def save(self, data, origin='Unknown'):
+class LocalData(DB):
+    def __init__(self, origin='Unknown'):
+        self.path = LocalData.path_dir()
+        self.current_date = datetime.now().strftime("%Y-%m-%d") #TODO: maybe a scheduler ?
+        self.origin = origin
+    
+    def save(self, data):
         logger.debug(f"Saving data locally: {data}")
-        with open("src/logs/log.txt", "a") as f: # TODO: Change this to a environment variable path
-            f.write(f"{origin}: {data.decode('utf-8')}\n")
-                
+        with open(f"{self.path}{self.current_date}_{self.origin}.log", "a") as f: #TODO: NEED to add size control here
+            f.write(f"{data}\n")
+    
+    def set_current_date(self):
+        logger.debug("Setting current date")
+        self.current_date = datetime.now().strftime("%Y-%m-%d")
+    
+    def set_origin(self, origin):
+        logger.info(f"Setting origin: {origin}")
+        self.origin = origin
 
-class RemoteSaver(DB):
+    @staticmethod
+    def path_dir():
+        path = getenv("LOG_INFO_LOCAL_PATH")
+        if path is None:
+            return "/tmp/"
+        return path
+        
+
+class RemoteData(DB):
     def save(self, data):
         logger.debug(f"Saving data remotely: {data}")
+        pass
+
+    def set_origin(self, origin):
+        pass
 
 
 def get_db_manager() -> DB:
-    return DataSaverManager()
+    return DataManager()

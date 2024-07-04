@@ -1,7 +1,7 @@
 # Module to pull messages from a RabbitMQ server and handle them using the provided message handler.
 
 import pika
-from handler import Handler
+from src.handler import Handler
 
 from logging import getLogger
 
@@ -20,13 +20,14 @@ def puller(msg_handler: Handler):
     """
     # Callback function to handle messages
     def callback(ch, method, properties, body) -> None:
-        msg_handler.handle_message(body)
+        msg_handler.handle_message(body, properties)
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
     logger.debug("Connecting to RabbitMQ server")
     connection = pika.BlockingConnection(
         pika.ConnectionParameters(
-            host='rabbitmq', port=5672
+            host='rabbitmq', port=5672, #TODO: Change to environment variables
+            credentials=pika.PlainCredentials('guest', 'guest') #TODO: Change to secure credentials
         )
     )
 
