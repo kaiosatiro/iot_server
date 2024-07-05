@@ -1,4 +1,4 @@
-# This module contains the "business logic" of the logging service. 
+# This module contains the "business logic" of the logging service.
 # It is responsible for handling the log messages pulled from the queue.
 
 from __future__ import annotations
@@ -15,22 +15,22 @@ class Handler(ABC):
     @abstractmethod
     def handle_message(self, msg, properties) -> None:
         pass
-    
+
 
 class HandlerManager(Handler):
-    def __init__(self, db_manager = DBManager | None):
+    def __init__(self, db_manager=DBManager | None):
         self.db_manager = db_manager
         if db_manager is None:
             logger.error("DBManager object is required")
             raise ValueError("DBManager object is required")
-        
+
         self.handlers = {
-            "logs_iot": HandlerLogsIoT( #TODO strongly cople, and data hardcoded, must be refactored to config files maybe?
+            "logs_iot": HandlerLogsIoT(  # TODO: strongly cople, and data hardcoded, must be refactored to config files maybe?
                 db_local=self.db_manager.get_local(),
                 # db_remote=self.db_manager.get_remote()
             )
         }
-    
+
     def handle_message(self, msg, properties):
         # logger.debug(f"Handling message: {msg}")
         self.handlers["logs_iot"].handle_message(msg.decode('utf-8'))

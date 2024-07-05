@@ -16,7 +16,7 @@ class DB(ABC):
     @abstractmethod
     def save(self, data, *args, **kwargs):
         pass
-    
+
     @abstractmethod
     def set_origin(self, origin):
         pass
@@ -31,11 +31,12 @@ class DBManager(ABC):
     def get_remote(self) -> DB:
         pass
 
+
 # DB Object Factory
-class DataManager(DBManager):    
+class DataManager(DBManager):
     def get_local(self) -> DB:
         return LocalData()
-    
+
     def get_remote(self) -> DB:
         return RemoteData()
 
@@ -43,29 +44,29 @@ class DataManager(DBManager):
 class LocalData(DB):
     def __init__(self, origin='Unknown'):
         self.path = LocalData.path_dir()
-        self.current_date = datetime.now().strftime("%Y-%m-%d") #TODO: maybe a scheduler ?
+        self.current_date = datetime.now().strftime("%Y-%m-%d")  # TODO: maybe a scheduler ?
         self.origin = origin
-    
+
     def save(self, data):
         logger.debug(f"Saving data locally: {data}")
-        with open(f"{self.path}{self.current_date}_{self.origin}.log", "a") as f: #TODO: NEED to add size control here
+        with open(f"{self.path}{self.current_date}_{self.origin}.log", "a") as f:  # TODO: NEED to add size control here
             f.write(f"{data}\n")
-    
+
     def set_current_date(self):
         logger.debug("Setting current date")
         self.current_date = datetime.now().strftime("%Y-%m-%d")
-    
+
     def set_origin(self, origin):
         logger.info(f"Setting origin: {origin}")
         self.origin = origin
 
     @staticmethod
     def path_dir():
-        path = getenv("LOG_INFO_LOCAL_PATH")
+        path = getenv("LOG_INFO_LOCAL_PATH")  # TODO: Use a PosixPath?
         if path is None:
             return "/tmp/"
         return path
-        
+
 
 class RemoteData(DB):
     def save(self, data):

@@ -15,13 +15,14 @@ from src.data import get_db_manager
 
 logger = logging.getLogger(__name__)
 
+
 # Function to setup logging configuration from a JSON
 def setup_logging():
     config_file = Path("logger-config.json")
     with open(config_file) as f_init:
         config = json_load(f_init)
-    
-    #TODO: Add the basic config in case the JSON file does not have it
+
+    # TODO: Add the basic config in case the JSON file does not have it
 
     logging.config.dictConfig(config)
 

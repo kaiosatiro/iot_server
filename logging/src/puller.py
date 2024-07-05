@@ -26,8 +26,8 @@ def puller(msg_handler: Handler):
     logger.debug("Connecting to RabbitMQ server")
     connection = pika.BlockingConnection(
         pika.ConnectionParameters(
-            host='rabbitmq', port=5672, #TODO: Change to environment variables
-            credentials=pika.PlainCredentials('guest', 'guest') #TODO: Change to secure credentials
+            host='rabbitmq', port=5672,  # TODO: Change to environment variables
+            credentials=pika.PlainCredentials('guest', 'guest')  # TODO: Change to secure credentials
         )
     )
 
