@@ -5,8 +5,8 @@ services:
       - internal_network
     # ports:
       # - "80:80"
-    environment:
-      - LOG_INFO_LOCAL_PATH=${LOG_INFO_LOCAL_PATH}
+    # environment:
+    #   - LOG_INFO_LOCAL_PATH=${LOG_INFO_LOCAL_PATH}
     depends_on:
       rabbitmq:
         condition: service_healthy
