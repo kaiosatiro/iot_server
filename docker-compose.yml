@@ -12,7 +12,7 @@ services:
         condition: service_healthy
         restart: true
     volumes:
-      - db-data:${LOG_INFO_LOCAL_PATH}
+      - db-data:/tmp/
 
   rabbitmq:
     image: rabbitmq:3.13-management
