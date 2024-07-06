@@ -42,4 +42,6 @@ jobs:
         run: |
             ssh Target "cd iot_server &&
             git pull origin main &&
+            export LOG_INFO_LOCAL_PATH="${{ env.LOG_INFO_LOCAL_PATH }}" &&
             sudo docker compose up -d --build"
+
