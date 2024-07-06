@@ -40,4 +40,9 @@ jobs:
           END
       - name: Deploy
         run: |
-          ssh Target "sudo apt install docker.io && sudo apt install docker-compose-v2 && cd logging && git pull origin main && docker compose up -d --build"
+            ssh Target "sudo apt install docker.io && sudo apt install docker-compose-v2 &&
+            sudo systemctl reenable docker.service && sudo systemctl reenable docker.socket &&
+            sudo systemctl restart docker.service && sudo systemctl restart docker.socket &&
+            cd logging &&
+            git pull origin main &&
+            sudo docker compose up -d --build"
