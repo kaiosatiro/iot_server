@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  logging:
+    ports:
+      - "8080:80"
+    environment:
+      - LOG_INFO_LOCAL_PATH=/app/src/logs/iot-server/
+
+  rabbitmq:
+    ports:
+      - "15672:15672"

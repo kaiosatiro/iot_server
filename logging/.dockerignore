@@ -1,7 +1,8 @@
 __pycache__
 tests/__pycache__/
 .venv
-src/logs/*
+src/logs/*.txt
+src/logs/*.log
 .pytest_cache
 .dockerignore
 .gitignore
