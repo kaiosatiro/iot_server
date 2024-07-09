@@ -5,8 +5,7 @@ services:
     ports:
       - "8080:80"
     environment:
-      - LOG_INFO_LOCAL_PATH=/app/src/logs/iot-server/
-
+      - LOG_INFO_LOCAL_PATH=${LOG_INFO_LOCAL_PATH}
   rabbitmq:
     ports:
       - "15672:15672"

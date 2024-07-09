@@ -39,9 +39,11 @@ jobs:
             StrictHostKeyChecking no
           END
       - name: Deploy
+        env: 
+          LOG_INFO_LOCAL_PATH: ${{ secrets.LOG_INFO_LOCAL_PATH }}
         run: |
             ssh Target "cd iot_server &&
             git pull origin main &&
-            export LOG_INFO_LOCAL_PATH="${{ env.LOG_INFO_LOCAL_PATH }}" &&
-            sudo docker compose up -d --build"
+            echo LOG_INFO_LOCAL_PATH=${{ env.LOG_INFO_LOCAL_PATH }} > .env &&
+            sudo docker compose -f docker-compose.yml up -d --build"
 
