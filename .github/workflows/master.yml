@@ -38,9 +38,16 @@ jobs:
             LogLevel ERROR
             StrictHostKeyChecking no
           END
-      - name: Deploy
-        # env: 
-        #   LOG_INFO_LOCAL_PATH: ${{ env.LOG_INFO_LOCAL_PATH }}
+      - name: Create env file
         run: |
-            ssh Target "cd iot_server && git pull origin main && echo LOG_INFO_LOCAL_PATH=${{ env.LOG_INFO_LOCAL_PATH }} > .env && sudo docker compose -f docker-compose.yml up -d --build"
+          echo LOG_INFO_LOCAL_PATH=${{ env.LOG_INFO_LOCAL_PATH }} > .env
+      - name: Pull repository
+        run: |
+          ssh Target "cd iot_server && git pull origin main"
+      - name: Send env file
+        run: |
+          scp .env Target:iot_server/.env
+      - name: Deploy
+        run: |
+            ssh Target "cd iot_server && sudo docker compose -f docker-compose.yml up -d --build"
 
