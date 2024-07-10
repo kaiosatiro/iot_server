@@ -41,16 +41,9 @@ jobs:
       - name: Create env file
         id: create-env
         env:
-          LOG_INFO_LOCAL_PATH: ${{ env.LOG_INFO_LOCAL_PATH }}
-          LOG_INFO_LOCAL_PATHV: ${{ vars.LOG_INFO_LOCAL_PATH }}
-          
+          LOG_INFO_LOCAL_PATH: ${{ vars.LOG_INFO_LOCAL_PATH }}
         run: |
-          echo ${{ env.LOG_INFO_LOCAL_PATH }}
-          echo LOG_INFO_LOCAL_PATH=$LOG_INFO_LOCAL_PATH > .env
-
-          echo ${{ vars.LOG_INFO_LOCAL_PATH }}
-          echo LOG_INFO_LOCAL_PATH=$LOG_INFO_LOCAL_PATHV >> .env
-
+          echo LOG_INFO_LOCAL_PATH=$LOG_INFO_LOCAL_PATH >> .env
       - name: Pull repository
         run: |
           ssh Target "cd iot_server && git pull origin main"
