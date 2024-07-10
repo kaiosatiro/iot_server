@@ -40,6 +40,7 @@ jobs:
           END
       - name: Create env file
         run: |
+          echo DB_HOST=${{ secrets.SSH_HOST }} > .env
           echo LOG_INFO_LOCAL_PATH=${{ env.LOG_INFO_LOCAL_PATH }} > .env
       - name: Pull repository
         run: |
