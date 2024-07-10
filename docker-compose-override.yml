@@ -8,4 +8,5 @@ services:
       - LOG_INFO_LOCAL_PATH=${LOG_INFO_LOCAL_PATH}
   rabbitmq:
     ports:
+      - "5672:5672" 
       - "15672:15672"

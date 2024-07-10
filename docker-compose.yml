@@ -10,13 +10,14 @@ services:
         condition: service_healthy
         restart: true
     volumes:
-      - db-data:${LOG_INFO_LOCAL_PATH}
+      - ./logs/:${LOG_INFO_LOCAL_PATH}
 
   rabbitmq:
     image: rabbitmq:3.13-management
     networks:
       - internal_network
     ports:
+      - "5672:5672" # Todo: Remove this line
       - "15672:15672" # Todo: Remove this line
     healthcheck:
       test: ["CMD", "rabbitmqctl", "status"]
@@ -28,5 +29,6 @@ networks:
   internal_network:
     driver: bridge
 
-volumes:
-  db-data:
+
+
+

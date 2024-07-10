@@ -6,3 +6,4 @@ src/logs/*.log
 .pytest_cache
 .dockerignore
 .gitignore
+.ruff_cache
