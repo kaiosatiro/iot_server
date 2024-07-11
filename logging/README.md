@@ -13,8 +13,8 @@ Because the logging service is an always-active service and does not wait for re
 Here is the architecture with a description of every layer:
 
 <div style="text-align: center;">
-  <img src="/img/logging_arch.png" alt="Alt text" />
-  <img src="/img/logging_service_flow.png" alt="Alt text" />
+  <img src="/img/logging_arch.png"/>
+  <img src="/img/logging_service_flow.png"/>
 </div>
 
 No layer interferes with other layers, which will make the service more easy to maintain.
