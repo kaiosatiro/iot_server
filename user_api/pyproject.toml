@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "user-api"
+version = "0.1.0"
+description = ""
+authors = ["kaiosatiro <kaiosatiro@gmail.com>"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.111.1"
+python-logging-rabbitmq = "^2.3.0"
+pika = "^1.3.2"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.2.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

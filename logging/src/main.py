@@ -2,20 +2,16 @@
 
 from sys import exit as sysexit
 from os import _exit as os_exit
-from os import getcwd
 
 from atexit import register as atexitregister
 from json import load as json_load
 import logging.config
 import logging.handlers
 from pathlib import Path
-print(getcwd())
 
 from src.puller import puller
 from src.handler import get_handler
 from src.data import get_db_manager
-
-logger = logging.getLogger(__name__)
 
 
 # Function to setup logging configuration from a JSON
@@ -37,7 +33,8 @@ def setup_logging():
 
 if __name__ == '__main__':
     setup_logging()
-    logging.basicConfig()
+    logger = logging.getLogger(__name__)
+    # logging.basicConfig()
     logger.info("Starting the logging service")
 
     db = get_db_manager()

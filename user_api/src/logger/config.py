@@ -1,10 +1,10 @@
-{
+LOG_CONFIG = {
     "version": 1,
-    "disable_existing_loggers": false,
+    "disable_existing_loggers": 'false',
     "formatters": {
         "simple": {
-            "format": "[%(levelname)s|%(module)s|L%(lineno)d] %(asctime)s: %(message)s",
-            "datefmt": "%Y-%m-%dT%H:%M:%S%z"
+            "format": "USER-API [%(levelname)s |%(module)s| L%(lineno)d] %(asctime)s: %(message)s",
+            "datefmt": "%Y-%m-%d %H:%M:%S"
         }
     },
     "handlers": {
@@ -14,21 +14,23 @@
             "formatter": "simple",
             "stream": "ext://sys.stderr"
         },
-    "file": {
-        "class": "logging.handlers.RotatingFileHandler",
+    "queue": {
+        "class": "python_logging_rabbitmq.RabbitMQHandler",
         "level": "INFO",
         "formatter": "simple",
-        "filename": "src/logs/logging_service_logs.log",
-        "maxBytes": 10000,
-        "backupCount": 3
+        "exchange":'logs',
+        "routing_key_formatter":lambda key: 'log.userapi',
+        "declare_exchange":True,
+        # "record_fields":['app', 'levelname', 'module', 'asctime', 'msg'],
+        # "fields":{'app': 'USERAPI'},
         },
     "queue_handler":{
         "class": "logging.handlers.QueueHandler",
         "handlers": [
             "stderr",
-            "file"
+            "queue"
             ],
-        "respect_handler_level": true
+        "respect_handler_level": 'true'
         }
     },
     "loggers": {

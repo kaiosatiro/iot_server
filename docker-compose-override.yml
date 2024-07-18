@@ -1,12 +1,20 @@
-version: '3.8'
-
+#FOR LOCAL DEVELOPMENT
 services:
-  logging:
+  db:
+    restart: "no"
     ports:
-      - "8080:80"
-    environment:
-      - LOG_INFO_LOCAL_PATH=${LOG_INFO_LOCAL_PATH}
+      - "5432:5432"
+
+  adminer:
+    restart: "no"
+    ports:
+      - "8080:8080"
+
   rabbitmq:
     ports:
       - "5672:5672" 
       - "15672:15672"
+
+
+
+
