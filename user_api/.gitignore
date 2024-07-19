@@ -8,3 +8,5 @@ src/logger/__pycache__/
 tests/load_test.py
 .ruff_cache
 src/del.py
+*.db
+src/test.py

@@ -8,3 +8,5 @@ if __name__ == '__main__':
     logger = getLogger(__name__)
     # logging.basicConfig()
     logger.info("Starting the User API service")
+
+# postgresurl= "postgresql://postgres:postgres@localhost:5432/app"

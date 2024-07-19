@@ -56,6 +56,7 @@ CREATE TABLE sites (
 CREATE TABLE devices (
   id SERIAL PRIMARY KEY,
   type_id INTEGER NOT NULL,
+  site_id INTEGER NOT NULL,
   name VARCHAR NOT NULL,
   model VARCHAR,
   description VARCHAR,
@@ -63,6 +64,7 @@ CREATE TABLE devices (
   update_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 
   FOREIGN KEY (type_id) REFERENCES device_types(id) ON DELETE CASCADE
+  FOREIGN KEY (site_id) REFERENCES sites_types(id) ON DELETE CASCADE
 );
 
 CREATE TABLE device_types (
@@ -73,17 +75,6 @@ CREATE TABLE device_types (
   update_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-CREATE TABLE site_devices (
-  site_id INTEGER,
-  device_id INTEGER,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  update_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-  
-  PRIMARY KEY (site_id, device_id),
-  FOREIGN KEY (site_id) REFERENCES sites(id) ON DELETE CASCADE,
-  FOREIGN KEY (device_id) REFERENCES devices(id) ON DELETE CASCADE
-);
-
 CREATE TABLE messages (
   id SERIAL PRIMARY KEY,
   device_id INTEGER,
@@ -92,14 +83,20 @@ CREATE TABLE messages (
   FOREIGN KEY (device_id) REFERENCES devices(id)
 );
 
-
--- Table permissions {
---   id integer [primary key]
---   permission_name varchar [not null, unique]
---   description varchar
---   created_at timestamp
---   update_at timestamp
--- }
+Table permissions {
+  id integer [primary key]
+  permission_name varchar [not null, unique]
+  description varchar
+  created_at timestamp
+  update_at timestamp
+}
+Table permissions {
+  id integer [primary key]
+  permission_name varchar [not null, unique]
+  description varchar
+  created_at timestamp
+  update_at timestamp
+}
 
 -- Ref: role_permissions.role_id > roles.id
 -- Ref: role_permissions.permission_id > permissions.id
@@ -134,6 +131,7 @@ CREATE TABLE messages (
 --   created_at timestamp
 --   update_at timestamp
 -- }
+-- Ref: sites.user_id > users.id 
 
 -- Table sites {
 --   id integer [primary key]
@@ -144,21 +142,12 @@ CREATE TABLE messages (
 --   update_at timestamp
 -- }
 
--- Ref: sites.user_id > users.id 
-
--- Table siteDevices {
---   site_id integer [primary key, not null]
---   device_id integer [primary key, not null]
---   created_at timestamp 
---   update_at timestamp
--- }
-
--- Ref: siteDevices.site_id > sites.id 
--- Ref: siteDevices.device_id - devices.id
+-- Ref: sites.id < devices.site_id 
 
 -- Table devices {
 --   id integer [primary key]
 --   type_id integer [not null]
+--   site_id integer [not null]
 --   name varchar [not null]
 --   description varchar 
 --   created_at timestamp 
@@ -183,5 +172,4 @@ CREATE TABLE messages (
 -- }
 
 -- Ref: messages.device_id > devices.id
-
 

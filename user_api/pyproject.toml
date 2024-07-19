@@ -11,6 +11,8 @@ python = "^3.12"
 fastapi = "^0.111.1"
 python-logging-rabbitmq = "^2.3.0"
 pika = "^1.3.2"
+sqlmodel = "^0.0.20"
+psycopg2-binary = "^2.9.9"
 
 
 [tool.poetry.group.dev.dependencies]
