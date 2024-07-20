@@ -1,6 +1,16 @@
 from sqlmodel import Session, select
 
-from .models import UserUpdate, UserCreate, User
+from .models import (
+    UserUpdate, 
+    UserCreate, 
+    User,
+    Site,
+    SiteCreate,
+    SiteUpdate,
+    Device,
+    DeviceCreate,
+    DeviceUpdate,
+)
 from .core.security import get_password_hash
 
 
@@ -41,3 +51,106 @@ def update_password(*, db: Session, user: User, password: str) -> User:
     db.commit()
     db.refresh(user)
     return user
+
+
+# -------------------------- SITE -----------------------------------
+def create_site(*, db: Session, site_input: SiteCreate, user_id: int) -> Site:
+    site = Site.model_validate(site_input, update={"user_id": user_id})
+    db.add(site)
+    db.commit()
+    db.refresh(site)
+    return site
+
+def update_site(*, db: Session, db_site: Site, site_new_input: SiteUpdate) -> Site:
+    site_data = site_new_input.model_dump(exclude_unset=True)
+    db_site.sqlmodel_update(site_data)
+    db.add(db_site)
+    db.commit()
+    db.refresh(db_site)
+    return db_site
+
+def get_site_by_name(*, db: Session, name: str) -> Site | None:
+    statement = select(Site).where(Site.name == name)
+    session_site = db.exec(statement).first()
+    return session_site
+
+def get_sites_by_user_id(*, db: Session, user_id: int) -> list[Site]:
+    statement = select(Site).where(Site.user_id == user_id)
+    session_sites = db.exec(statement).all()
+    return session_sites
+
+def delete_site(*, db: Session, site: Site) -> None:
+    db.delete(site)
+    db.commit()
+    return None
+
+def delete_sites_from_user(*, db: Session, user_id: int) -> None:
+    statement = select(Site).where(Site.user_id == user_id)
+    session_sites = db.exec(statement).all()
+    for site in session_sites:
+        db.delete(site)
+    db.commit()
+    return None
+
+
+# -------------------------- DEVICE -----------------------------------
+def create_device(*, db: Session, device_input: DeviceCreate) -> Device:
+    device = Device.model_validate(device_input)
+    db.add(device)
+    db.commit()
+    db.refresh(device)
+    return device
+
+def update_device(*, db: Session, db_device: Device, device_new_input: DeviceUpdate) -> Device:
+    device_data = device_new_input.model_dump(exclude_unset=True)
+    db_device.sqlmodel_update(device_data)
+    db.add(db_device)
+    db.commit()
+    db.refresh(db_device)
+    return db_device
+
+def get_device_by_name(*, db: Session, name: str) -> Device | None:
+    statement = select(Device).where(Device.name == name)
+    session_device = db.exec(statement).first()
+    return session_device
+
+def get_devices_by_type(*, db: Session, type: str, user_id: int) -> list[Device]:
+    statement = select(Device).where(Device.type == type, Device.user_id == user_id)
+    session_devices = db.exec(statement).all()
+    return session_devices
+
+def get_devices_by_model(*, db: Session, model: str, user_id: int) -> list[Device]:
+    statement = select(Device).where(Device.model == model, Device.user_id == user_id)
+    session_devices = db.exec(statement).all()
+    return session_devices
+
+def get_devices_by_user_id(*, db: Session, user_id: int) -> list[Device]:
+    statement = select(Device).where(Device.user_id == user_id)
+    session_devices = db.exec(statement).all()
+    return session_devices
+
+def get_devices_by_site_id(*, db: Session, site_id: int) -> list[Device]:
+    statement = select(Device).where(Device.site_id == site_id)
+    session_devices = db.exec(statement).all()
+    return session_devices
+
+def delete_devices_from_user(*, db: Session, user_id: int) -> None:
+    statement = select(Device).where(Device.user_id == user_id)
+    session_devices = db.exec(statement).all()
+    for device in session_devices:
+        db.delete(device)
+    db.commit()
+    return None
+
+def delete_devices_per_site_id(*, db: Session, site_id: int) -> None:
+    statement = select(Device).where(Device.site_id == site_id)
+    session_devices = db.exec(statement).all()
+    for device in session_devices:
+        db.delete(device)
+    db.commit()
+    return None
+
+def delete_device(*, db: Session, device: Device) -> None:
+    db.delete(device)
+    db.commit()
+    return None

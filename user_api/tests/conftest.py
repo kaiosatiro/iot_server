@@ -4,7 +4,6 @@ import pytest
 from sqlmodel import Session, SQLModel, create_engine
 from sqlmodel.pool import StaticPool
 
-from src.models import User
 from tests.utils.utils import random_email, random_lower_string
 
 
@@ -17,11 +16,27 @@ def session_fixture() -> Generator[Session, None, None]:
     with Session(engine) as session:
         yield session
 
-@pytest.fixture(name="user_fixture")
+@pytest.fixture(name="userfix")
 def user_fixture() -> dict:
     return {
         "email": random_email(),
         "username": random_lower_string(),
         "password": random_lower_string(),
         "about": random_lower_string(),
+    }
+
+@pytest.fixture(name="sitefix")
+def site_fixture() -> dict:
+    return {
+        "name": random_lower_string(),
+        "description": random_lower_string(),
+    }
+
+@pytest.fixture(name="devicefix")
+def device_fixture() -> dict:
+    return {
+        "name": random_lower_string(),
+        "model": random_lower_string(),
+        "type": random_lower_string(),
+        "description": random_lower_string(),
     }

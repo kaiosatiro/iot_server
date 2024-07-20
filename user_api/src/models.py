@@ -18,13 +18,25 @@ class BaseModel(SQLModel):
         sa_column_kwargs={"onupdate": sa.func.now(), "server_default": sa.func.now()},
     )
 
+
 # --------------------------- DEVICE MODELS ----------------------------
-class Device(BaseModel, table=True):
+class DeviceBase(SQLModel):
     name: str
     model: str | None = None
     type: str | None = None
     description: str | None = None
 
+
+class DeviceCreate(DeviceBase):
+    user_id: int
+    site_id: int
+
+
+class DeviceUpdate(DeviceBase):
+    name: str | None = None
+
+
+class Device(DeviceBase, BaseModel, table=True):
     user_id: int = Field(foreign_key="user.id", nullable=False)
     user: "User" = Relationship(back_populates='devices')
 
@@ -33,8 +45,8 @@ class Device(BaseModel, table=True):
 
     messages: list["Message"] = Relationship(back_populates='device')
 
-# --------------------------- MESSAGE MODELS ---------------------------
 
+# --------------------------- MESSAGE MODELS ---------------------------
 class Message(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)  # index=False?
     message: str #nullable=False
@@ -52,16 +64,27 @@ class Message(SQLModel, table=True):
         ) 
     device: "Device" = Relationship(back_populates='messages')
 
-# --------------------------- SITE MODELS ------------------------------
 
-class Site(BaseModel, table=True):
+# --------------------------- SITE MODELS ------------------------------
+class SiteBase(SQLModel):
     name: str = Field(nullable=False)
     description: str | None = None
 
+
+class SiteCreate(SiteBase):
+    pass
+
+
+class SiteUpdate(SiteBase):
+    name: str | None = None
+
+
+class Site(SiteBase, BaseModel, table=True):
     user_id: int = Field(foreign_key="user.id", nullable=False)
     user: "User" = Relationship(back_populates='sites')
 
     devices: list["Device"] = Relationship(back_populates='site')
+
 
 # --------------------------- USER MODELS -----------------------------
 class UserBase(SQLModel):
@@ -78,7 +101,6 @@ class UserCreate(UserBase):
 
 class UserUpdate(UserBase):
     email: str | None = None
-    username: str | None = None
 
 
 class UpdatePassword(SQLModel):
