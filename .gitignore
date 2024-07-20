@@ -3,3 +3,4 @@
 logs/*
 .pytest_cache/
 .venv/
+doc/schema.sql

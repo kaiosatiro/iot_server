@@ -1,5 +1,5 @@
 __pycache__
-tests/__pycache__/
+
 .venv
 src/logs/*.txt
 src/logs/*.log
@@ -7,4 +7,17 @@ src/logs/*.log
 .dockerignore
 .gitignore
 .ruff_cache
+src/test.py
+.env
+src/logs/*
+*/__pycache__/
+*/*/__pycache__/
+*/*/__pycache__/
+*/*/*/__pycache__/
+*/*/*/*/__pycache__/
+.pytest_cache
+tests/load_test.py
+.ruff_cache
+src/del.py
+*.db
 src/test.py
