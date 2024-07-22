@@ -9,6 +9,7 @@ from src.models import (
 )
 from src import crud
 
+
 def test_create_device(db: Session, userfix: dict, sitefix: dict, devicefix) -> None:
     user_in = UserCreate(**userfix)
     site_in = SiteCreate(**sitefix)
@@ -198,4 +199,4 @@ def test_delete_device(db: Session, userfix: dict, sitefix: dict, devicefix) -> 
     crud.delete_device(db=db, device=device)
 
     assert not crud.get_device_by_name(db=db, name=devicefix["name"])
-
+    assert crud.get_devices_by_user_id(db=db, user_id=user.id) == []

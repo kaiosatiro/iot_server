@@ -39,7 +39,7 @@ if __name__ == '__main__':
 # - DELETE /devices/sites/{siteId} - 204 No Content | 404 Not Found
 
 # Messages:
-# - GET /messages/{deviceId}?from=from&to=to&all=true - 200 OK | 404 Not Found
+# - GET /messages/{deviceId}?from=from&to=to&limit=limit - 200 OK | 404 Not Found
 # - DELETE /messages/{messageId} - 204 No Content | 404 Not Found
 # - DELETE /messages/devices/{deviceId}?from=from&to=to&all=true - 204 OK | 404 Not Found
 

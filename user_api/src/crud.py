@@ -1,15 +1,18 @@
+from datetime import datetime, timedelta
+
 from sqlmodel import Session, select
 
 from .models import (
-    UserUpdate, 
-    UserCreate, 
     User,
+    UserUpdate, 
+    UserCreate,
     Site,
     SiteCreate,
     SiteUpdate,
     Device,
     DeviceCreate,
     DeviceUpdate,
+    Message,
 )
 from .core.security import get_password_hash
 
@@ -152,5 +155,68 @@ def delete_devices_per_site_id(*, db: Session, site_id: int) -> None:
 
 def delete_device(*, db: Session, device: Device) -> None:
     db.delete(device)
+    db.commit()
+    return None
+
+
+# -------------------------- MESSAGE -----------------------------------
+def get_message_by_id(*, db: Session, message_id: int) -> Message | None:
+    statement = select(Message).where(Message.id == message_id)
+    session_message = db.exec(statement).first()
+    return session_message
+
+def get_messages(
+        *, db: Session,
+        device_id: int,
+        start_date: str = datetime.now() - timedelta(hours=24),
+        end_date: str = datetime.now(),
+        limit: int = 100,
+        offset: int = 0
+) -> list[Message]:
+    """
+    By Period and Device ID
+    Defaut: Period of 24 hours
+    Format: '2024-07-22 13:00:44' %Y-%m-%d %H:%M:%S,
+    """
+    statement = select(Message).where(
+        Message.created_on >= start_date.strftime('%Y-%m-%d %H:%M:%S'),
+        Message.created_on <= end_date.strftime('%Y-%m-%d %H:%M:%S')
+    ).offset(offset).limit(limit)
+    session_messages = db.exec(statement).all()
+    return session_messages
+
+def delete_message(*, db: Session, message: Message) -> bool:
+    db.delete(message)
+    db.commit()
+    return True
+
+def delete_messages_list(*, db: Session, message_ids: list[int]) -> None:
+    for message_id in message_ids:
+        statement = select(Message).where(Message.id == message_id)
+        message = db.exec(statement).first()
+        if message:
+            db.delete(message)
+    db.commit()
+    return None
+
+def delete_messages_by_period(
+        *, db: Session, 
+        device_id: int, 
+        start_date: str = datetime.now() - timedelta(hours=24), 
+        end_date: str
+) -> None:
+    """
+    By Period and Device ID
+    Defaut: Period of 24 hours
+    Format: '2024-07-22 13:00:44' %Y-%m-%d %H:%M:%S,
+    """
+    statement = select(Message).where(
+        Message.device_id == device_id,
+        Message.created_on >= start_date,
+        Message.created_on <= end_date
+    )
+    session_messages = db.exec(statement).all()
+    for message in session_messages:
+        db.delete(message)
     db.commit()
     return None

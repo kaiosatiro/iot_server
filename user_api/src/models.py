@@ -47,12 +47,21 @@ class Device(DeviceBase, BaseModel, table=True):
 
 
 # --------------------------- MESSAGE MODELS ---------------------------
+class MessageBase(SQLModel):
+    message: str 
+    device_id: int
+
+
+class MessageCreate(MessageBase):
+    pass
+
+
 class Message(SQLModel, table=True):
-    id: int | None = Field(default=None, primary_key=True)  # index=False?
+    id: int | None = Field(default=None, primary_key=True, index=False)  # index=False?
     message: str #nullable=False
     created_on: datetime | None = Field(
         default=None,
-        sa_type=sa.DateTime(timezone=True),
+        sa_type=sa.DateTime(timezone=True), # timezone=True
         sa_column_kwargs={"server_default": sa.func.now()},
         nullable=False,
     )
@@ -117,9 +126,6 @@ class User(UserBase, BaseModel, table=True):
 
 
 
-
-
-
 # class UserRoleLink(SQLModel, table=True):
 #     user_id: int | None = Field(default=None, foreign_key="user.id", primary_key=True)
 #     role_id: int | None = Field(default=None, foreign_key="role.id", primary_key=True)
@@ -142,3 +148,79 @@ class User(UserBase, BaseModel, table=True):
 #     description: str | None = None
 
 #     roles: list["Role"] = Relationship(back_populates='permissions', link_model=RolePermissionLink)
+
+
+if __name__ == "__main__":
+    from sqlmodel import create_engine, Session, select
+    from sqlmodel.pool import StaticPool
+    from datetime import datetime, timedelta
+
+    engine = create_engine(
+        "sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool
+        , echo=True
+    )
+    SQLModel.metadata.create_all(engine)
+    with Session(engine) as session:
+        user_in = UserCreate(
+            email="random_email()",
+            username="random_lower_string()",
+            password="random_lower_string()",
+            about="random_lower_string()",
+            )
+        user = User.model_validate(user_in, update={"hashed_password": "random_lower"})
+        session.add(user)
+        session.commit()
+        session.refresh(user)
+                
+        site_in = SiteCreate(
+            name="random_lower_string()",
+            description="random_lower_string()",
+            )
+        site = Site.model_validate(site_in, update={"user_id": user.id})
+        session.add(site)
+        session.commit()
+        session.refresh(site)
+
+        device_in = DeviceCreate(
+            name="random_lower_string()",
+            model="random_lower_string()",
+            type="random_lower_string()",
+            description="random_lower_string()",           
+            user_id=user.id, 
+            site_id=site.id
+            )
+        
+        device = Device.model_validate(device_in)
+        session.add(device)
+        session.commit()
+        session.refresh(device)
+
+        messages = []
+        for _ in range(1):
+            message = MessageCreate(message="random_lower_string()", device_id=device.id)
+            message_in = Message.model_validate(message)
+            messages.append(message_in)
+
+        session.add_all(messages)
+        session.commit()
+
+
+        yesterday = datetime.now() - timedelta(hours=24)
+        now = datetime.now() + timedelta(hours=24)
+        print("*******")
+        print(yesterday)
+        print(now)
+        print(sa.func.now())
+        print("*******")
+
+        # statement = select(Message).where(
+        #     User.id == user.id)
+        # session_messages = session.exec(statement).all()
+        statement = select(Message).where(
+            Message.created_on >= yesterday.strftime('%Y-%m-%d %H:%M:%S'), Message.created_on <= now.strftime('%Y-%m-%d %H:%M:%S')
+        )
+        session_messages = session.exec(statement).all()
+        print(session_messages)
+
+
+
