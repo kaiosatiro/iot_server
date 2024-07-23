@@ -169,7 +169,7 @@ def get_messages(
         *, db: Session,
         device_id: int,
         start_date: str = datetime.now() - timedelta(hours=24),
-        end_date: str = datetime.now(),
+        end_date: str = datetime.now() + timedelta(hours=1),
         limit: int = 100,
         offset: int = 0
 ) -> list[Message]:
@@ -179,6 +179,7 @@ def get_messages(
     Format: '2024-07-22 13:00:44' %Y-%m-%d %H:%M:%S,
     """
     statement = select(Message).where(
+        Message.device_id == device_id,
         Message.created_on >= start_date.strftime('%Y-%m-%d %H:%M:%S'),
         Message.created_on <= end_date.strftime('%Y-%m-%d %H:%M:%S')
     ).offset(offset).limit(limit)

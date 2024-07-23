@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlmodel import SQLModel, Field, Relationship
+from sqlmodel import SQLModel, Field, Relationship, delete
 import sqlalchemy as sa
 
 
@@ -8,13 +8,13 @@ class BaseModel(SQLModel):
     id: int | None = Field(default=None, primary_key=True)
     created_on: datetime | None = Field(
         default=None,
-        sa_type=sa.DateTime(timezone=True),
+        sa_type=sa.TIMESTAMP(timezone=True),
         sa_column_kwargs={"server_default": sa.func.now()},
         nullable=False,
     )
     updated_on: datetime | None = Field(
         default=None,
-        sa_type=sa.DateTime(timezone=True),
+        sa_type=sa.TIMESTAMP(timezone=True),
         sa_column_kwargs={"onupdate": sa.func.now(), "server_default": sa.func.now()},
     )
 
@@ -37,13 +37,13 @@ class DeviceUpdate(DeviceBase):
 
 
 class Device(DeviceBase, BaseModel, table=True):
-    user_id: int = Field(foreign_key="user.id", nullable=False)
+    user_id: int = Field(foreign_key="user.id", nullable=False, ondelete="CASCADE")
     user: "User" = Relationship(back_populates='devices')
 
-    site_id: int = Field(foreign_key="site.id", nullable=False)
+    site_id: int = Field(foreign_key="site.id", nullable=False, ondelete="CASCADE")
     site: "Site" = Relationship(back_populates='devices')
 
-    messages: list["Message"] = Relationship(back_populates='device')
+    messages: list["Message"] = Relationship(back_populates='device', cascade_delete=True)
 
 
 # --------------------------- MESSAGE MODELS ---------------------------
@@ -61,7 +61,7 @@ class Message(SQLModel, table=True):
     message: str #nullable=False
     created_on: datetime | None = Field(
         default=None,
-        sa_type=sa.DateTime(timezone=True), # timezone=True
+        sa_type=sa.TIMESTAMP(timezone=True),
         sa_column_kwargs={"server_default": sa.func.now()},
         nullable=False,
     )
@@ -69,7 +69,8 @@ class Message(SQLModel, table=True):
     device_id: int = Field(
         foreign_key="device.id",
         nullable=False,
-        index=True
+        index=True,
+        ondelete="CASCADE"
         ) 
     device: "Device" = Relationship(back_populates='messages')
 
@@ -89,10 +90,10 @@ class SiteUpdate(SiteBase):
 
 
 class Site(SiteBase, BaseModel, table=True):
-    user_id: int = Field(foreign_key="user.id", nullable=False)
+    user_id: int = Field(foreign_key="user.id", nullable=False, ondelete="CASCADE")
     user: "User" = Relationship(back_populates='sites')
 
-    devices: list["Device"] = Relationship(back_populates='site')
+    devices: list["Device"] = Relationship(back_populates='site', cascade_delete=True)
 
 
 # --------------------------- USER MODELS -----------------------------
@@ -120,8 +121,8 @@ class UpdatePassword(SQLModel):
 class User(UserBase, BaseModel, table=True):
     hashed_password: str
 
-    devices: list["Device"] = Relationship(back_populates='user')
-    sites: list["Site"] = Relationship(back_populates='user')
+    devices: list["Device"] = Relationship(back_populates='user', cascade_delete=True)
+    sites: list["Site"] = Relationship(back_populates='user', cascade_delete=True)
     # roles: list["Role"] = Relationship(back_populates='users', link_model=UserRoleLink)
 
 
@@ -155,14 +156,25 @@ if __name__ == "__main__":
     from sqlmodel.pool import StaticPool
     from datetime import datetime, timedelta
 
+    DATABASE_URL = "postgresql://postgres:postgres@localhost:5432/app"
+
     engine = create_engine(
-        "sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool
-        , echo=True
+        DATABASE_URL, echo=True
     )
+
+    SQLModel.metadata.drop_all(engine)
     SQLModel.metadata.create_all(engine)
     with Session(engine) as session:
+        session.exec(select(1))
+
+    # engine = create_engine(
+    #     "sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool
+    #     , echo=True
+    # )
+    # SQLModel.metadata.create_all(engine)
+    with Session(engine) as session:
         user_in = UserCreate(
-            email="random_email()",
+            email="email",
             username="random_lower_string()",
             password="random_lower_string()",
             about="random_lower_string()",
@@ -196,7 +208,7 @@ if __name__ == "__main__":
         session.refresh(device)
 
         messages = []
-        for _ in range(1):
+        for _ in range(3):
             message = MessageCreate(message="random_lower_string()", device_id=device.id)
             message_in = Message.model_validate(message)
             messages.append(message_in)
@@ -204,23 +216,54 @@ if __name__ == "__main__":
         session.add_all(messages)
         session.commit()
 
+        # user = session.get(User, user.id)
+        # print("*******")
+        # print(user.id)
+        # print("*******")
+        # session.delete(user)
+        # session.commit()
 
-        yesterday = datetime.now() - timedelta(hours=24)
-        now = datetime.now() + timedelta(hours=24)
-        print("*******")
-        print(yesterday)
-        print(now)
-        print(sa.func.now())
-        print("*******")
+        # yesterday = datetime.now() - timedelta(hours=24)
+        # now = datetime.now()
+        # print("*******")
+        # print(yesterday)
+        # print(now)
+        # print(sa.func.now())
+        # print("*******")
 
         # statement = select(Message).where(
         #     User.id == user.id)
         # session_messages = session.exec(statement).all()
-        statement = select(Message).where(
-            Message.created_on >= yesterday.strftime('%Y-%m-%d %H:%M:%S'), Message.created_on <= now.strftime('%Y-%m-%d %H:%M:%S')
-        )
-        session_messages = session.exec(statement).all()
-        print(session_messages)
+
+        # statement = select(Message).where(
+        #     Message.created_on >= yesterday, 
+        #     Message.created_on <= now
+        # )
+        # session_messages = session.exec(statement).all()
+        # print(session_messages)
+
+    # SQLModel.metadata.drop_all(engine)
+        # statement = delete(Message)
+        # resulta = session.exec(statement)
+
+        # statement = delete(Device)
+        # resultb = session.exec(statement)
+
+        # statement = delete(Site)
+        # resultc = session.exec(statement)
+
+        # statement = delete(User)
+        # resultd = session.exec(statement)
+
+        # session.commit()
+        # print(resulta.rowcount)
+        # print(resultb.rowcount)
+        # print(resultc.rowcount)
+        # print(resultd.rowcount)
+
+
+
+
 
 
 

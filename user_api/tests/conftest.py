@@ -1,27 +1,43 @@
 from collections.abc import Generator
 
 import pytest
-from sqlmodel import Session, SQLModel, create_engine
+from sqlmodel import Session, SQLModel, create_engine, delete
 from sqlmodel.pool import StaticPool
 
 from tests.utils.utils import random_email, random_lower_string
 from src.models import (
+    User,
     UserCreate,
+    Site,
     SiteCreate,
+    Device,
     DeviceCreate,
     Message,
     MessageCreate,
 )
 from src import crud
+from src.core.db import engine, init_db
 
 @pytest.fixture(name="db", autouse=True, scope="class")
 def session_fixture() -> Generator[Session, None, None]:
-    engine = create_engine(
-        "sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool
-    )
-    SQLModel.metadata.create_all(engine)
+    # engine = create_engine(
+    #     "sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool
+    # )
+    # SQLModel.metadata.drop_all(engine)
+    # SQLModel.metadata.create_all(engine)
     with Session(engine) as session:
+        init_db(session)
         yield session
+        statement = delete(Message)
+        session.exec(statement)
+        statement = delete(Device)
+        session.exec(statement)
+        statement = delete(Site)
+        session.exec(statement)
+        statement = delete(User)
+        session.exec(statement)
+        session.commit()
+
 
 @pytest.fixture(name="userfix", scope="module")
 def user_fixture() -> dict:

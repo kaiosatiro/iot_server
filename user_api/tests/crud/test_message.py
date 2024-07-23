@@ -12,7 +12,7 @@ class TestGetMessage:
         messages = crud.get_messages(
             db=db,
             device_id=device_id,
-            end_date=datetime.now() + timedelta(hours=24)
+            end_date=datetime.now() + timedelta(minutes=2)
         )
 
         assert len(messages) == 100, f"Should be the {range_N} 'set in the fixture'"
@@ -28,7 +28,7 @@ class TestGetMessage:
         messages = crud.get_messages(
             db=db,
             device_id=device_id,
-            end_date=datetime.now() + timedelta(hours=24)
+            end_date=datetime.now() + timedelta(minutes=2)
         )
 
         msg = messages[66]
@@ -51,24 +51,22 @@ class TestGetMessage:
 
         assert len(messages) == 100, f"Should be the {range_N} 'set in the fixture'"
     
-    @pytest.mark.skip(reason="need to change the DB timezone")
     def test_get_message_by_period_of_day_using_default(self, db: Session, messagesbatchfix) -> None:
         device_id, range_N = messagesbatchfix
         messages = crud.get_messages(
             db=db,
-            user_id=device_id,
+            device_id=device_id,
         )
 
         assert len(messages) == 100, f"Should be the {range_N} 'set in the fixture'"
     
-    @pytest.mark.skip(reason="need to change the DB timezone")
     def test_get_messages_by_period_of_hour(self, db: Session, messagesbatchfix) -> None:
         device_id, range_N = messagesbatchfix
         messages = crud.get_messages(
             db=db,
             device_id=device_id,
             start_date=datetime.now() - timedelta(hours=1),
-            end_date=datetime.now()
+            end_date=datetime.now() + timedelta(minutes=2)
         )
 
         assert len(messages) == 100, f"Should be the {range_N} 'set in the fixture'"
@@ -79,7 +77,7 @@ class TestGetMessage:
             db=db,
             device_id=device_id,
             start_date=datetime.now() - timedelta(hours=24),
-            end_date=datetime.now() + timedelta(hours=24),
+            end_date=datetime.now() + timedelta(minutes=2),
             limit=range_N / 2
         )
 
@@ -91,7 +89,7 @@ class TestGetMessage:
             db=db,
             device_id=device_id,
             start_date=datetime.now() - timedelta(hours=24),
-            end_date=datetime.now() + timedelta(hours=24),
+            end_date=datetime.now() + timedelta(minutes=2),
             limit=range_N / 2,
             offset=range_N / 2
         )
@@ -102,7 +100,7 @@ class TestGetMessage:
             db=db,
             device_id=device_id,
             start_date=datetime.now() - timedelta(hours=24),
-            end_date=datetime.now() + timedelta(hours=24),
+            end_date=datetime.now() + timedelta(minutes=2),
             limit=10,
             offset=60
         )
@@ -115,7 +113,7 @@ class TestGetMessage:
             db=db,
             device_id=device_id,
             start_date=datetime.now() - timedelta(hours=24),
-            end_date=datetime.now() + timedelta(hours=24),
+            end_date=datetime.now() + timedelta(minutes=2),
             limit=range_N / 2,
             offset=range_N
         )
@@ -126,7 +124,7 @@ class TestGetMessage:
             db=db,
             device_id=device_id,
             start_date=datetime.now() - timedelta(hours=24),
-            end_date=datetime.now() + timedelta(hours=24),
+            end_date=datetime.now() + timedelta(minutes=2),
             limit=10,
             offset=range_N
         )
@@ -139,7 +137,7 @@ class TestGetMessage:
             db=db,
             device_id=device_id,
             start_date=datetime.now() - timedelta(hours=24),
-            end_date=datetime.now() + timedelta(hours=24), # Need to change this in all of them
+            end_date=datetime.now() + timedelta(minutes=2), # Need to change this in all of them
             offset=60
         )
 
@@ -152,7 +150,7 @@ class TestDeleteMessage:
         messages = crud.get_messages(
             db=db,
             device_id=device_id,
-            end_date=datetime.now() + timedelta(hours=24)
+            end_date=datetime.now() + timedelta(minutes=2)
         )
 
         assert len(messages) == 100, f"Should be the {range_N} 'set in the fixture'"
@@ -174,7 +172,7 @@ class TestDeleteMessage:
         messages = crud.get_messages(
             db=db,
             device_id=device_id,
-            end_date=datetime.now() + timedelta(hours=24)
+            end_date=datetime.now() + timedelta(minutes=2)
         )
         assert len(messages) == 98, f"Should be the {range_N - 2} 'set in the fixture' minus the 2 deleted"
     
@@ -183,7 +181,7 @@ class TestDeleteMessage:
         messages = crud.get_messages(
             db=db,
             device_id=device_id,
-            end_date=datetime.now() + timedelta(hours=24)
+            end_date=datetime.now() + timedelta(minutes=2)
         )
 
         assert len(messages) == 98, f"Should be the 98, 2 deleted in the previous test"
@@ -194,7 +192,7 @@ class TestDeleteMessage:
         messages = crud.get_messages(
             db=db,
             device_id=device_id,
-            end_date=datetime.now() + timedelta(hours=24)
+            end_date=datetime.now() + timedelta(minutes=2)
         )
 
         assert len(messages) == 73, f"Should be the 73, 2 deleted in the previous test plus the 25 deleted in this test"
@@ -204,7 +202,7 @@ class TestDeleteMessage:
         messages = crud.get_messages(
             db=db,
             device_id=device_id,
-            end_date=datetime.now() + timedelta(hours=24)
+            end_date=datetime.now() + timedelta(minutes=2)
         )
 
         assert len(messages) == 73, f"Should be the 73, 27 deleted in the previous test"
@@ -212,13 +210,13 @@ class TestDeleteMessage:
         crud.delete_messages_by_period(
             db=db, device_id=device_id, 
             start_date=datetime.now() - timedelta(hours=24), 
-            end_date=datetime.now() + timedelta(hours=24)
+            end_date=datetime.now() + timedelta(minutes=2)
         )
 
         messages = crud.get_messages(
             db=db,
             device_id=device_id,
-            end_date=datetime.now() + timedelta(hours=24)
+            end_date=datetime.now() + timedelta(minutes=2)
         )
 
         assert len(messages) == 0, f"Should be the 0, all deleted"

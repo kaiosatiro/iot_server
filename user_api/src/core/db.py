@@ -1,14 +1,33 @@
-from sqlalchemy import create_engine
-from sqlmodel import SQLModel, create_engine
+from sqlmodel import Session, create_engine, select
+from sqlmodel.pool import StaticPool
 
-# Define your database URL
-DATABASE_URL = "postgresql://postgres:postgres@localhost:5432/app"
+from src.models import (
+    User,
+    UserCreate,
+    )
+import src.crud as crud
+from src.core.config import settings
 
 
-sqlite_file_name = "database.db"
-sqlite_url = f"sqlite:///{sqlite_file_name}"
+engine = create_engine(str(settings.SQL_DATABASE_URI), poolclass=StaticPool)
 
-engine = create_engine(sqlite_url)
-
-def create_db_and_tables():
+def init_db(session: Session) -> None:
+    from sqlmodel import SQLModel
     SQLModel.metadata.create_all(engine)
+
+    user = session.exec(
+        select(User).where(User.email == settings.FIRST_SUPERUSER)
+    ).first()
+    
+    if not user:
+        user_in = UserCreate(
+            email=settings.FIRST_SUPERUSER,
+            username=settings.FIRST_SUPERUSER,
+            password=settings.FIRST_SUPERUSER_PASSWORD,
+            is_superuser=True,
+        )
+        user = crud.create_user(db=session, user_input=user_in)
+
+
+
+

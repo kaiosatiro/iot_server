@@ -2,7 +2,7 @@ import logging.config
 
 from atexit import register as atexitregister
 
-from logger.config import LOG_CONFIG
+from src.logger.config import LOG_CONFIG
 
 def setup_logging():
     logging.config.dictConfig(LOG_CONFIG)
