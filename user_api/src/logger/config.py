@@ -17,6 +17,8 @@ LOG_CONFIG = {
     "queue": {
         "class": "python_logging_rabbitmq.RabbitMQHandler",
         "level": "INFO",
+        'host': 'rabbitmq',
+        'port': "5672",
         "formatter": "simple",
         "exchange":'logs',
         "routing_key_formatter":lambda key: 'log.userapi',

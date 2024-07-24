@@ -1,0 +1,49 @@
+name: Test
+on: [pull_request, workflow_call]
+
+jobs:
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest
+      
+      - name: Build and run
+        run: |
+          make compose-dev-d
+      # Test services
+      - name: Tests - Logging service
+        run: |
+          docker compose exec -T logging bash tests-start.sh
+
+      - name: Tests - UserAPI service
+        run: |
+          docker compose exec -T userapi bash tests-start.sh
+      
+      # Cleanup
+      - name: Cleanup
+        run: |
+          make compose-down-dev
+
+  # # https://github.com/marketplace/actions/alls-green#why
+  # alls-green:  # This job does nothing and is only used for the branch protection
+  #   if: always()
+  #   needs:
+  #     - test
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Decide whether the needed jobs succeeded or failed
+  #       uses: re-actors/alls-green@release/v1
+  #       with:
+  #         jobs: ${{ toJSON(needs) }}

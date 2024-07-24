@@ -1,4 +1,5 @@
-.PHONY: install #migrations migrate run superuser update test install-pre-commit lint
+.PHONY: install run test lint #migrations migrate install-pre-commit
+
 install:
 	@echo "Installing dependencies..."
 	poetry install
@@ -7,9 +8,10 @@ install:
 # 	@echo "Installing pre-commit..."
 # 	poetry run pre-commit uninstall; poetry run pre-commit install
 
-# lint:
-# 	@echo "Running linter(pre-commit)..."
-# 	poetry run pre-commit run --all-files
+lint:
+	@echo "Running linter"
+	flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics --exclude=.venv
+	flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude=.venv
 
 # migrations:
 # 	@echo "Creating migrations..."
@@ -17,16 +19,9 @@ install:
 # migrate:
 # 	@echo "Running migrations..."
 
-# run:
-# 	@echo "Running server..."
-
-# superuser:
-# 	@echo "Creating superuser..."
-
-# up-dependencies-only:
-# 	@echo "Starting dependencies..."
-# 	test -f .env || touch .env
-# 	docker compose -f docker-compose.dev.yml up --force-recreate db
+run:
+	@echo "Running server..."
+	poetry run fastapi run src/main.py --port 8000
 
 # update: install migrate install-pre-commit;
 

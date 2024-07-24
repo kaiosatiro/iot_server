@@ -7,3 +7,4 @@ src/logs/*.log
 .dockerignore
 .gitignore
 .ruff_cache
+tests/load_test.py

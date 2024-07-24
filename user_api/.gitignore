@@ -14,3 +14,4 @@ src/del.py
 *.db
 src/test.py
 del.py
+Dockerfiletest

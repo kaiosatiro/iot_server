@@ -35,7 +35,8 @@ class Settings(BaseSettings):
             path=self.POSTGRES_DB,
         )
     
-    FIRST_SUPERUSER: str
+    FIRST_SUPERUSER_EMAIL: str
+    FIRST_SUPERUSER_NAME: str
     FIRST_SUPERUSER_PASSWORD: str
     # USERS_OPEN_REGISTRATION: bool = False
 

@@ -1,0 +1,45 @@
+name: Deploy to Staging
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # - name: Checkout
+      #   uses: actions/checkout@v4
+      - name: Test
+        run: echo "Testing..."
+
+      # - name: Configure SSH
+      #   env:
+      #     SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      #     SSH_HOST: ${{ secrets.SSH_HOST }}
+      #     SSH_USER: ${{ secrets.SSH_USER }}
+      #   run: |
+      #     mkdir -p ~/.ssh
+      #     echo "$SSH_PRIVATE_KEY" > ~/.ssh/github
+      #     chmod 600 ~/.ssh/github
+      #     cat >> ~/.ssh/config << END
+      #     Host Target
+      #       HostName $SSH_HOST
+      #       User $SSH_USER
+      #       IdentityFile ~/.ssh/github
+      #       LogLevel ERROR
+      #       StrictHostKeyChecking no
+      #     END
+      # - name: Create env file
+      #   id: create-env
+      #   env:
+      #     LOG_INFO_LOCAL_PATH: ${{ vars.LOG_INFO_LOCAL_PATH }}
+      #   run: |
+      #     echo LOG_INFO_LOCAL_PATH=$LOG_INFO_LOCAL_PATH >> .env
+      # - name: Pull repository
+      #   run: |
+      #     ssh Target "cd iot_server && git pull origin main"
+      # - name: Send env file
+      #   run: |
+      #     scp .env Target:iot_server/.env
+      # - name: Deploy
+      #   if: steps.create-env.outcome == 'success'
+      #   run: |
+      #       ssh Target "cd iot_server && sudo docker compose -f docker-compose.yml up -d --build"
+

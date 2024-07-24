@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlmodel import SQLModel, Field, Relationship, delete
+from sqlmodel import SQLModel, Field, Relationship
 import sqlalchemy as sa
 
 
@@ -21,10 +21,10 @@ class BaseModel(SQLModel):
 
 # --------------------------- DEVICE MODELS ----------------------------
 class DeviceBase(SQLModel):
-    name: str
-    model: str | None = None
-    type: str | None = None
-    description: str | None = None
+    name: str = Field(max_length=55)
+    model: str | None = Field(default=None, max_length=85)
+    type: str | None = Field(default=None, max_length=55)
+    description: str | None = Field(default=None, max_length=255)
 
 
 class DeviceCreate(DeviceBase):
@@ -48,7 +48,7 @@ class Device(DeviceBase, BaseModel, table=True):
 
 # --------------------------- MESSAGE MODELS ---------------------------
 class MessageBase(SQLModel):
-    message: str 
+    message: dict 
     device_id: int
 
 
@@ -58,7 +58,7 @@ class MessageCreate(MessageBase):
 
 class Message(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True, index=False)  # index=False?
-    message: str #nullable=False
+    message: dict = Field(nullable=False, sa_type=sa.JSON)
     created_on: datetime | None = Field(
         default=None,
         sa_type=sa.TIMESTAMP(timezone=True),
@@ -78,7 +78,7 @@ class Message(SQLModel, table=True):
 # --------------------------- SITE MODELS ------------------------------
 class SiteBase(SQLModel):
     name: str = Field(nullable=False)
-    description: str | None = None
+    description: str | None = Field(default=None, max_length=255)
 
 
 class SiteCreate(SiteBase):
@@ -99,8 +99,8 @@ class Site(SiteBase, BaseModel, table=True):
 # --------------------------- USER MODELS -----------------------------
 class UserBase(SQLModel):
     email: str = Field(unique=True, index=True) # TODO replace email str with EmailStr when sqlmodel supports it
-    username: str
-    about: str | None = None
+    username: str = Field(max_length=50)
+    about: str | None = Field(default=None, max_length=255)
     is_active: bool = True
     is_superuser: bool = False
 
@@ -209,7 +209,15 @@ if __name__ == "__main__":
 
         messages = []
         for _ in range(3):
-            message = MessageCreate(message="random_lower_string()", device_id=device.id)
+            message = MessageCreate(message={
+                "deviceId": "12345",
+                "sensorId": "humiditySensor01",
+                "timestamp": "2024-07-12T15:00:00Z",
+                "type": "humidity",
+                "unit": "percent",
+                "value": 45.2
+                },
+                device_id=device.id)
             message_in = Message.model_validate(message)
             messages.append(message_in)
 

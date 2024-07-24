@@ -85,7 +85,6 @@ def get_sites_by_user_id(*, db: Session, user_id: int) -> list[Site]:
 def delete_site(*, db: Session, site: Site) -> None:
     db.delete(site)
     db.commit()
-    return None
 
 def delete_sites_from_user(*, db: Session, user_id: int) -> None:
     statement = select(Site).where(Site.user_id == user_id)
@@ -93,7 +92,6 @@ def delete_sites_from_user(*, db: Session, user_id: int) -> None:
     for site in session_sites:
         db.delete(site)
     db.commit()
-    return None
 
 
 # -------------------------- DEVICE -----------------------------------
@@ -143,7 +141,6 @@ def delete_devices_from_user(*, db: Session, user_id: int) -> None:
     for device in session_devices:
         db.delete(device)
     db.commit()
-    return None
 
 def delete_devices_per_site_id(*, db: Session, site_id: int) -> None:
     statement = select(Device).where(Device.site_id == site_id)
@@ -151,12 +148,10 @@ def delete_devices_per_site_id(*, db: Session, site_id: int) -> None:
     for device in session_devices:
         db.delete(device)
     db.commit()
-    return None
 
 def delete_device(*, db: Session, device: Device) -> None:
     db.delete(device)
     db.commit()
-    return None
 
 
 # -------------------------- MESSAGE -----------------------------------
@@ -198,7 +193,6 @@ def delete_messages_list(*, db: Session, message_ids: list[int]) -> None:
         if message:
             db.delete(message)
     db.commit()
-    return None
 
 def delete_messages_by_period(
         *, db: Session, 
@@ -220,4 +214,3 @@ def delete_messages_by_period(
     for message in session_messages:
         db.delete(message)
     db.commit()
-    return None

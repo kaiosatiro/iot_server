@@ -20,6 +20,7 @@ pydantic-settings = "^2.3.4"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2.2"
+flake8 = "^7.1.0"
 
 [build-system]
 requires = ["poetry-core"]

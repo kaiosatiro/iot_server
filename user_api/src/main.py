@@ -1,15 +1,29 @@
 from logging import getLogger
 
-from logger.setup import setup_logging
+from fastapi import FastAPI
+
+from src.logger.setup import setup_logging
+
+setup_logging()
+logger = getLogger(__name__)
+
+app = FastAPI()
+
+@app.get("/")
+async def root():
+    logger.info("GAIUS: Hello")
+    logger.error("GAIUS: TEST")
+    return {"message": "Hello World"}
 
 
-if __name__ == '__main__':
-    setup_logging()
-    logger = getLogger(__name__)
-    # logging.basicConfig()
-    logger.info("Starting the User API service")
+# if __name__ == '__main__':
+#     setup_logging()
+#     logger = getLogger(__name__)
+#     uvicorn.run(app, host="0.0.0.0", port=8000)
+#     logger.info("Starting the User API service")
+   
+    
 
-# postgresurl= "postgresql://postgres:postgres@localhost:5432/app"
 
 
 # Users:

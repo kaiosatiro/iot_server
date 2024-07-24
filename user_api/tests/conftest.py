@@ -78,7 +78,14 @@ def messages_batch_fixture(db, userfix, sitefix, devicefix):
     messages = []
     range_number = 100
     for _ in range(range_number):
-        message = MessageCreate(message=random_lower_string(), device_id=device.id)
+        message = MessageCreate(message={
+                "deviceId": random_lower_string(),
+                "sensorId": random_lower_string(),
+                "timestamp": random_lower_string(),
+                "type": random_lower_string(),
+                "unit": random_lower_string(),
+                "value": 45.2
+                }, device_id=device.id)
         message_in = Message.model_validate(message)
         messages.append(message_in)
 
