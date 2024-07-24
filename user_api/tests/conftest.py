@@ -1,8 +1,9 @@
 from collections.abc import Generator
 
 import pytest
-from sqlmodel import Session, SQLModel, create_engine, delete
-from sqlmodel.pool import StaticPool
+from sqlmodel import Session, delete
+# from sqlmodel import SQLModel, create_engine
+# from sqlmodel.pool import StaticPool
 
 from tests.utils.utils import random_email, random_lower_string
 from src.models import (
@@ -17,6 +18,7 @@ from src.models import (
 )
 from src import crud
 from src.core.db import engine, init_db
+
 
 @pytest.fixture(name="db", autouse=True, scope="class")
 def session_fixture() -> Generator[Session, None, None]:
@@ -48,12 +50,14 @@ def user_fixture() -> dict:
         "about": random_lower_string(),
     }
 
+
 @pytest.fixture(name="sitefix", scope="module")
 def site_fixture() -> dict:
     return {
         "name": random_lower_string(),
         "description": random_lower_string(),
     }
+
 
 @pytest.fixture(name="devicefix", scope="module")
 def device_fixture() -> dict:
@@ -64,6 +68,7 @@ def device_fixture() -> dict:
         "description": random_lower_string(),
     }
 
+
 @pytest.fixture(name="messagesbatchfix", scope="class")
 def messages_batch_fixture(db, userfix, sitefix, devicefix):
     user_in = UserCreate(**userfix)
@@ -71,7 +76,7 @@ def messages_batch_fixture(db, userfix, sitefix, devicefix):
 
     site_in = SiteCreate(**sitefix)
     site = crud.create_site(db=db, site_input=site_in, user_id=user.id)
-    
+
     device_in = DeviceCreate(**devicefix, user_id=user.id, site_id=site.id)
     device = crud.create_device(db=db, device_input=device_in)
 
@@ -93,4 +98,3 @@ def messages_batch_fixture(db, userfix, sitefix, devicefix):
     db.commit()
 
     return device.id, range_number
-    

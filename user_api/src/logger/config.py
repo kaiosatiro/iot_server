@@ -8,32 +8,32 @@ LOG_CONFIG = {
         }
     },
     "handlers": {
-    "stderr": {
-            "class": "logging.StreamHandler",
-            "level": "WARNING",
-            "formatter": "simple",
-            "stream": "ext://sys.stderr"
-        },
-    "queue": {
-        "class": "python_logging_rabbitmq.RabbitMQHandler",
-        "level": "INFO",
-        'host': 'rabbitmq',
-        'port': "5672",
-        "formatter": "simple",
-        "exchange":'logs',
-        "routing_key_formatter":lambda key: 'log.userapi',
-        "declare_exchange":True,
-        # "record_fields":['app', 'levelname', 'module', 'asctime', 'msg'],
-        # "fields":{'app': 'USERAPI'},
-        },
-    "queue_handler":{
-        "class": "logging.handlers.QueueHandler",
-        "handlers": [
-            "stderr",
-            "queue"
-            ],
-        "respect_handler_level": 'true'
-        }
+            "stderr": {
+                    "class": "logging.StreamHandler",
+                    "level": "WARNING",
+                    "formatter": "simple",
+                    "stream": "ext://sys.stderr"
+                },
+            "queue": {
+                "class": "python_logging_rabbitmq.RabbitMQHandler",
+                "level": "INFO",
+                'host': 'rabbitmq',
+                'port': "5672",
+                "formatter": "simple",
+                "exchange": 'logs',
+                "routing_key_formatter": lambda key: 'log.userapi',
+                "declare_exchange": True,
+                # "record_fields":['app', 'levelname', 'module', 'asctime', 'msg'],
+                # "fields":{'app': 'USERAPI'},
+                },
+            "queue_handler": {
+                "class": "logging.handlers.QueueHandler",
+                "handlers": [
+                    "stderr",
+                    "queue"
+                    ],
+                "respect_handler_level": 'true'
+                }
     },
     "loggers": {
         "root": {

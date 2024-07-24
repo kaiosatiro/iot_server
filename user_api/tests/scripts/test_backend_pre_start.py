@@ -1,13 +1,13 @@
 from unittest.mock import MagicMock, patch
 
-from sqlmodel import select, Session
+# from sqlmodel import select, Session
 
-from src.backend_pre_start import init, logger
+from src.backend_pre_start import init
 
 
 def test_init_successful_connection() -> None:
     engine_mock = MagicMock()
-    
+
     session_mock = MagicMock()
     exec_mock = MagicMock(return_value=True)
     session_mock.configure_mock(**{"exec.return_value": exec_mock})

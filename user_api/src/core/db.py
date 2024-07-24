@@ -11,6 +11,7 @@ from src.core.config import settings
 
 engine = create_engine(str(settings.SQL_DATABASE_URI), poolclass=StaticPool)
 
+
 def init_db(session: Session) -> None:
     from sqlmodel import SQLModel
     SQLModel.metadata.create_all(engine)
@@ -18,7 +19,7 @@ def init_db(session: Session) -> None:
     user = session.exec(
         select(User).where(User.email == settings.FIRST_SUPERUSER_EMAIL)
     ).first()
-    
+
     if not user:
         user_in = UserCreate(
             email=settings.FIRST_SUPERUSER_EMAIL,
@@ -27,7 +28,3 @@ def init_db(session: Session) -> None:
             is_superuser=True,
         )
         user = crud.create_user(db=session, user_input=user_in)
-
-
-
-

@@ -1,16 +1,16 @@
 import pytest
 from unittest.mock import patch, MagicMock
-from src.puller import puller
-import pika
-from src.handler import Handler
+
 
 class MockHandler:
     def handle_message(self, body, properties):
         pass
 
+
 @pytest.fixture
 def mock_handler():
     return MockHandler()
+
 
 @pytest.fixture
 def mock_pika():

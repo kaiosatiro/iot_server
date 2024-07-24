@@ -34,7 +34,7 @@ class Settings(BaseSettings):
             port=self.POSTGRES_PORT,
             path=self.POSTGRES_DB,
         )
-    
+
     FIRST_SUPERUSER_EMAIL: str
     FIRST_SUPERUSER_NAME: str
     FIRST_SUPERUSER_PASSWORD: str
@@ -60,6 +60,7 @@ class Settings(BaseSettings):
     #     )
 
     #     return self
+
 
 settings = Settings()
 

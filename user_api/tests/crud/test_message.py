@@ -17,7 +17,7 @@ class TestGetMessage:
 
         assert len(messages) == 100, f"Should be the {range_N} 'set in the fixture'"
         assert messages[0].device_id == device_id, "Device id does not match"
-    
+
     def test_get_empty_message_by_device_id(self, db: Session) -> None:
         messages = crud.get_messages(db=db, device_id=2)
 
@@ -38,8 +38,7 @@ class TestGetMessage:
         msg = messages[77]
         query = crud.get_message_by_id(db=db, message_id=msg.id)
         assert query.id == msg.id, "Message id does not match"
-        
-    
+
     def test_get_message_by_period_of_day(self, db: Session, messagesbatchfix) -> None:
         device_id, range_N = messagesbatchfix
         messages = crud.get_messages(
@@ -50,7 +49,7 @@ class TestGetMessage:
         )
 
         assert len(messages) == 100, f"Should be the {range_N} 'set in the fixture'"
-    
+
     def test_get_message_by_period_of_day_using_default(self, db: Session, messagesbatchfix) -> None:
         device_id, range_N = messagesbatchfix
         messages = crud.get_messages(
@@ -59,7 +58,7 @@ class TestGetMessage:
         )
 
         assert len(messages) == 100, f"Should be the {range_N} 'set in the fixture'"
-    
+
     @pytest.mark.skip(reason="Strange behavior")
     def test_get_messages_by_period_of_hour(self, db: Session, messagesbatchfix) -> None:
         device_id, range_N = messagesbatchfix
@@ -83,7 +82,7 @@ class TestGetMessage:
         )
 
         assert len(messages) == range_N / 2, f"Should be {range_N / 2} messages"
-    
+
     def test_get_msg_with_limit_and_off_set(self, db: Session, messagesbatchfix) -> None:
         device_id, range_N = messagesbatchfix
         messages = crud.get_messages(
@@ -106,8 +105,8 @@ class TestGetMessage:
             offset=60
         )
 
-        assert len(messages) == 10, f"Should be 10 messages"
-    
+        assert len(messages) == 10, "Should be 10 messages"
+
     def test_get_msg_with_limit_and_off_set_out_of_range(self, db: Session, messagesbatchfix) -> None:
         device_id, range_N = messagesbatchfix
         messages = crud.get_messages(
@@ -119,7 +118,7 @@ class TestGetMessage:
             offset=range_N
         )
 
-        assert len(messages) == 0, f"Should be 0 messages"
+        assert len(messages) == 0, "Should be 0 messages"
 
         messages = crud.get_messages(
             db=db,
@@ -130,15 +129,15 @@ class TestGetMessage:
             offset=range_N
         )
 
-        assert len(messages) == 0, f"Should be 0 messages"
-    
+        assert len(messages) == 0, "Should be 0 messages"
+
     def test_get_msg_with_off_set(self, db: Session, messagesbatchfix) -> None:
         device_id, range_N = messagesbatchfix
         messages = crud.get_messages(
             db=db,
             device_id=device_id,
             start_date=datetime.now() - timedelta(hours=24),
-            end_date=datetime.now() + timedelta(minutes=2), # Need to change this in all of them
+            end_date=datetime.now() + timedelta(minutes=2),
             offset=60
         )
 
@@ -155,7 +154,7 @@ class TestDeleteMessage:
         )
 
         assert len(messages) == 100, f"Should be the {range_N} 'set in the fixture'"
-        
+
         msgA = messages[66]
         query = crud.get_message_by_id(db=db, message_id=msgA.id)
         assert query.id == msgA.id, "Message id does not match"
@@ -176,7 +175,7 @@ class TestDeleteMessage:
             end_date=datetime.now() + timedelta(minutes=2)
         )
         assert len(messages) == 98, f"Should be the {range_N - 2} 'set in the fixture' minus the 2 deleted"
-    
+
     def test_delete_msg_per_message_list(self, db: Session, messagesbatchfix) -> None:
         device_id, range_N = messagesbatchfix
         messages = crud.get_messages(
@@ -185,8 +184,8 @@ class TestDeleteMessage:
             end_date=datetime.now() + timedelta(minutes=2)
         )
 
-        assert len(messages) == 98, f"Should be the 98, 2 deleted in the previous test"
-        
+        assert len(messages) == 98, "Should be the 98, 2 deleted in the previous test"
+
         msg_list = [msg.id for msg in messages[50:75]]
         crud.delete_messages_list(db=db, message_ids=msg_list)
 
@@ -196,7 +195,7 @@ class TestDeleteMessage:
             end_date=datetime.now() + timedelta(minutes=2)
         )
 
-        assert len(messages) == 73, f"Should be the 73, 2 deleted in the previous test plus the 25 deleted in this test"
+        assert len(messages) == 73, "Should be the 73, 2 deleted in the previous test plus the 25 deleted in this test"
 
     def test_delete_msg_per_period(self, db: Session, messagesbatchfix) -> None:
         device_id, range_N = messagesbatchfix
@@ -206,11 +205,11 @@ class TestDeleteMessage:
             end_date=datetime.now() + timedelta(minutes=2)
         )
 
-        assert len(messages) == 73, f"Should be the 73, 27 deleted in the previous test"
-        
+        assert len(messages) == 73, "Should be the 73, 27 deleted in the previous test"
+
         crud.delete_messages_by_period(
-            db=db, device_id=device_id, 
-            start_date=datetime.now() - timedelta(hours=24), 
+            db=db, device_id=device_id,
+            start_date=datetime.now() - timedelta(hours=24),
             end_date=datetime.now() + timedelta(minutes=2)
         )
 
@@ -220,7 +219,7 @@ class TestDeleteMessage:
             end_date=datetime.now() + timedelta(minutes=2)
         )
 
-        assert len(messages) == 0, f"Should be the 0, all deleted"
+        assert len(messages) == 0, "Should be the 0, all deleted"
 
 
 class TestMessageContent:

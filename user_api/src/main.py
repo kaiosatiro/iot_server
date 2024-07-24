@@ -9,6 +9,7 @@ logger = getLogger(__name__)
 
 app = FastAPI()
 
+
 @app.get("/")
 async def root():
     logger.info("GAIUS: Hello")
@@ -21,10 +22,6 @@ async def root():
 #     logger = getLogger(__name__)
 #     uvicorn.run(app, host="0.0.0.0", port=8000)
 #     logger.info("Starting the User API service")
-   
-    
-
-
 
 # Users:
 # - GET /users - 200 OK | 403 Forbidden
@@ -56,4 +53,3 @@ async def root():
 # - GET /messages/{deviceId}?from=from&to=to&limit=limit - 200 OK | 404 Not Found
 # - DELETE /messages/{messageId} - 204 No Content | 404 Not Found
 # - DELETE /messages/devices/{deviceId}?from=from&to=to&all=true - 204 OK | 404 Not Found
-

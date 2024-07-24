@@ -3,7 +3,7 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 
-from os import getenv, getcwd
+from os import getenv
 from datetime import datetime
 
 from logging import getLogger

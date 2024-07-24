@@ -37,15 +37,13 @@ def puller(msg_handler: Handler):
     logger.debug("Declaring exchange and queue")
     channel.exchange_declare(exchange='logs', exchange_type='topic', durable=True)
     result = channel.queue_declare(queue='', durable=True)
-    
+
     logger.debug("Binding queue to exchange")
     queue_name = result.method.queue
     channel.queue_bind(exchange='logs', queue=queue_name, routing_key='log.*')
 
     channel.basic_qos(prefetch_count=1)
-    channel.basic_consume( queue=queue_name, on_message_callback=callback
-    )
+    channel.basic_consume(queue=queue_name, on_message_callback=callback)
 
     logger.info("Puller is waiting for messages")
     channel.start_consuming()
-

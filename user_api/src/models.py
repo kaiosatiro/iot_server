@@ -48,7 +48,7 @@ class Device(DeviceBase, BaseModel, table=True):
 
 # --------------------------- MESSAGE MODELS ---------------------------
 class MessageBase(SQLModel):
-    message: dict 
+    message: dict
     device_id: int
 
 
@@ -71,7 +71,7 @@ class Message(SQLModel, table=True):
         nullable=False,
         index=True,
         ondelete="CASCADE"
-        ) 
+        )
     device: "Device" = Relationship(back_populates='messages')
 
 
@@ -98,7 +98,7 @@ class Site(SiteBase, BaseModel, table=True):
 
 # --------------------------- USER MODELS -----------------------------
 class UserBase(SQLModel):
-    email: str = Field(unique=True, index=True) # TODO replace email str with EmailStr when sqlmodel supports it
+    email: str = Field(unique=True, index=True)  # TODO replace email str with EmailStr when sqlmodel supports it
     username: str = Field(max_length=50)
     about: str | None = Field(default=None, max_length=255)
     is_active: bool = True
@@ -126,10 +126,10 @@ class User(UserBase, BaseModel, table=True):
     # roles: list["Role"] = Relationship(back_populates='users', link_model=UserRoleLink)
 
 
-
 # class UserRoleLink(SQLModel, table=True):
 #     user_id: int | None = Field(default=None, foreign_key="user.id", primary_key=True)
 #     role_id: int | None = Field(default=None, foreign_key="role.id", primary_key=True)
+
 
 # class RolePermissionLink(SQLModel, table=True):
 #     role_id: int | None = Field(default=None, foreign_key="role.id", primary_key=True)
@@ -151,127 +151,120 @@ class User(UserBase, BaseModel, table=True):
 #     roles: list["Role"] = Relationship(back_populates='permissions', link_model=RolePermissionLink)
 
 
-if __name__ == "__main__":
-    from sqlmodel import create_engine, Session, select
-    from sqlmodel.pool import StaticPool
-    from datetime import datetime, timedelta
+# if __name__ == "__main__":
+#     from sqlmodel import create_engine, Session, select
+#     from sqlmodel.pool import StaticPool
+#     from datetime import datetime, timedelta
 
-    DATABASE_URL = "postgresql://postgres:postgres@localhost:5432/app"
+#     DATABASE_URL = "postgresql://postgres:postgres@localhost:5432/app"
 
-    engine = create_engine(
-        DATABASE_URL, echo=True
-    )
+#     engine = create_engine(
+#         DATABASE_URL, echo=True
+#     )
 
-    SQLModel.metadata.drop_all(engine)
-    SQLModel.metadata.create_all(engine)
-    with Session(engine) as session:
-        session.exec(select(1))
+#     SQLModel.metadata.drop_all(engine)
+#     SQLModel.metadata.create_all(engine)
+#     with Session(engine) as session:
+#         session.exec(select(1))
 
-    # engine = create_engine(
-    #     "sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool
-    #     , echo=True
-    # )
-    # SQLModel.metadata.create_all(engine)
-    with Session(engine) as session:
-        user_in = UserCreate(
-            email="email",
-            username="random_lower_string()",
-            password="random_lower_string()",
-            about="random_lower_string()",
-            )
-        user = User.model_validate(user_in, update={"hashed_password": "random_lower"})
-        session.add(user)
-        session.commit()
-        session.refresh(user)
-                
-        site_in = SiteCreate(
-            name="random_lower_string()",
-            description="random_lower_string()",
-            )
-        site = Site.model_validate(site_in, update={"user_id": user.id})
-        session.add(site)
-        session.commit()
-        session.refresh(site)
+#     engine = create_engine(
+#         "sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool
+#         , echo=True
+#     )
+#     SQLModel.metadata.create_all(engine)
+#     with Session(engine) as session:
+#         user_in = UserCreate(
+#             email="email",
+#             username="random_lower_string()",
+#             password="random_lower_string()",
+#             about="random_lower_string()",
+#             )
+#         user = User.model_validate(user_in, update={"hashed_password": "random_lower"})
+#         session.add(user)
+#         session.commit()
+#         session.refresh(user)
 
-        device_in = DeviceCreate(
-            name="random_lower_string()",
-            model="random_lower_string()",
-            type="random_lower_string()",
-            description="random_lower_string()",           
-            user_id=user.id, 
-            site_id=site.id
-            )
-        
-        device = Device.model_validate(device_in)
-        session.add(device)
-        session.commit()
-        session.refresh(device)
+#         site_in = SiteCreate(
+#             name="random_lower_string()",
+#             description="random_lower_string()",
+#             )
+#         site = Site.model_validate(site_in, update={"user_id": user.id})
+#         session.add(site)
+#         session.commit()
+#         session.refresh(site)
 
-        messages = []
-        for _ in range(3):
-            message = MessageCreate(message={
-                "deviceId": "12345",
-                "sensorId": "humiditySensor01",
-                "timestamp": "2024-07-12T15:00:00Z",
-                "type": "humidity",
-                "unit": "percent",
-                "value": 45.2
-                },
-                device_id=device.id)
-            message_in = Message.model_validate(message)
-            messages.append(message_in)
+#         device_in = DeviceCreate(
+#             name="random_lower_string()",
+#             model="random_lower_string()",
+#             type="random_lower_string()",
+#             description="random_lower_string()",
+#             user_id=user.id,
+#             site_id=site.id
+#             )
 
-        session.add_all(messages)
-        session.commit()
+#         device = Device.model_validate(device_in)
+#         session.add(device)
+#         session.commit()
+#         session.refresh(device)
 
-        # user = session.get(User, user.id)
-        # print("*******")
-        # print(user.id)
-        # print("*******")
-        # session.delete(user)
-        # session.commit()
+#         messages = []
+#         for _ in range(3):
+#             message = MessageCreate(message={
+#                 "deviceId": "12345",
+#                 "sensorId": "humiditySensor01",
+#                 "timestamp": "2024-07-12T15:00:00Z",
+#                 "type": "humidity",
+#                 "unit": "percent",
+#                 "value": 45.2
+#                 },
+#                 device_id=device.id)
+#             message_in = Message.model_validate(message)
+#             messages.append(message_in)
 
-        # yesterday = datetime.now() - timedelta(hours=24)
-        # now = datetime.now()
-        # print("*******")
-        # print(yesterday)
-        # print(now)
-        # print(sa.func.now())
-        # print("*******")
+#         session.add_all(messages)
+#         session.commit()
 
-        # statement = select(Message).where(
-        #     User.id == user.id)
-        # session_messages = session.exec(statement).all()
+#         user = session.get(User, user.id)
+#         print("*******")
+#         print(user.id)
+#         print("*******")
+#         session.delete(user)
+#         session.commit()
 
-        # statement = select(Message).where(
-        #     Message.created_on >= yesterday, 
-        #     Message.created_on <= now
-        # )
-        # session_messages = session.exec(statement).all()
-        # print(session_messages)
+#         yesterday = datetime.now() - timedelta(hours=24)
+#         now = datetime.now()
+#         print("*******")
+#         print(yesterday)
+#         print(now)
+#         print(sa.func.now())
+#         print("*******")
 
-    # SQLModel.metadata.drop_all(engine)
-        # statement = delete(Message)
-        # resulta = session.exec(statement)
+#         statement = select(Message).where(
+#             User.id == user.id)
+#         session_messages = session.exec(statement).all()
 
-        # statement = delete(Device)
-        # resultb = session.exec(statement)
+#         statement = select(Message).where(
+#             Message.created_on >= yesterday,
+#             Message.created_on <= now
+#         )
+#         session_messages = session.exec(statement).all()
+#         print(session_messages)
 
-        # statement = delete(Site)
-        # resultc = session.exec(statement)
+#         SQLModel.metadata.drop_all(engine)
+#         statement = delete(Message)
+#         resulta = session.exec(statement)
 
-        # statement = delete(User)
-        # resultd = session.exec(statement)
+#         statement = delete(Device)
+#         resultb = session.exec(statement)
 
-        # session.commit()
-        # print(resulta.rowcount)
-        # print(resultb.rowcount)
-        # print(resultc.rowcount)
-        # print(resultd.rowcount)
+#         statement = delete(Site)
+#         resultc = session.exec(statement)
 
+#         statement = delete(User)
+#         resultd = session.exec(statement)
 
-
-
-
-
-
+#         session.commit()
+#         print(resulta.rowcount)
+#         print(resultb.rowcount)
+#         print(resultc.rowcount)
+#         print(resultd.rowcount)

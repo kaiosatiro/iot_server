@@ -4,6 +4,7 @@ from atexit import register as atexitregister
 
 from src.logger.config import LOG_CONFIG
 
+
 def setup_logging():
     logging.config.dictConfig(LOG_CONFIG)
     # get the queue handler

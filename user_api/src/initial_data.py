@@ -9,9 +9,11 @@ from src.logger.setup import setup_logging
 setup_logging()
 logger = logging.getLogger(__name__)
 
+
 def init() -> None:
     with Session(engine) as session:
         init_db(session)
+
 
 def main() -> None:
     logger.info("Creating initial data")
