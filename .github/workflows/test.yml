@@ -5,6 +5,19 @@ jobs:
   test:
     runs-on: ubuntu-latest
     environment: test
+    env:
+      ENV: ${{ vars.ENV }}
+      LOG_INFO_LOCAL_PATH: ${{ vars.LOG_INFO_LOCAL_PATH }}
+      
+      POSTGRES_PORT: ${{ vars.POSTGRES_PORT }}
+      POSTGRES_USER: ${{ vars.POSTGRES_USER }}
+      POSTGRES_PASSWORD: ${{ vars.POSTGRES_PASSWORD }}
+      POSTGRES_DB: ${{ vars.POSTGRES_DB }}
+
+      FIRST_SUPERUSER_NAME: ${{ vars.FIRST_SUPERUSER_NAME }}
+      FIRST_SUPERUSER_EMAIL: ${{ vars.FIRST_SUPERUSER_EMAIL }}
+      FIRST_SUPERUSER_PASSWORD: ${{ vars.FIRST_SUPERUSER_PASSWORD }}
+      PROJECT_NAME: ${{ vars.PROJECT_NAME }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -22,16 +35,16 @@ jobs:
       - name: Create env file
         id: create-env
         run: |
-          echo ENV=${{ vars.ENV }} > .env
-          echo LOG_INFO_LOCAL_PATH=${{ vars.LOG_INFO_LOCAL_PATH }} >> .env
-          echo POSTGRES_PORT=${{ vars.POSTGRES_PORT }} > .env
-          echo POSTGRES_USER=${{ vars.POSTGRES_USER }} > .env
-          echo POSTGRES_PASSWORD=${{ vars.POSTGRES_PASSWORD }} > .env
-          echo POSTGRES_DB=${{ vars.POSTGRES_DB }} > .env
-          echo FIRST_SUPERUSER_NAME=${{ vars.FIRST_SUPERUSER_NAME }} > .env
-          echo FIRST_SUPERUSER_EMAIL=${{ vars.FIRST_SUPERUSER_EMAIL }} > .env
-          echo FIRST_SUPERUSER_PASSWORD=${{ vars.FIRST_SUPERUSER_PASSWORD }} > .env
-          echo PROJECT_NAME=${{ vars.PROJECT_NAME }} > .env
+          echo ENV=$ENV >> .env
+          echo LOG_INFO_LOCAL_PATH=$LOG_INFO_LOCAL_PATH > .env
+          echo POSTGRES_PORT=$POSTGRES_PORT > .env
+          echo POSTGRES_USER=$POSTGRES_USER > .env
+          echo POSTGRES_PASSWORD=$POSTGRES_PASSWORD > .env
+          echo POSTGRES_DB=$POSTGRES_DB > .env
+          echo FIRST_SUPERUSER_NAME=$FIRST_SUPERUSER_NAME > .env
+          echo FIRST_SUPERUSER_EMAIL=$FIRST_SUPERUSER_EMAIL > .env
+          echo FIRST_SUPERUSER_PASSWORD=$FIRST_SUPERUSER_PASSWORD > .env
+          echo PROJECT_NAME=$PROJECT_NAME > .env   
       
       - name: Build and run
         run: |
