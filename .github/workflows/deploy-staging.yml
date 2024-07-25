@@ -1,11 +1,6 @@
 name: Deploy to Staging
 on: [workflow_call]
 
-env:
-  SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-  SSH_HOST: ${{ secrets.SSH_HOST }}
-  SSH_USER: ${{ secrets.SSH_USER }}
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -17,10 +12,10 @@ jobs:
         run: echo "Testing..."
 
       - name: Configure SSH
-        # env:
-        #   SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        #   SSH_HOST: ${{ secrets.SSH_HOST }}
-        #   SSH_USER: ${{ secrets.SSH_USER }}
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
         run: |
           mkdir -p ~/.ssh
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/github
