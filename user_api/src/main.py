@@ -13,7 +13,6 @@ app = FastAPI()
 @app.get("/")
 async def root():
     logger.info("GAIUS: Hello")
-    logger.error("GAIUS: TEST")
     return {"message": "Hello World"}
 
 
