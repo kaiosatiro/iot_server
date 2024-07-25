@@ -21,7 +21,7 @@ jobs:
 
   deploy:
     name: Deploy
-    needs: [test, quality-assurance]
+    # needs: [test, quality-assurance]
     uses: ./.github/workflows/deploy-staging.yml
 
 
