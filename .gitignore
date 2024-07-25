@@ -4,4 +4,3 @@ logs/*
 .pytest_cache/
 .venv/
 doc/schema.sql
-default_nginx_config

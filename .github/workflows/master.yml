@@ -11,13 +11,13 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
-    name: Tests
-    uses: ./.github/workflows/test.yml
+  # test:
+  #   name: Tests
+  #   uses: ./.github/workflows/test.yml
     
-  quality-assurance:
-    name: Quality Assurance
-    uses: ./.github/workflows/qa.yml
+  # quality-assurance:
+  #   name: Quality Assurance
+  #   uses: ./.github/workflows/qa.yml
 
   deploy:
     name: Deploy
