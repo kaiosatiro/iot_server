@@ -86,5 +86,5 @@ jobs:
       - name: Deploy
         if: steps.create-env.outcome == 'success'
         run: |
-            ssh Target "cd iot_server && compose-down && make compose-prod"
+            ssh Target "cd iot_server && make compose-down && make compose-prod"
 
