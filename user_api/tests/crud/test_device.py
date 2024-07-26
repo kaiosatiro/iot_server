@@ -1,6 +1,6 @@
 from sqlmodel import Session
 
-from tests.utils.utils import random_lower_string
+from tests.utils import random_lower_string
 from src.models import (
     UserCreate,
     SiteCreate,

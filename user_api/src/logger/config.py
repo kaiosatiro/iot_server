@@ -1,3 +1,5 @@
+from src.core.config import settings
+
 LOG_CONFIG = {
     "version": 1,
     "disable_existing_loggers": 'false',
@@ -16,8 +18,8 @@ LOG_CONFIG = {
                 },
             "queue": {
                 "class": "python_logging_rabbitmq.RabbitMQHandler",
-                "level": "INFO",
-                'host': 'rabbitmq',
+                "level": settings.LOG_LEVEL,
+                'host': settings.RABBITMQ_DNS,
                 'port': "5672",
                 "formatter": "simple",
                 "exchange": 'logs',
@@ -37,7 +39,7 @@ LOG_CONFIG = {
     },
     "loggers": {
         "root": {
-            "level": "INFO",
+            "level": settings.LOG_LEVEL,
             "handlers": [
                 "queue_handler"
             ]

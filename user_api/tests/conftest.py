@@ -1,11 +1,12 @@
 from collections.abc import Generator
 
 import pytest
+from fastapi.testclient import TestClient
 from sqlmodel import Session, delete
 # from sqlmodel import SQLModel, create_engine
 # from sqlmodel.pool import StaticPool
 
-from tests.utils.utils import random_email, random_lower_string
+from tests.utils import random_email, random_lower_string
 from src.models import (
     User,
     UserCreate,
@@ -18,9 +19,11 @@ from src.models import (
 )
 from src import crud
 from src.core.db import engine, init_db
+from src.core.config import settings
+from src.main import app
 
 
-@pytest.fixture(name="db", autouse=True, scope="class")
+@pytest.fixture(name="db", autouse=True, scope="class")  # scope="session"
 def session_fixture() -> Generator[Session, None, None]:
     # engine = create_engine(
     #     "sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool
@@ -39,6 +42,21 @@ def session_fixture() -> Generator[Session, None, None]:
         statement = delete(User)
         session.exec(statement)
         session.commit()
+
+
+@pytest.fixture(scope="module")
+def client() -> Generator[TestClient, None, None]:
+    with TestClient(app) as client:
+        yield client
+
+
+@pytest.fixture(name="superuserfix")
+def superuser_fixture() -> dict:
+    return {
+        "email": settings.FIRST_SUPERUSER_EMAIL,
+        "username": settings.FIRST_SUPERUSERNAME,
+        "password": settings.FIRST_SUPERUSER_PASSWORD,
+    }
 
 
 @pytest.fixture(name="userfix", scope="module")

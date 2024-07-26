@@ -18,6 +18,11 @@ services:
   userapi:
     environment:
       - ENV=dev
+      - LOG_LEVEL=DEBUG
+    volumes:
+      - type: bind
+        source: ./user_api
+        target: /app
 
 
 

@@ -98,8 +98,8 @@ class Site(SiteBase, BaseModel, table=True):
 
 # --------------------------- USER MODELS -----------------------------
 class UserBase(SQLModel):
-    email: str = Field(unique=True, index=True)  # TODO replace email str with EmailStr when sqlmodel supports it
-    username: str = Field(max_length=50)
+    username: str = Field(unique=True, max_length=50, index=True)
+    email: str = Field(unique=True)  # TODO replace email str with EmailStr when sqlmodel supports it
     about: str | None = Field(default=None, max_length=255)
     is_active: bool = True
     is_superuser: bool = False
@@ -124,6 +124,12 @@ class User(UserBase, BaseModel, table=True):
     devices: list["Device"] = Relationship(back_populates='user', cascade_delete=True)
     sites: list["Site"] = Relationship(back_populates='user', cascade_delete=True)
     # roles: list["Role"] = Relationship(back_populates='users', link_model=UserRoleLink)
+
+
+# --------------------------- UTILS MODELS -----------------------------
+class Token(SQLModel):
+    access_token: str
+    token_type: str = "bearer"
 
 
 # class UserRoleLink(SQLModel, table=True):

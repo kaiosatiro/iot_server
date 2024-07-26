@@ -11,21 +11,19 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # test:
-  #   name: Tests
-  #   uses: ./.github/workflows/test.yml
+  test:
+    name: Tests
+    uses: ./.github/workflows/test.yml
     
-  # quality-assurance:
-  #   name: Quality Assurance
-  #   uses: ./.github/workflows/qa.yml
+  quality-assurance:
+    name: Quality Assurance
+    uses: ./.github/workflows/qa.yml
 
   # Deploy to staging
   deploy:
     runs-on: ubuntu-latest
     environment: staging
     steps:
-      # - name: Checkout
-      #   uses: actions/checkout@v4
       - name: Test
         run: echo "Testing..."
 
@@ -59,7 +57,7 @@ jobs:
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
 
-          FIRST_SUPERUSER_NAME: ${{ secrets.FIRST_SUPERUSER_NAME }}
+          FIRST_SUPERUSERNAME: ${{ secrets.FIRST_SUPERUSERNAME }}
           FIRST_SUPERUSER_EMAIL: ${{ secrets.FIRST_SUPERUSER_EMAIL }}
           FIRST_SUPERUSER_PASSWORD: ${{ secrets.FIRST_SUPERUSER_PASSWORD }}
           PROJECT_NAME: ${{ vars.PROJECT_NAME }}
@@ -70,7 +68,7 @@ jobs:
           echo POSTGRES_USER=$POSTGRES_USER >> .env
           echo POSTGRES_PASSWORD=$POSTGRES_PASSWORD >> .env
           echo POSTGRES_DB=$POSTGRES_DB >> .env
-          echo FIRST_SUPERUSER_NAME=$FIRST_SUPERUSER_NAME >> .env
+          echo FIRST_SUPERUSERNAME=$FIRST_SUPERUSERNAME >> .env
           echo FIRST_SUPERUSER_EMAIL=$FIRST_SUPERUSER_EMAIL >> .env
           echo FIRST_SUPERUSER_PASSWORD=$FIRST_SUPERUSER_PASSWORD >> .env
           echo PROJECT_NAME=$PROJECT_NAME >> .env   

@@ -1,4 +1,4 @@
-.PHONY: install run test lint #migrations migrate install-pre-commit
+.PHONY: install run run-dev test lint #migrations migrate install-pre-commit
 
 install:
 	@echo "Installing dependencies..."
@@ -22,6 +22,10 @@ lint:
 run:
 	@echo "Running server..."
 	poetry run fastapi run src/main.py --port 8000
+
+run-local:
+	@echo "Running server..."
+	poetry run fastapi dev src/main.py --port 8000
 
 # update: install migrate install-pre-commit;
 
