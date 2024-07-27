@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from sqlmodel import SQLModel, Field, Relationship
 import sqlalchemy as sa
+from sqlmodel import Field, Relationship, SQLModel
 
 
 class BaseModel(SQLModel):
@@ -38,12 +38,14 @@ class DeviceUpdate(DeviceBase):
 
 class Device(DeviceBase, BaseModel, table=True):
     user_id: int = Field(foreign_key="user.id", nullable=False, ondelete="CASCADE")
-    user: "User" = Relationship(back_populates='devices')
+    user: "User" = Relationship(back_populates="devices")
 
     site_id: int = Field(foreign_key="site.id", nullable=False, ondelete="CASCADE")
-    site: "Site" = Relationship(back_populates='devices')
+    site: "Site" = Relationship(back_populates="devices")
 
-    messages: list["Message"] = Relationship(back_populates='device', cascade_delete=True)
+    messages: list["Message"] = Relationship(
+        back_populates="device", cascade_delete=True
+    )
 
 
 # --------------------------- MESSAGE MODELS ---------------------------
@@ -67,12 +69,9 @@ class Message(SQLModel, table=True):
     )
 
     device_id: int = Field(
-        foreign_key="device.id",
-        nullable=False,
-        index=True,
-        ondelete="CASCADE"
-        )
-    device: "Device" = Relationship(back_populates='messages')
+        foreign_key="device.id", nullable=False, index=True, ondelete="CASCADE"
+    )
+    device: "Device" = Relationship(back_populates="messages")
 
 
 # --------------------------- SITE MODELS ------------------------------
@@ -89,17 +88,28 @@ class SiteUpdate(SiteBase):
     name: str | None = None
 
 
+class SitePublic(SiteBase, BaseModel):
+    id: int
+
+
+class SitesPublic(SQLModel):
+    data: list["SitePublic"]
+    count: int | None = None
+
+
 class Site(SiteBase, BaseModel, table=True):
     user_id: int = Field(foreign_key="user.id", nullable=False, ondelete="CASCADE")
-    user: "User" = Relationship(back_populates='sites')
+    user: "User" = Relationship(back_populates="sites")
 
-    devices: list["Device"] = Relationship(back_populates='site', cascade_delete=True)
+    devices: list["Device"] = Relationship(back_populates="site", cascade_delete=True)
 
 
 # --------------------------- USER MODELS -----------------------------
 class UserBase(SQLModel):
     username: str = Field(unique=True, max_length=50, index=True)
-    email: str = Field(unique=True)  # TODO replace email str with EmailStr when sqlmodel supports it
+    email: str = Field(
+        unique=True
+    )  # TODO replace email str with EmailStr when sqlmodel supports it
     about: str | None = Field(default=None, max_length=255)
     is_active: bool = True
     is_superuser: bool = False
@@ -110,7 +120,15 @@ class UserCreate(UserBase):
 
 
 class UserUpdate(UserBase):
+    id: int | None = None
+    username: str | None = None
     email: str | None = None
+
+
+class UserUpdateMe(SQLModel):
+    username: str | None = None
+    email: str | None = None
+    about: str | None = None
 
 
 class UpdatePassword(SQLModel):
@@ -118,11 +136,20 @@ class UpdatePassword(SQLModel):
     new_password: str
 
 
+class UserPublic(UserBase, BaseModel):
+    id: int
+
+
+class UsersPublic(SQLModel):
+    data: list["UserPublic"]
+    count: int | None = None
+
+
 class User(UserBase, BaseModel, table=True):
     hashed_password: str
 
-    devices: list["Device"] = Relationship(back_populates='user', cascade_delete=True)
-    sites: list["Site"] = Relationship(back_populates='user', cascade_delete=True)
+    devices: list["Device"] = Relationship(back_populates="user", cascade_delete=True)
+    sites: list["Site"] = Relationship(back_populates="user", cascade_delete=True)
     # roles: list["Role"] = Relationship(back_populates='users', link_model=UserRoleLink)
 
 
@@ -130,6 +157,14 @@ class User(UserBase, BaseModel, table=True):
 class Token(SQLModel):
     access_token: str
     token_type: str = "bearer"
+
+
+class TokenPayload(SQLModel):
+    sub: int | None = None
+
+
+class ResponseMessage(SQLModel):
+    message: str
 
 
 # class UserRoleLink(SQLModel, table=True):

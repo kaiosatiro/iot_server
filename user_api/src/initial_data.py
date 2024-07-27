@@ -5,7 +5,6 @@ from sqlmodel import Session
 from src.core.db import engine, init_db
 from src.logger.setup import setup_logging
 
-
 setup_logging()
 logger = logging.getLogger(__name__)
 

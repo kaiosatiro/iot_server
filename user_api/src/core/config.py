@@ -1,11 +1,11 @@
 import secrets
 
-from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import (
     PostgresDsn,
     computed_field,
 )
 from pydantic_core import MultiHostUrl
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -21,9 +21,9 @@ class Settings(BaseSettings):
 
     PROJECT_NAME: str
 
-    RABBITMQ_DNS: str = 'rabbitmq'
+    RABBITMQ_DNS: str = "rabbitmq"
 
-    LOG_LEVEL: str = 'INFO'
+    LOG_LEVEL: str = "INFO"
 
     POSTGRES_SERVER: str
     POSTGRES_PORT: int = 5432

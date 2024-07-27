@@ -4,8 +4,8 @@ from sqlalchemy import Engine
 from sqlmodel import Session, select
 from tenacity import after_log, before_log, retry, stop_after_attempt, wait_fixed
 
-from src.logger.setup import setup_logging
 from src.core.db import engine
+from src.logger.setup import setup_logging
 
 setup_logging()
 logger = logging.getLogger(__name__)

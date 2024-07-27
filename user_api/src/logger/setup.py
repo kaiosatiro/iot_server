@@ -1,5 +1,4 @@
 import logging.config
-
 from atexit import register as atexitregister
 
 from src.logger.config import LOG_CONFIG

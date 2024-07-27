@@ -1,8 +1,17 @@
-from typing import Generator, Annotated
+import logging
+from collections.abc import Generator
+from typing import Annotated
 
-from fastapi import Depends
+import jwt
+from fastapi import Depends, HTTPException
+from fastapi.security import OAuth2PasswordBearer
+from jwt.exceptions import InvalidTokenError
+from pydantic import ValidationError
 
+from src.core import security
+from src.core.config import settings
 from src.core.db import Session, engine
+from src.models import TokenPayload, User
 
 
 def get_db() -> Generator[Session, None, None]:
@@ -10,4 +19,39 @@ def get_db() -> Generator[Session, None, None]:
         yield session  # So it can close the session after the request is finished
 
 
+reusable_oauth2 = OAuth2PasswordBearer(tokenUrl="/access-token")
+
 SessionDep = Annotated[Session, Depends(get_db)]  # And then MetaData do be injected
+TokenDep = Annotated[str, Depends(reusable_oauth2)]
+
+
+def get_current_user(session: SessionDep, token: TokenDep) -> User:
+    logger = logging.getLogger("get_current_user")
+    try:
+        payload = jwt.decode(
+            token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
+        )
+        token_data = TokenPayload(**payload)
+
+    except (InvalidTokenError, ValidationError):
+        raise HTTPException(
+            status_code=403,
+            detail="Could not validate credentials",
+        )
+
+    user = session.get(User, token_data.sub)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if not user.is_active:
+        raise HTTPException(status_code=401, detail="Inactive user")
+    return user
+
+
+CurrentUser = Annotated[User, Depends(get_current_user)]
+
+
+def get_current_active_superuser(current_user: CurrentUser) -> User:
+    if not current_user.is_superuser:
+        raise HTTPException(status_code=403, detail="Not enough privileges")
+    return current_user

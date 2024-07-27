@@ -1,4 +1,4 @@
-.PHONY: install run run-dev test lint #migrations migrate install-pre-commit
+.PHONY: install run run-dev tests lint #migrations migrate install-pre-commit
 
 install:
 	@echo "Installing dependencies..."
@@ -12,6 +12,10 @@ lint:
 	@echo "Running linter"
 	flake8 . --count --exit-zero --max-complexity=10 --max-line-length=150 --statistics --exclude=.venv
 	flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude=.venv
+
+	# mypy app
+	# ruff check app
+	# ruff format app --check
 
 # migrations:
 # 	@echo "Creating migrations..."
@@ -29,6 +33,6 @@ run-local:
 
 # update: install migrate install-pre-commit;
 
-test:
+tests:
 	@echo "Running tests..."
 	poetry run python -m pytest

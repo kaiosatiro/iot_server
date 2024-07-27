@@ -3,12 +3,11 @@ from logging import getLogger
 
 from fastapi import FastAPI
 
-from src.logger.setup import setup_logging
-from src.core.config import settings
 from src.api.main import api_router
+from src.core.config import settings
+from src.logger.setup import setup_logging
 
 setup_logging()
-
 logger = getLogger(__name__)
 
 app = FastAPI(
@@ -22,7 +21,11 @@ app = FastAPI(
     # contact=
     # license_info=
     root_path=settings.API_V1_STR,
-    root_path_in_servers=True
+    root_path_in_servers=True,
+)
+
+app.include_router(
+    api_router,
 )
 
 
@@ -33,18 +36,10 @@ async def lifespan(app: FastAPI):
     logger.info("ShutDown")
 
 
-app.include_router(
-    api_router,
-)
-
-
 @app.get("/")
 async def root():
     logger.info("Root")
     return {"TEST": "PACMAN"}
-
-
-
 
 
 # if __name__ == '__main__':
@@ -53,33 +48,33 @@ async def root():
 #     uvicorn.run(app, host="0.0.0.0", port=8000)
 #     logger.info("Starting the User API service")
 
+# Login:
+# - POST /access-token - 200 | 401 Unauthorized
+
 # Users:
-# - GET /users - 200 OK | 403 Forbidden
-# - GET /users/{id} - 200 OK | 403 Forbidden | 404 Not Found
-# - POST /users - 201 Created | 400 Bad Request | 403 Forbidden | 409 Conflict
-# - PUT /users/{id} - 200 OK | 400 Bad Request | 403 Forbidden | 404 Not Found
-# - PATCH /users/{id} - 200 OK | 400 Bad Request | 403 Forbidden | 404 Not Found
-# - DELETE /users/{id} - 204 No Content | 403 Forbidden | 404 Not Found
+# - GET /users - 200 | 401 | 403 | 404
+# - GET /users/me - 200 | 404
+# - GET /users/{id} - 200 | 403 | 404
+# - POST /users - 201 | 422 | 403 | 409
+# - PATCH /users/{id} - 200 | 422 | 403 | 404 | 409
+# - PATCH /users/me/ - 200 | 422 | 404 | 409
+# - PATCH /users/me/password - 200 | 422 | 404 | 401
+# - DELETE /users/{id} - 200 | 403 | 404
 
-# Sites:
-# - GET /sites - 200 OK | 403 Forbidden
-# - GET /sites/{siteId} - 200 OK | 403 Forbidden | 404 Not Found
-# - POST /sites - 201 Created | 400 Bad Request | 403 Forbidden
-# - PUT /sites/{siteId} - 200 OK | 400 Bad Request | 403 Forbidden | 404 Not Found
-# - DELETE /sites - 204 No Content | 403 Forbidden
-# - DELETE /sites/{siteId} - 200 OK | 403 Forbidden | 404 Not Found
+# Sites | Devices | Messages:
 
-# Devices:
-# - GET /devices - 200 OK | 404 Not Found | 403 Forbidden
-# - GET /devices/{deviceId} - 200 OK | 404 Not Found | 403 Forbidden
-# - GET /devices/site/{siteId} - 200 OK | 404 Not Found | 403 Forbidden
-# - POST /devices - 201 Created | 400 Bad Request | 403 Forbidden
-# - PUT /devices/{id} - 200 OK | 400 Bad Request | 403 Forbidden | 404 Not Found
-# - DELETE /devices - 204 No Content | 404 Not Found
-# - DELETE /devices/{deviceId} - 204 No Content | 404 Not Found
-# - DELETE /devices/site/{siteId} - 204 No Content | 404 Not Found
+# - GET /sites - 200 | 403
+# - POST /sites - 201 | 400 | 403
+# - PATCH /sites/{siteId} - 200 | 400 | 403 | 404
+# - DELETE /sites/{siteId} - 200 | 403 | 404
 
-# Messages:
-# - GET /messages/{deviceId}?from=from&to=to&limit=limit - 200 OK | 404 Not Found
-# - DELETE /messages/{messageId} - 204 No Content | 404 Not Found
-# - DELETE /messages/device/{deviceId}?from=from&to=to&all=true - 204 OK | 404 Not Found
+# - GET /devices - 200 | 404 | 403
+# - GET /devices/site/{siteId} - 200 | 403 | 404
+# - POST /devices - 201 Created | 400 | 403
+# - PATCH /devices/{id} - 200 | 400  | 403  | 404
+# - DELETE /devices/{deviceId} - 200 | 404
+# - DELETE /devices/site/{siteId} - 200 | 404
+
+# - GET /messages/device/{deviceId}?from=from&to=to&limit=limit - 200 | 404 | 403
+# - DELETE /messages/{messageId} - 200 | 404 
+# - DELETE /messages/device/{deviceId}?from=from&to=to&all=true - 200 | 404

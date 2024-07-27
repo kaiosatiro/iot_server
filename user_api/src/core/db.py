@@ -1,19 +1,19 @@
 from sqlmodel import Session, create_engine, select
 from sqlmodel.pool import StaticPool
 
+import src.crud as crud
+from src.core.config import settings
 from src.models import (
     User,
     UserCreate,
-    )
-import src.crud as crud
-from src.core.config import settings
-
+)
 
 engine = create_engine(str(settings.SQL_DATABASE_URI), poolclass=StaticPool)
 
 
 def init_db(session: Session) -> None:
     from sqlmodel import SQLModel
+
     SQLModel.metadata.create_all(engine)
 
     user = session.exec(

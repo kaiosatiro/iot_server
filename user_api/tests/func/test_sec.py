@@ -1,9 +1,7 @@
 from datetime import timedelta
 
-import pytest
 # from jwt import DecodeError, ExpiredSignatureError
-
-from src.core.security import get_password_hash, verify_password, create_access_token
+from src.core.security import create_access_token, get_password_hash, verify_password
 from src.crud import authenticate_user
 
 
@@ -15,34 +13,33 @@ def test_get_password_hash():
 
 
 # --------------------------------------------------------------------------------------
-def test_authenticate_user(db, superuserfix):
-    email = superuserfix["email"]
-    password = superuserfix["password"]
+class TestVerifyPassword:
+    def test_authenticate_user(self, db, superuserfix):
+        username = superuserfix["username"]
+        password = superuserfix["password"]
 
-    user = authenticate_user(db=db, email=email, password=password)
-    assert user, "Should be True"
-    assert user.email == email, "Should be True"
-    assert user.is_active, "Should be True"
-    assert user.is_superuser, "Should be True"
+        user = authenticate_user(db=db, username=username, password=password)
+        assert user, "Should exist"
+        assert user.username == username, "Should be True"
+        assert user.is_active, "Should be True"
+        assert user.is_superuser, "Should be True"
+
+    def test_authenticate_user_incorrect_password(self, db, superuserfix):
+        username = superuserfix["username"]
+        password = "incorrect"
+
+        user = authenticate_user(db=db, username=username, password=password)
+        assert not user, "Should be False"
+
+    def test_authenticate_user_incorrect_username(self, db, superuserfix):
+        username = "incorrect"
+        password = superuserfix["password"]
+
+        user = authenticate_user(db=db, username=username, password=password)
+        assert not user, "Should be False"
 
 
-def test_authenticate_user_incorrect_password(db, superuserfix):
-    email = superuserfix["email"]
-    password = "incorrect"
-
-    user = authenticate_user(db=db, email=email, password=password)
-    assert not user, "Should be False"
-
-
-def test_authenticate_user_incorrect_email(db, superuserfix):
-    email = "incorrect"
-    password = superuserfix["password"]
-
-    user = authenticate_user(db=db, email=email, password=password)
-    assert not user, "Should be False"
-
-
-#--------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
 def test_create_access_token():
     subject = "test_subject"
     expires_delta = timedelta(minutes=30)

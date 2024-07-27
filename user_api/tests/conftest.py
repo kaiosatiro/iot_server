@@ -3,26 +3,28 @@ from collections.abc import Generator
 import pytest
 from fastapi.testclient import TestClient
 from sqlmodel import Session, delete
-# from sqlmodel import SQLModel, create_engine
-# from sqlmodel.pool import StaticPool
 
-from tests.utils import random_email, random_lower_string
+from src import crud
+from src.core.config import settings
+from src.core.db import engine, init_db
+from src.main import app
 from src.models import (
-    User,
-    UserCreate,
-    Site,
-    SiteCreate,
     Device,
     DeviceCreate,
     Message,
     MessageCreate,
+    Site,
+    SiteCreate,
+    User,
+    UserCreate,
 )
-from src import crud
-from src.core.db import engine, init_db
-from src.core.config import settings
-from src.main import app
+
+# from sqlmodel import SQLModel, create_engine
+# from sqlmodel.pool import StaticPool
+from tests.utils import random_email, random_lower_string
 
 
+# ----------------------------- Sessions --------------------------------
 @pytest.fixture(name="db", autouse=True, scope="class")  # scope="session"
 def session_fixture() -> Generator[Session, None, None]:
     # engine = create_engine(
@@ -44,12 +46,13 @@ def session_fixture() -> Generator[Session, None, None]:
         session.commit()
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="class")
 def client() -> Generator[TestClient, None, None]:
     with TestClient(app) as client:
         yield client
 
 
+# ----------------------------- Superuser --------------------------------
 @pytest.fixture(name="superuserfix")
 def superuser_fixture() -> dict:
     return {
@@ -59,6 +62,39 @@ def superuser_fixture() -> dict:
     }
 
 
+@pytest.fixture(scope="class")
+def superuser_token_headers(client: TestClient) -> dict[str, str]:
+    login_data = {
+        "username": settings.FIRST_SUPERUSERNAME,
+        "password": settings.FIRST_SUPERUSER_PASSWORD,
+    }
+    response = client.post("/access-token", data=login_data)
+    tokens = response.json()
+    headers = {"Authorization": f"Bearer {tokens["access_token"]}"}
+    return headers
+
+
+# ----------------------------- Normal User --------------------------------
+@pytest.fixture(name="normaluserfix", scope="class")
+def normaluser_fixture(db, userfix) -> dict:
+    user_in = UserCreate(**userfix)
+    crud.create_user(db=db, user_input=user_in)
+    return userfix
+
+
+@pytest.fixture(scope="class")
+def normal_token_headers(normaluserfix, client: TestClient) -> dict[str, str]:
+    login_data = {
+        "username": normaluserfix["username"],
+        "password": normaluserfix["password"],
+    }
+    response = client.post("/access-token", data=login_data)
+    tokens = response.json()
+    headers = {"Authorization": f"Bearer {tokens["access_token"]}"}
+    return headers
+
+
+# ----------------------------- Model Fixtures --------------------------------
 @pytest.fixture(name="userfix", scope="module")
 def user_fixture() -> dict:
     return {
@@ -87,8 +123,9 @@ def device_fixture() -> dict:
     }
 
 
+# ----------------------------- For Messages --------------------------------
 @pytest.fixture(name="messagesbatchfix", scope="class")
-def messages_batch_fixture(db, userfix, sitefix, devicefix):
+def messages_batch_fixture(db, userfix, sitefix, devicefix) -> tuple[int | None, int]:
     user_in = UserCreate(**userfix)
     user = crud.create_user(db=db, user_input=user_in)
 
@@ -101,14 +138,17 @@ def messages_batch_fixture(db, userfix, sitefix, devicefix):
     messages = []
     range_number = 100
     for _ in range(range_number):
-        message = MessageCreate(message={
+        message = MessageCreate(
+            message={
                 "deviceId": random_lower_string(),
                 "sensorId": random_lower_string(),
                 "timestamp": random_lower_string(),
                 "type": random_lower_string(),
                 "unit": random_lower_string(),
-                "value": 45.2
-                }, device_id=device.id)
+                "value": 45.2,
+            },
+            device_id=device.id,
+        )
         message_in = Message.model_validate(message)
         messages.append(message_in)
 

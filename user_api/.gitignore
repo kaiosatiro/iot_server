@@ -6,6 +6,7 @@ src/logs/*
 */*/__pycache__/
 */*/*/__pycache__/
 */*/*/*/__pycache__/
+.mypy_cache
 .env
 .pytest_cache
 tests/load_test.py

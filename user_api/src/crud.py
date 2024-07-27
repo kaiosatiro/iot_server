@@ -2,24 +2,27 @@ from datetime import datetime, timedelta
 
 from sqlmodel import Session, select
 
+import src.core.security as security
+
 from .models import (
-    User,
-    UserUpdate,
-    UserCreate,
-    Site,
-    SiteCreate,
-    SiteUpdate,
     Device,
     DeviceCreate,
     DeviceUpdate,
     Message,
+    Site,
+    SiteCreate,
+    SiteUpdate,
+    User,
+    UserCreate,
+    UserUpdate,
 )
-import src.core.security as security
+
 
 # -------------------------- USER -----------------------------------
 def create_user(*, db: Session, user_input: UserCreate) -> User:
     user = User.model_validate(
-        user_input, update={"hashed_password": security.get_password_hash(user_input.password)}
+        user_input,
+        update={"hashed_password": security.get_password_hash(user_input.password)},
     )
     db.add(user)
     db.commit()
@@ -56,8 +59,16 @@ def deactivate_user(*, db: Session, user: User) -> User:
     return user
 
 
-def update_password(*, db: Session, user: User, password: str) -> User:
-    hashed_password = security.get_password_hash(password)
+def activate_user(*, db: Session, user: User) -> User:
+    user.is_active = True
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+def update_password(*, db: Session, user: User, new_password: str) -> User:
+    hashed_password = security.get_password_hash(new_password)
     user.hashed_password = hashed_password
     db.add(user)
     db.commit()
@@ -126,7 +137,9 @@ def create_device(*, db: Session, device_input: DeviceCreate) -> Device:
     return device
 
 
-def update_device(*, db: Session, db_device: Device, device_new_input: DeviceUpdate) -> Device:
+def update_device(
+    *, db: Session, db_device: Device, device_new_input: DeviceUpdate
+) -> Device:
     device_data = device_new_input.model_dump(exclude_unset=True)
     db_device.sqlmodel_update(device_data)
     db.add(db_device)
@@ -194,23 +207,29 @@ def get_message_by_id(*, db: Session, message_id: int) -> Message | None:
 
 
 def get_messages(
-        *, db: Session,
-        device_id: int,
-        start_date: str = datetime.now() - timedelta(hours=24),
-        end_date: str = datetime.now() + timedelta(hours=1),
-        limit: int = 100,
-        offset: int = 0
+    *,
+    db: Session,
+    device_id: int,
+    start_date: str = datetime.now() - timedelta(hours=24),
+    end_date: str = datetime.now() + timedelta(hours=1),
+    limit: int = 100,
+    offset: int = 0,
 ) -> list[Message]:
     """
     By Period and Device ID
     Defaut: Period of 24 hours
     Format: '2024-07-22 13:00:44' %Y-%m-%d %H:%M:%S,
     """
-    statement = select(Message).where(
-        Message.device_id == device_id,
-        Message.created_on >= start_date.strftime('%Y-%m-%d %H:%M:%S'),
-        Message.created_on <= end_date.strftime('%Y-%m-%d %H:%M:%S')
-    ).offset(offset).limit(limit)
+    statement = (
+        select(Message)
+        .where(
+            Message.device_id == device_id,
+            Message.created_on >= start_date.strftime("%Y-%m-%d %H:%M:%S"),
+            Message.created_on <= end_date.strftime("%Y-%m-%d %H:%M:%S"),
+        )
+        .offset(offset)
+        .limit(limit)
+    )
     session_messages = db.exec(statement).all()
     return session_messages
 
@@ -231,10 +250,11 @@ def delete_messages_list(*, db: Session, message_ids: list[int]) -> None:
 
 
 def delete_messages_by_period(
-        *, db: Session,
-        device_id: int,
-        start_date: str = datetime.now() - timedelta(hours=24),
-        end_date: str
+    *,
+    db: Session,
+    device_id: int,
+    start_date: str = datetime.now() - timedelta(hours=24),
+    end_date: str,
 ) -> None:
     """
     By Period and Device ID
@@ -244,7 +264,7 @@ def delete_messages_by_period(
     statement = select(Message).where(
         Message.device_id == device_id,
         Message.created_on >= start_date,
-        Message.created_on <= end_date
+        Message.created_on <= end_date,
     )
     session_messages = db.exec(statement).all()
     for message in session_messages:

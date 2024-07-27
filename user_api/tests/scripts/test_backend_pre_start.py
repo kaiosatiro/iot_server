@@ -1,7 +1,6 @@
 from unittest.mock import MagicMock, patch
 
 # from sqlmodel import select, Session
-
 from src.backend_pre_start import init
 
 
