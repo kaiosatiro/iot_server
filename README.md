@@ -44,7 +44,7 @@ Whether developing a home automation system, industrial monitoring solution, or 
 Here is the architecture diagram:
 
 <div style="text-align: center;">
-  <img src="/img/logic_diagram.png" alt="Alt text" />
+  <img src="/doc/logic_diagram.png" alt="Alt text" />
 </div>
 
 #### Services
@@ -52,7 +52,7 @@ Here is the architecture diagram:
 -- **Logging**: Aggregates logs from various services, pulling them from a queue:
 
 <div style="text-align: center;">
-  <img src="/img/logging_arch.png" alt="Alt text" />
+  <img src="/doc/logging_arch.png" alt="Alt text" />
 </div>
 
 
