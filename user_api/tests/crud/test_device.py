@@ -1,17 +1,17 @@
 from sqlmodel import Session
 
 from src import crud
-from src.models import DeviceCreate, DeviceUpdate, SiteCreate, UserCreate
+from src.models import DeviceCreation, DeviceUpdate, SiteCreation, UserCreation
 from tests.utils import random_lower_string
 
 
 def test_create_device(db: Session, userfix: dict, sitefix: dict, devicefix) -> None:
-    user_in = UserCreate(**userfix)
-    site_in = SiteCreate(**sitefix)
+    user_in = UserCreation(**userfix)
+    site_in = SiteCreation(**sitefix)
     user = crud.create_user(db=db, user_input=user_in)
     site = crud.create_site(db=db, site_input=site_in, user_id=user.id)
 
-    device_in = DeviceCreate(**devicefix, user_id=user.id, site_id=site.id)
+    device_in = DeviceCreation(**devicefix, user_id=user.id, site_id=site.id)
     device = crud.create_device(db=db, device_input=device_in)
 
     assert device.name == device_in.name, "Device name does not match"
@@ -26,12 +26,12 @@ def test_create_device(db: Session, userfix: dict, sitefix: dict, devicefix) -> 
 
 
 def test_update_device(db: Session, userfix: dict, sitefix: dict, devicefix) -> None:
-    user_in = UserCreate(**userfix)
-    site_in = SiteCreate(**sitefix)
+    user_in = UserCreation(**userfix)
+    site_in = SiteCreation(**sitefix)
     user = crud.create_user(db=db, user_input=user_in)
     site = crud.create_site(db=db, site_input=site_in, user_id=user.id)
 
-    device_in = DeviceCreate(**devicefix, user_id=user.id, site_id=site.id)
+    device_in = DeviceCreation(**devicefix, user_id=user.id, site_id=site.id)
     device = crud.create_device(db=db, device_input=device_in)
 
     device_update = DeviceUpdate(
@@ -54,12 +54,12 @@ def test_update_device(db: Session, userfix: dict, sitefix: dict, devicefix) -> 
 def test_get_device_by_name(
     db: Session, userfix: dict, sitefix: dict, devicefix
 ) -> None:
-    user_in = UserCreate(**userfix)
-    site_in = SiteCreate(**sitefix)
+    user_in = UserCreation(**userfix)
+    site_in = SiteCreation(**sitefix)
     user = crud.create_user(db=db, user_input=user_in)
     site = crud.create_site(db=db, site_input=site_in, user_id=user.id)
 
-    device_in = DeviceCreate(**devicefix, user_id=user.id, site_id=site.id)
+    device_in = DeviceCreation(**devicefix, user_id=user.id, site_id=site.id)
     device = crud.create_device(db=db, device_input=device_in)
 
     device_seek = crud.get_device_by_name(db=db, name=devicefix["name"])
@@ -86,13 +86,13 @@ def test_get_device_by_name_none(db: Session, devicefix) -> None:
 def test_get_devices_by_type(
     db: Session, userfix: dict, sitefix: dict, devicefix
 ) -> None:
-    user_in = UserCreate(**userfix)
-    site_in = SiteCreate(**sitefix)
+    user_in = UserCreation(**userfix)
+    site_in = SiteCreation(**sitefix)
     user = crud.create_user(db=db, user_input=user_in)
     site = crud.create_site(db=db, site_input=site_in, user_id=user.id)
 
     for _ in range(5):
-        device_in = DeviceCreate(**devicefix, user_id=user.id, site_id=site.id)
+        device_in = DeviceCreation(**devicefix, user_id=user.id, site_id=site.id)
         device = crud.create_device(db=db, device_input=device_in)
 
     devices = crud.get_devices_by_type(db=db, type=devicefix["type"], user_id=user.id)
@@ -108,13 +108,13 @@ def test_get_devices_by_type(
 def test_get_devices_by_model(
     db: Session, userfix: dict, sitefix: dict, devicefix
 ) -> None:
-    user_in = UserCreate(**userfix)
-    site_in = SiteCreate(**sitefix)
+    user_in = UserCreation(**userfix)
+    site_in = SiteCreation(**sitefix)
     user = crud.create_user(db=db, user_input=user_in)
     site = crud.create_site(db=db, site_input=site_in, user_id=user.id)
 
     for _ in range(5):
-        device_in = DeviceCreate(**devicefix, user_id=user.id, site_id=site.id)
+        device_in = DeviceCreation(**devicefix, user_id=user.id, site_id=site.id)
         device = crud.create_device(db=db, device_input=device_in)
 
     devices = crud.get_devices_by_model(
@@ -132,13 +132,13 @@ def test_get_devices_by_model(
 def test_get_devices_by_user_id(
     db: Session, userfix: dict, sitefix: dict, devicefix
 ) -> None:
-    user_in = UserCreate(**userfix)
-    site_in = SiteCreate(**sitefix)
+    user_in = UserCreation(**userfix)
+    site_in = SiteCreation(**sitefix)
     user = crud.create_user(db=db, user_input=user_in)
     site = crud.create_site(db=db, site_input=site_in, user_id=user.id)
 
     for _ in range(5):
-        device_in = DeviceCreate(**devicefix, user_id=user.id, site_id=site.id)
+        device_in = DeviceCreation(**devicefix, user_id=user.id, site_id=site.id)
         device = crud.create_device(db=db, device_input=device_in)
 
     devices = crud.get_devices_by_user_id(db=db, user_id=user.id)
@@ -153,13 +153,13 @@ def test_get_devices_by_user_id(
 def test_get_devices_by_site_id(
     db: Session, userfix: dict, sitefix: dict, devicefix
 ) -> None:
-    user_in = UserCreate(**userfix)
-    site_in = SiteCreate(**sitefix)
+    user_in = UserCreation(**userfix)
+    site_in = SiteCreation(**sitefix)
     user = crud.create_user(db=db, user_input=user_in)
     site = crud.create_site(db=db, site_input=site_in, user_id=user.id)
 
     for _ in range(5):
-        device_in = DeviceCreate(**devicefix, user_id=user.id, site_id=site.id)
+        device_in = DeviceCreation(**devicefix, user_id=user.id, site_id=site.id)
         device = crud.create_device(db=db, device_input=device_in)
 
     devices = crud.get_devices_by_site_id(db=db, site_id=site.id)
@@ -174,13 +174,13 @@ def test_get_devices_by_site_id(
 def test_delete_devices_from_user(
     db: Session, userfix: dict, sitefix: dict, devicefix
 ) -> None:
-    user_in = UserCreate(**userfix)
-    site_in = SiteCreate(**sitefix)
+    user_in = UserCreation(**userfix)
+    site_in = SiteCreation(**sitefix)
     user = crud.create_user(db=db, user_input=user_in)
     site = crud.create_site(db=db, site_input=site_in, user_id=user.id)
 
     for _ in range(5):
-        device_in = DeviceCreate(**devicefix, user_id=user.id, site_id=site.id)
+        device_in = DeviceCreation(**devicefix, user_id=user.id, site_id=site.id)
         crud.create_device(db=db, device_input=device_in)
 
     assert len(crud.get_devices_by_user_id(db=db, user_id=user.id)) == 5
@@ -194,13 +194,13 @@ def test_delete_devices_from_user(
 def test_delete_devices_per_site_id(
     db: Session, userfix: dict, sitefix: dict, devicefix
 ) -> None:
-    user_in = UserCreate(**userfix)
-    site_in = SiteCreate(**sitefix)
+    user_in = UserCreation(**userfix)
+    site_in = SiteCreation(**sitefix)
     user = crud.create_user(db=db, user_input=user_in)
     site = crud.create_site(db=db, site_input=site_in, user_id=user.id)
 
     for _ in range(5):
-        device_in = DeviceCreate(**devicefix, user_id=user.id, site_id=site.id)
+        device_in = DeviceCreation(**devicefix, user_id=user.id, site_id=site.id)
         crud.create_device(db=db, device_input=device_in)
 
     assert len(crud.get_devices_by_site_id(db=db, site_id=site.id)) == 5
@@ -212,12 +212,12 @@ def test_delete_devices_per_site_id(
 
 
 def test_delete_device(db: Session, userfix: dict, sitefix: dict, devicefix) -> None:
-    user_in = UserCreate(**userfix)
-    site_in = SiteCreate(**sitefix)
+    user_in = UserCreation(**userfix)
+    site_in = SiteCreation(**sitefix)
     user = crud.create_user(db=db, user_input=user_in)
     site = crud.create_site(db=db, site_input=site_in, user_id=user.id)
 
-    device_in = DeviceCreate(**devicefix, user_id=user.id, site_id=site.id)
+    device_in = DeviceCreation(**devicefix, user_id=user.id, site_id=site.id)
     device = crud.create_device(db=db, device_input=device_in)
 
     assert crud.get_device_by_name(db=db, name=devicefix["name"])

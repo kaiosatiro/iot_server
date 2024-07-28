@@ -10,13 +10,13 @@ from src.core.db import engine, init_db
 from src.main import app
 from src.models import (
     Device,
-    DeviceCreate,
+    DeviceCreation,
     Message,
-    MessageCreate,
+    MessageCreation,
     Site,
-    SiteCreate,
+    SiteCreation,
     User,
-    UserCreate,
+    UserCreation,
 )
 
 # from sqlmodel import SQLModel, create_engine
@@ -75,18 +75,24 @@ def superuser_token_headers(client: TestClient) -> dict[str, str]:
 
 
 # ----------------------------- Normal User --------------------------------
-@pytest.fixture(name="normaluserfix", scope="class")
-def normaluser_fixture(db, userfix) -> dict:
-    user_in = UserCreate(**userfix)
+@pytest.fixture(scope="class")
+def normaluser_fixture(db: Session) -> dict:
+    userdict = {
+        "email": random_email(),
+        "username": random_lower_string(),
+        "password": random_lower_string(),
+        "about": random_lower_string(),
+    }
+    user_in = UserCreation(**userdict)
     crud.create_user(db=db, user_input=user_in)
-    return userfix
+    return userdict
 
 
 @pytest.fixture(scope="class")
-def normal_token_headers(normaluserfix, client: TestClient) -> dict[str, str]:
+def normal_token_headers(normaluser_fixture, client: TestClient) -> dict[str, str]:
     login_data = {
-        "username": normaluserfix["username"],
-        "password": normaluserfix["password"],
+        "username": normaluser_fixture["username"],
+        "password": normaluser_fixture["password"],
     }
     response = client.post("/access-token", data=login_data)
     tokens = response.json()
@@ -126,19 +132,19 @@ def device_fixture() -> dict:
 # ----------------------------- For Messages --------------------------------
 @pytest.fixture(name="messagesbatchfix", scope="class")
 def messages_batch_fixture(db, userfix, sitefix, devicefix) -> tuple[int | None, int]:
-    user_in = UserCreate(**userfix)
+    user_in = UserCreation(**userfix)
     user = crud.create_user(db=db, user_input=user_in)
 
-    site_in = SiteCreate(**sitefix)
+    site_in = SiteCreation(**sitefix)
     site = crud.create_site(db=db, site_input=site_in, user_id=user.id)
 
-    device_in = DeviceCreate(**devicefix, user_id=user.id, site_id=site.id)
+    device_in = DeviceCreation(**devicefix, user_id=user.id, site_id=site.id)
     device = crud.create_device(db=db, device_input=device_in)
 
     messages = []
     range_number = 100
     for _ in range(range_number):
-        message = MessageCreate(
+        message = MessageCreation(
             message={
                 "deviceId": random_lower_string(),
                 "sensorId": random_lower_string(),

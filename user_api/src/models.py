@@ -27,13 +27,26 @@ class DeviceBase(SQLModel):
     description: str | None = Field(default=None, max_length=255)
 
 
-class DeviceCreate(DeviceBase):
-    user_id: int
+class DeviceCreation(DeviceBase):
+    user_id: int | None = None
     site_id: int
 
 
 class DeviceUpdate(DeviceBase):
     name: str | None = None
+
+
+class DeviceResponse(DeviceBase):
+    id: int
+    user_id: int
+    site_id: int
+    created_on: datetime
+    updated_on: datetime | None = None
+
+
+class DevicesListResponse(SQLModel):
+    data: list["DeviceResponse"]
+    count: int
 
 
 class Device(DeviceBase, BaseModel, table=True):
@@ -54,8 +67,18 @@ class MessageBase(SQLModel):
     device_id: int
 
 
-class MessageCreate(MessageBase):
+class MessageCreation(MessageBase):
     pass
+
+
+class MessageResponse(MessageBase):
+    id: int
+    created_on: datetime
+
+
+class MessagesListResponse(SQLModel):
+    data: list["MessageResponse"]
+    count: int
 
 
 class Message(SQLModel, table=True):
@@ -80,7 +103,7 @@ class SiteBase(SQLModel):
     description: str | None = Field(default=None, max_length=255)
 
 
-class SiteCreate(SiteBase):
+class SiteCreation(SiteBase):
     pass
 
 
@@ -88,13 +111,15 @@ class SiteUpdate(SiteBase):
     name: str | None = None
 
 
-class SitePublic(SiteBase, BaseModel):
+class SiteResponse(SiteBase):
     id: int
+    created_on: datetime
+    updated_on: datetime | None = None
 
 
-class SitesPublic(SQLModel):
-    data: list["SitePublic"]
-    count: int | None = None
+class SitesListResponse(SQLModel):
+    data: list["SiteResponse"]
+    count: int
 
 
 class Site(SiteBase, BaseModel, table=True):
@@ -115,7 +140,7 @@ class UserBase(SQLModel):
     is_superuser: bool = False
 
 
-class UserCreate(UserBase):
+class UserCreation(UserBase):
     password: str
 
 
@@ -136,13 +161,19 @@ class UpdatePassword(SQLModel):
     new_password: str
 
 
-class UserPublic(UserBase, BaseModel):
+class UserResponseObject(SQLModel):
     id: int
+    username: str
+    email: str
+    about: str | None = None
+    created_on: datetime
+    updated_on: datetime | None = None
+    is_active: bool
 
 
-class UsersPublic(SQLModel):
-    data: list["UserPublic"]
-    count: int | None = None
+class UsersListResponse(SQLModel):
+    data: list["UserResponseObject"]
+    count: int
 
 
 class User(UserBase, BaseModel, table=True):
@@ -163,7 +194,7 @@ class TokenPayload(SQLModel):
     sub: int | None = None
 
 
-class ResponseMessage(SQLModel):
+class DefaultResponseMessage(SQLModel):
     message: str
 
 
@@ -214,7 +245,7 @@ class ResponseMessage(SQLModel):
 #     )
 #     SQLModel.metadata.create_all(engine)
 #     with Session(engine) as session:
-#         user_in = UserCreate(
+#         user_in = UserCreation(
 #             email="email",
 #             username="random_lower_string()",
 #             password="random_lower_string()",
@@ -225,7 +256,7 @@ class ResponseMessage(SQLModel):
 #         session.commit()
 #         session.refresh(user)
 
-#         site_in = SiteCreate(
+#         site_in = SiteCreation(
 #             name="random_lower_string()",
 #             description="random_lower_string()",
 #             )
@@ -234,7 +265,7 @@ class ResponseMessage(SQLModel):
 #         session.commit()
 #         session.refresh(site)
 
-#         device_in = DeviceCreate(
+#         device_in = DeviceCreation(
 #             name="random_lower_string()",
 #             model="random_lower_string()",
 #             type="random_lower_string()",
@@ -250,7 +281,7 @@ class ResponseMessage(SQLModel):
 
 #         messages = []
 #         for _ in range(3):
-#             message = MessageCreate(message={
+#             message = MessageCreation(message={
 #                 "deviceId": "12345",
 #                 "sensorId": "humiditySensor01",
 #                 "timestamp": "2024-07-12T15:00:00Z",

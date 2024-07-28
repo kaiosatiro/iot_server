@@ -10,12 +10,12 @@ import src.api.dependencies as deps
 from src import crud
 from src.core.security import get_password_hash, verify_password
 from src.models import (
-    ResponseMessage,
+    DefaultResponseMessage,
     UpdatePassword,
     User,
-    UserCreate,
-    UserPublic,
-    UsersPublic,
+    UserCreation,
+    UserResponseObject,
+    UsersListResponse,
     UserUpdate,
     UserUpdateMe,
 )
@@ -23,8 +23,8 @@ from src.models import (
 router = APIRouter()
 
 
-@router.get("/me", response_model=UserPublic)
-async def read_user_me(*, current_user: deps.CurrentUser) -> Any:
+@router.get("/me", tags=["Users"], response_model=UserResponseObject)
+async def read_user_me(*, current_user: deps.CurrentUser) -> User | HTTPException:
     """
     Get current user.
     """
@@ -32,7 +32,7 @@ async def read_user_me(*, current_user: deps.CurrentUser) -> Any:
     return current_user
 
 
-@router.patch("/me", response_model=UserPublic)
+@router.patch("/me", tags=["Users"], response_model=UserResponseObject)
 def update_user_me(
     *, session: deps.SessionDep, user_in: UserUpdateMe, current_user: deps.CurrentUser
 ) -> Any:
@@ -60,7 +60,7 @@ def update_user_me(
     return current_user
 
 
-@router.patch("/me/password", response_model=ResponseMessage)
+@router.patch("/me/password", tags=["Users"], response_model=DefaultResponseMessage)
 def update_password_me(
     *, session: deps.SessionDep, body: UpdatePassword, current_user: deps.CurrentUser
 ) -> Any:
@@ -86,10 +86,10 @@ def update_password_me(
     if crud.update_password(
         db=session, user=current_user, new_password=body.new_password
     ):
-        return ResponseMessage(message="Password updated successfully")
+        return DefaultResponseMessage(message="Password updated successfully")
 
 
-@router.delete("/me", response_model=ResponseMessage)
+@router.delete("/me", tags=["Users"], response_model=DefaultResponseMessage)
 async def dactivate_user_me(
     session: deps.SessionDep, current_user: deps.CurrentUser
 ) -> Any:
@@ -102,13 +102,14 @@ async def dactivate_user_me(
         )
     crud.deactivate_user(db=session, user=current_user)
 
-    return ResponseMessage(message="User deactivated successfully")
+    return DefaultResponseMessage(message="User deactivated successfully")
 
 
 @router.get(
     "/",
+    tags=["Admin"],
     dependencies=[Depends(deps.get_current_active_superuser)],
-    response_model=UsersPublic,
+    response_model=UsersListResponse,
 )
 async def read_users(*, session: deps.SessionDep) -> Any:
     """
@@ -120,13 +121,14 @@ async def read_users(*, session: deps.SessionDep) -> Any:
     statement = select(User)
     users = session.exec(statement).all()
 
-    return UsersPublic(data=users, count=count)
+    return UsersListResponse(data=users, count=count)
 
 
 @router.get(
     "/{user_id}",
+    tags=["Admin"],
     dependencies=[Depends(deps.get_current_active_superuser)],
-    response_model=UserPublic,
+    response_model=UserResponseObject,
 )
 async def read_user_by_id(*, user_id: int, session: deps.SessionDep) -> Any:
     """
@@ -140,11 +142,12 @@ async def read_user_by_id(*, user_id: int, session: deps.SessionDep) -> Any:
 
 @router.post(
     "/",
+    tags=["Admin"],
     dependencies=[Depends(deps.get_current_active_superuser)],
-    response_model=UserPublic,
+    response_model=UserResponseObject,
     status_code=201,
 )
-async def create_user(*, session: deps.SessionDep, user_in: UserCreate) -> Any:
+async def create_user(*, session: deps.SessionDep, user_in: UserCreation) -> Any:
     """
     Create new user.
     """
@@ -176,8 +179,9 @@ async def create_user(*, session: deps.SessionDep, user_in: UserCreate) -> Any:
 
 @router.patch(
     "/{id}",
+    tags=["Admin"],
     dependencies=[Depends(deps.get_current_active_superuser)],
-    response_model=UserPublic,
+    response_model=UserResponseObject,
 )
 async def update_user(*, id: int, session: deps.SessionDep, user_in: UserUpdate) -> Any:
     """
@@ -209,8 +213,9 @@ async def update_user(*, id: int, session: deps.SessionDep, user_in: UserUpdate)
 
 @router.delete(
     "/{id}",
+    tags=["Admin"],
     dependencies=[Depends(deps.get_current_active_superuser)],
-    response_model=ResponseMessage,
+    response_model=DefaultResponseMessage,
 )
 async def delete_user(
     *, id: int, session: deps.SessionDep, current_user: deps.CurrentUser
@@ -231,4 +236,4 @@ async def delete_user(
         )
 
     crud.deactivate_user(db=session, user=user)
-    return ResponseMessage(message="User deactivated successfully")
+    return DefaultResponseMessage(message="User deactivated successfully")

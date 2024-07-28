@@ -36,3 +36,5 @@ run-local:
 tests:
 	@echo "Running tests..."
 	poetry run python -m pytest
+
+# poetry run pytest --lf tests/api/test_message.py -W ignore::DeprecationWarning

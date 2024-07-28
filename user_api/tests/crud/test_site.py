@@ -3,17 +3,17 @@ from sqlmodel import Session
 from src import crud
 from src.models import (
     Site,
-    SiteCreate,
+    SiteCreation,
     SiteUpdate,
-    UserCreate,
+    UserCreation,
 )
 from tests.utils import random_lower_string
 
 
 def test_create_site(db: Session, userfix: dict, sitefix: dict) -> None:
-    user_in = UserCreate(**userfix)
+    user_in = UserCreation(**userfix)
     user = crud.create_user(db=db, user_input=user_in)
-    site_in = SiteCreate(**sitefix)
+    site_in = SiteCreation(**sitefix)
     site = crud.create_site(db=db, site_input=site_in, user_id=user.id)
 
     assert (
@@ -26,9 +26,9 @@ def test_create_site(db: Session, userfix: dict, sitefix: dict) -> None:
 
 
 def test_update_site(db: Session, userfix: dict, sitefix: dict) -> None:
-    user_in = UserCreate(**userfix)
+    user_in = UserCreation(**userfix)
     user = crud.create_user(db=db, user_input=user_in)
-    site_in = SiteCreate(**sitefix)
+    site_in = SiteCreation(**sitefix)
     site = crud.create_site(db=db, site_input=site_in, user_id=user.id)
     site_update = SiteUpdate(
         name=random_lower_string(),
@@ -55,9 +55,9 @@ def test_update_site(db: Session, userfix: dict, sitefix: dict) -> None:
 
 
 def test_get_site_by_name(db: Session, userfix: dict, sitefix: dict) -> None:
-    user_in = UserCreate(**userfix)
+    user_in = UserCreation(**userfix)
     user = crud.create_user(db=db, user_input=user_in)
-    site_in = SiteCreate(**sitefix)
+    site_in = SiteCreation(**sitefix)
     site = crud.create_site(db=db, site_input=site_in, user_id=user.id)
     site_seek = crud.get_site_by_name(db=db, name=sitefix["name"])
 
@@ -81,9 +81,9 @@ def test_get_site_by_name_none(db: Session, sitefix: dict) -> None:
 
 
 def test_get_sites_by_user_id(db: Session, userfix: dict, sitefix: dict) -> None:
-    user_in = UserCreate(**userfix)
+    user_in = UserCreation(**userfix)
     user = crud.create_user(db=db, user_input=user_in)
-    site_in = SiteCreate(**sitefix)
+    site_in = SiteCreation(**sitefix)
     site = crud.create_site(db=db, site_input=site_in, user_id=user.id)
     site_seek = crud.get_sites_by_user_id(db=db, user_id=user.id)
 
@@ -101,7 +101,7 @@ def test_get_sites_by_user_id(db: Session, userfix: dict, sitefix: dict) -> None
         site_seek[0].id == site.id
     ), f"site_seek[0].id: {site_seek[0].id}, site.id: {site.id}"
 
-    site_in = SiteCreate(**sitefix)
+    site_in = SiteCreation(**sitefix)
     site = crud.create_site(db=db, site_input=site_in, user_id=user.id)
     site_seek = crud.get_sites_by_user_id(db=db, user_id=user.id)
 
@@ -120,9 +120,9 @@ def test_get_sites_by_user_id(db: Session, userfix: dict, sitefix: dict) -> None
 
 
 def test_delete_site(db: Session, userfix: dict, sitefix: dict) -> None:
-    user_in = UserCreate(**userfix)
+    user_in = UserCreation(**userfix)
     user = crud.create_user(db=db, user_input=user_in)
-    site_in = SiteCreate(**sitefix)
+    site_in = SiteCreation(**sitefix)
     site = crud.create_site(db=db, site_input=site_in, user_id=user.id)
 
     site_seek = db.get(Site, site.id)
@@ -141,11 +141,11 @@ def test_delete_site(db: Session, userfix: dict, sitefix: dict) -> None:
 
 
 def test_delete_sites_from_user(db: Session, userfix: dict, sitefix: dict) -> None:
-    user_in = UserCreate(**userfix)
+    user_in = UserCreation(**userfix)
     user = crud.create_user(db=db, user_input=user_in)
 
     for _ in range(3):
-        site_in = SiteCreate(**sitefix)
+        site_in = SiteCreation(**sitefix)
         crud.create_site(db=db, site_input=site_in, user_id=user.id)
 
     site_seek = crud.get_sites_by_user_id(db=db, user_id=user.id)

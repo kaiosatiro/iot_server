@@ -4,7 +4,7 @@ from sqlmodel import Session
 
 import src.crud as crud
 from src.core.config import settings
-from src.models import UserCreate
+from src.models import UserCreation
 from tests.utils import random_email, random_lower_string
 
 
@@ -88,7 +88,7 @@ class TestGetUser:
         username = random_lower_string()
         password = random_lower_string()
         email = random_email()
-        user_in = UserCreate(username=username, email=email, password=password)
+        user_in = UserCreation(username=username, email=email, password=password)
         user = crud.create_user(db=db, user_input=user_in)
 
         user_id = user.id
@@ -114,7 +114,7 @@ class TestGetUser:
         username = random_lower_string()
         password = random_lower_string()
         email = random_email()
-        user_in = UserCreate(username=username, email=email, password=password)
+        user_in = UserCreation(username=username, email=email, password=password)
         user = crud.create_user(db=db, user_input=user_in)
 
         user_id = user.id
@@ -175,7 +175,7 @@ class TestCreateUser:
         username = random_lower_string()
         password = random_lower_string()
         email = random_email()
-        user_in = UserCreate(username=username, email=email, password=password)
+        user_in = UserCreation(username=username, email=email, password=password)
         crud.create_user(db=db, user_input=user_in)
 
         user_in = {"username": username, "email": email, "password": password}
@@ -192,7 +192,7 @@ class TestCreateUser:
         username = random_lower_string()
         password = random_lower_string()
         email = random_email()
-        user_in = UserCreate(username=username, email=email, password=password)
+        user_in = UserCreation(username=username, email=email, password=password)
         crud.create_user(db=db, user_input=user_in)
 
         email = random_email()
@@ -212,7 +212,7 @@ class TestPatchUser:
         username = random_lower_string()
         password = random_lower_string()
         email = random_email()
-        user_in = UserCreate(username=username, email=email, password=password)
+        user_in = UserCreation(username=username, email=email, password=password)
         user = crud.create_user(db=db, user_input=user_in)
 
         user_id = user.id
@@ -232,7 +232,7 @@ class TestPatchUser:
         username = random_lower_string()
         password = random_lower_string()
         email = random_email()
-        user_in = UserCreate(username=username, email=email, password=password)
+        user_in = UserCreation(username=username, email=email, password=password)
         user = crud.create_user(db=db, user_input=user_in)
 
         user_id = user.id
@@ -251,7 +251,7 @@ class TestPatchUser:
         username = random_lower_string()
         password = random_lower_string()
         email = random_email()
-        user_in = UserCreate(username=username, email=email, password=password)
+        user_in = UserCreation(username=username, email=email, password=password)
         user = crud.create_user(db=db, user_input=user_in)
 
         user_id = user.id
@@ -280,14 +280,14 @@ class TestPatchUser:
 
         first_username = random_lower_string()
         first_email = random_email()
-        user_in = UserCreate(
+        user_in = UserCreation(
             username=first_username, email=first_email, password=password
         )
         first_user = crud.create_user(db=db, user_input=user_in)
 
         second_username = random_lower_string()
         second_email = random_email()
-        user_in = UserCreate(
+        user_in = UserCreation(
             username=second_username, email=second_email, password=password
         )
         second_user = crud.create_user(db=db, user_input=user_in)
@@ -348,7 +348,7 @@ class TestPatchMe:
 
         first_username = random_lower_string()
         first_email = random_email()
-        user_in = UserCreate(
+        user_in = UserCreation(
             username=first_username, email=first_email, password=password
         )
         crud.create_user(db=db, user_input=user_in)
@@ -367,7 +367,7 @@ class TestPatchMe:
 
         first_username = random_lower_string()
         first_email = random_email()
-        user_in = UserCreate(
+        user_in = UserCreation(
             username=first_username, email=first_email, password=password
         )
         crud.create_user(db=db, user_input=user_in)
@@ -381,7 +381,7 @@ class TestPatchMe:
 
 class TestPatchMePassword:
     def test_patch_me_password(
-        self, client: TestClient, normaluserfix, normal_token_headers: dict[str, str]
+        self, client: TestClient, normaluser_fixture, normal_token_headers: dict[str, str]
     ) -> None:
         new_password = random_lower_string()
         response = client.patch(
@@ -389,14 +389,14 @@ class TestPatchMePassword:
             headers=normal_token_headers,
             json={
                 "new_password": new_password,
-                "current_password": normaluserfix["password"],
+                "current_password": normaluser_fixture["password"],
             },
         )
         assert response.status_code == 200
         assert response.json() == {"message": "Password updated successfully"}
 
     def test_patch_me_password_bad_password(
-        self, client: TestClient, normaluserfix, normal_token_headers: dict[str, str]
+        self, client: TestClient, normal_token_headers: dict[str, str]
     ) -> None:
         new_password = random_lower_string()
         response = client.patch(
@@ -468,7 +468,7 @@ class TestDeactivateUser:
         username = random_lower_string()
         password = random_lower_string()
         email = random_email()
-        user_in = UserCreate(username=username, email=email, password=password)
+        user_in = UserCreation(username=username, email=email, password=password)
         user = crud.create_user(db=db, user_input=user_in)
 
         user_id = user.id
@@ -484,7 +484,7 @@ class TestDeactivateUser:
         username = random_lower_string()
         password = random_lower_string()
         email = random_email()
-        user_in = UserCreate(username=username, email=email, password=password)
+        user_in = UserCreation(username=username, email=email, password=password)
         user = crud.create_user(db=db, user_input=user_in)
 
         user_id = user.id
@@ -518,7 +518,7 @@ class TestDeactivateUser:
         username = random_lower_string()
         password = random_lower_string()
         email = random_email()
-        user_in = UserCreate(username=username, email=email, password=password)
+        user_in = UserCreation(username=username, email=email, password=password)
         user = crud.create_user(db=db, user_input=user_in)
 
         user_id = user.id

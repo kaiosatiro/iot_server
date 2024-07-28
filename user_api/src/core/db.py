@@ -5,7 +5,7 @@ import src.crud as crud
 from src.core.config import settings
 from src.models import (
     User,
-    UserCreate,
+    UserCreation,
 )
 
 engine = create_engine(str(settings.SQL_DATABASE_URI), poolclass=StaticPool)
@@ -21,7 +21,7 @@ def init_db(session: Session) -> None:
     ).first()
 
     if not user:
-        user_in = UserCreate(
+        user_in = UserCreation(
             email=settings.FIRST_SUPERUSER_EMAIL,
             username=settings.FIRST_SUPERUSERNAME,
             password=settings.FIRST_SUPERUSER_PASSWORD,

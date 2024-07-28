@@ -6,20 +6,20 @@ import src.core.security as security
 
 from .models import (
     Device,
-    DeviceCreate,
+    DeviceCreation,
     DeviceUpdate,
     Message,
     Site,
-    SiteCreate,
+    SiteCreation,
     SiteUpdate,
     User,
-    UserCreate,
+    UserCreation,
     UserUpdate,
 )
 
 
 # -------------------------- USER -----------------------------------
-def create_user(*, db: Session, user_input: UserCreate) -> User:
+def create_user(*, db: Session, user_input: UserCreation) -> User:
     user = User.model_validate(
         user_input,
         update={"hashed_password": security.get_password_hash(user_input.password)},
@@ -86,7 +86,7 @@ def authenticate_user(*, db: Session, username: str, password: str) -> User | No
 
 
 # -------------------------- SITE -----------------------------------
-def create_site(*, db: Session, site_input: SiteCreate, user_id: int) -> Site:
+def create_site(*, db: Session, site_input: SiteCreation, user_id: int) -> Site:
     site = Site.model_validate(site_input, update={"user_id": user_id})
     db.add(site)
     db.commit()
@@ -129,7 +129,7 @@ def delete_sites_from_user(*, db: Session, user_id: int) -> None:
 
 
 # -------------------------- DEVICE -----------------------------------
-def create_device(*, db: Session, device_input: DeviceCreate) -> Device:
+def create_device(*, db: Session, device_input: DeviceCreation) -> Device:
     device = Device.model_validate(device_input)
     db.add(device)
     db.commit()
@@ -218,14 +218,18 @@ def get_messages(
     """
     By Period and Device ID
     Defaut: Period of 24 hours
-    Format: '2024-07-22 13:00:44' %Y-%m-%d %H:%M:%S,
+    Format:
+        Complete: '2024-07-22 13:00:44' %Y-%m-%d %H:%M:%S,
+        Date: '2024-07-22' %Y-%m-%d,
+    Limit: 100 messages, Default: 100
     """
+
     statement = (
         select(Message)
         .where(
             Message.device_id == device_id,
-            Message.created_on >= start_date.strftime("%Y-%m-%d %H:%M:%S"),
-            Message.created_on <= end_date.strftime("%Y-%m-%d %H:%M:%S"),
+            Message.created_on >= start_date,
+            Message.created_on <= end_date,
         )
         .offset(offset)
         .limit(limit)
@@ -266,6 +270,14 @@ def delete_messages_by_period(
         Message.created_on >= start_date,
         Message.created_on <= end_date,
     )
+    session_messages = db.exec(statement).all()
+    for message in session_messages:
+        db.delete(message)
+    db.commit()
+
+
+def delete_all_messages_per_device(*, db: Session, device_id: int) -> None:
+    statement = select(Message).where(Message.device_id == device_id)
     session_messages = db.exec(statement).all()
     for message in session_messages:
         db.delete(message)

@@ -2,12 +2,12 @@ from sqlmodel import Session
 
 from src import crud
 from src.core.security import verify_password
-from src.models import UserCreate, UserUpdate
+from src.models import UserCreation, UserUpdate
 from tests.utils import random_email, random_lower_string
 
 
 def test_create_user(db: Session, userfix: dict) -> None:
-    user_in = UserCreate(**userfix)
+    user_in = UserCreation(**userfix)
     user_out = crud.create_user(db=db, user_input=user_in)
 
     assert (
@@ -23,7 +23,7 @@ def test_create_user(db: Session, userfix: dict) -> None:
 
 
 def test_update_user(db: Session, userfix: dict) -> None:
-    old_user_in = UserCreate(**userfix)
+    old_user_in = UserCreation(**userfix)
     old_user = crud.create_user(db=db, user_input=old_user_in)
     new_email = random_email()
     new_username = random_lower_string()
@@ -43,7 +43,7 @@ def test_update_user(db: Session, userfix: dict) -> None:
 
 
 def test_get_user_by_username(db: Session, userfix: dict) -> None:
-    user_in = UserCreate(**userfix)
+    user_in = UserCreation(**userfix)
     user = crud.create_user(db=db, user_input=user_in)
     seek_user = crud.get_user_by_username(db=db, username=userfix["username"])
 
@@ -56,7 +56,7 @@ def test_get_user_by_username(db: Session, userfix: dict) -> None:
 
 
 def test_get_user_by_email(db: Session, userfix: dict) -> None:
-    user_in = UserCreate(**userfix)
+    user_in = UserCreation(**userfix)
     user = crud.create_user(db=db, user_input=user_in)
     seek_user = crud.get_user_by_email(db=db, email=userfix["email"])
 
@@ -72,7 +72,7 @@ def test_get_user_by_email_none(db: Session, userfix: dict) -> None:
 
 
 def test_update_password(db: Session, userfix: dict) -> None:
-    user_in = UserCreate(**userfix)
+    user_in = UserCreation(**userfix)
     user_out = crud.create_user(db=db, user_input=user_in)
 
     new_password = random_lower_string()
@@ -85,7 +85,7 @@ def test_update_password(db: Session, userfix: dict) -> None:
 
 
 def test_deactivate_user(db: Session, userfix: dict) -> None:
-    user_in = UserCreate(**userfix)
+    user_in = UserCreation(**userfix)
     user_out = crud.create_user(db=db, user_input=user_in)
 
     user = crud.deactivate_user(db=db, user=user_out)
@@ -94,7 +94,7 @@ def test_deactivate_user(db: Session, userfix: dict) -> None:
 
 
 def test_activate_user(db: Session, userfix: dict) -> None:
-    user_in = UserCreate(**userfix)
+    user_in = UserCreation(**userfix)
     user_out = crud.create_user(db=db, user_input=user_in)
     assert user_out.is_active, "User is not active"
 

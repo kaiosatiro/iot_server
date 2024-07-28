@@ -10,9 +10,42 @@ from src.logger.setup import setup_logging
 setup_logging()
 logger = getLogger(__name__)
 
+tags_metadata = [
+    {
+        "name": "Login",
+        "description": "Operations with users. The **login** logic is also here.",
+    },
+    {
+        "name": "Users",
+        "description": "Operations with users. The **login** logic is also here.",
+    },
+    {
+        "name": "Sites",
+        "description": "Operations with users. The **login** logic is also here.",
+    },
+    {
+        "name": "Devices",
+        "description": "Operations with users. The **login** logic is also here.",
+    },
+    {
+        "name": "Messages",
+        "description": "Operations with users. The **login** logic is also here.",
+    },
+    {
+        "name": "Admin",
+        "description": "Manage items. So _fancy_ they have their own docs.",
+        "externalDocs": {
+            "description": "Items external docs",
+            "url": "https://fastapi.tiangolo.com/",
+        },
+    },
+]
+
 app = FastAPI(
     # debug=True,
     title=settings.PROJECT_NAME,
+    openapi_tags=tags_metadata,
+    swagger_ui_parameters={"operationsSorter": "method"},
     # summary=
     # description=
     version=settings.VERSION,
@@ -52,29 +85,36 @@ async def root():
 # - POST /access-token - 200 | 401 Unauthorized
 
 # Users:
-# - GET /users - 200 | 401 | 403 | 404
 # - GET /users/me - 200 | 404
+# - PATCH /users/me/ - 200 | 422 | 404 | 409
+# - PATCH /users/me/password - 200 | 422 | 404 |
+# - DELETE /users/me - 200 | 403 | 404
+
+# Admin:
+# - GET /users - 200 | 401 | 403 | 404
 # - GET /users/{id} - 200 | 403 | 404
 # - POST /users - 201 | 422 | 403 | 409
 # - PATCH /users/{id} - 200 | 422 | 403 | 404 | 409
-# - PATCH /users/me/ - 200 | 422 | 404 | 409
-# - PATCH /users/me/password - 200 | 422 | 404 | 401
 # - DELETE /users/{id} - 200 | 403 | 404
 
-# Sites | Devices | Messages:
-
-# - GET /sites - 200 | 403
-# - POST /sites - 201 | 400 | 403
-# - PATCH /sites/{siteId} - 200 | 400 | 403 | 404
-# - DELETE /sites/{siteId} - 200 | 403 | 404
-
+# - GET /sites - 200 | 401
 # - GET /devices - 200 | 404 | 403
-# - GET /devices/site/{siteId} - 200 | 403 | 404
-# - POST /devices - 201 Created | 400 | 403
-# - PATCH /devices/{id} - 200 | 400  | 403  | 404
-# - DELETE /devices/{deviceId} - 200 | 404
-# - DELETE /devices/site/{siteId} - 200 | 404
 
-# - GET /messages/device/{deviceId}?from=from&to=to&limit=limit - 200 | 404 | 403
-# - DELETE /messages/{messageId} - 200 | 404 
-# - DELETE /messages/device/{deviceId}?from=from&to=to&all=true - 200 | 404
+# Sites:
+# - GET /sites - 200 | 401
+# - POST /sites - 201 | 400 | 403
+# - PATCH /sites/{site_id} - 200 | 400 | 403 | 404
+# - DELETE /sites/{site_id} - 200 | 403 | 404
+
+# Devices:
+# - GET /devices - 200 | 404 | 403
+# - GET /devices/site/{site_id} - 200 | 403 | 404
+# - POST /devices/site - 201 | 400 | 403
+# - PATCH /devices/{device_id} - 200 | 422  | 403  | 404
+# - DELETE /devices/{device_id} - 200 | 404
+# - DELETE /devices/site/{site_id} - 200 | 404
+
+# Messages:
+# - GET /messages/device/{device_id}?from=from&to=to&limit=limit&offset=offset - 200 | 404 | 401 | 403
+# - DELETE /messages/{message_id} - 200 | 404 | 403
+# - DELETE /messages/device/{device_id}?from=from&to=to&all=true - 200 | 404

@@ -219,6 +219,17 @@ class TestDeleteMessage:
         assert len(messages) == 0, "Should be the 0, all deleted"
 
 
+class TestDeleteAll:
+    def test_delete_all_messages_per_device_id(self, db: Session, messagesbatchfix) -> None:
+        device_id, range_N = messagesbatchfix
+        crud.delete_all_messages_per_device(db=db, device_id=device_id)
+        messages = crud.get_messages(
+            db=db, device_id=device_id, end_date=datetime.now() + timedelta(minutes=2)
+        )
+
+        assert len(messages) == 0, "Should be the 0, all deleted"
+
+
 class TestMessageContent:
     def test_validate_if_message_content_is_a_JSON(
         self, db: Session, messagesbatchfix
