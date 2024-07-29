@@ -23,8 +23,13 @@ from src.models import (
 router = APIRouter()
 
 
-@router.get("/me", tags=["Users"], response_model=UserResponseObject)
-async def read_user_me(*, current_user: deps.CurrentUser) -> User | HTTPException:
+@router.get(
+        "/me",
+        tags=["Users"],
+        response_model=UserResponseObject,
+        responses={401: deps.responses_401, 403: deps.responses_403}
+)
+async def read_me(*, current_user: deps.CurrentUser) -> User | HTTPException:
     """
     Get current user.
     """
@@ -32,10 +37,15 @@ async def read_user_me(*, current_user: deps.CurrentUser) -> User | HTTPExceptio
     return current_user
 
 
-@router.patch("/me", tags=["Users"], response_model=UserResponseObject)
-def update_user_me(
+@router.patch(
+        "/me",
+        tags=["Users"],
+        response_model=UserResponseObject,
+        responses={401: deps.responses_401, 403: deps.responses_403, 409: deps.responses_409}
+)
+def update_me(
     *, session: deps.SessionDep, user_in: UserUpdateMe, current_user: deps.CurrentUser
-) -> Any:
+) -> UserResponseObject | HTTPException:
     """
     Update own user.
     """
@@ -60,10 +70,15 @@ def update_user_me(
     return current_user
 
 
-@router.patch("/me/password", tags=["Users"], response_model=DefaultResponseMessage)
-def update_password_me(
+@router.patch(
+        "/me/password",
+        tags=["Users"],
+        response_model=DefaultResponseMessage,
+        responses={401: deps.responses_401, 403: deps.responses_403, 409: deps.responses_409}
+)
+def update_my_password(
     *, session: deps.SessionDep, body: UpdatePassword, current_user: deps.CurrentUser
-) -> Any:
+) -> DefaultResponseMessage | HTTPException:
     """
     Update own password.
     """
@@ -80,19 +95,22 @@ def update_password_me(
 
     if body.current_password == body.new_password:
         raise HTTPException(
-            status_code=422, detail="New password cannot be the same as the current one"
+            status_code=409, detail="New password cannot be the same as the current one"
         )
 
-    if crud.update_password(
-        db=session, user=current_user, new_password=body.new_password
-    ):
+    if crud.update_password(db=session, user=current_user, new_password=body.new_password):
         return DefaultResponseMessage(message="Password updated successfully")
 
 
-@router.delete("/me", tags=["Users"], response_model=DefaultResponseMessage)
-async def dactivate_user_me(
+@router.delete(
+        "/me", tags=["Users"],
+        response_model=DefaultResponseMessage,
+        responses={401: deps.responses_401, 403: deps.responses_403}
+)
+
+async def deactivate_me(
     session: deps.SessionDep, current_user: deps.CurrentUser
-) -> Any:
+) -> DefaultResponseMessage | HTTPException:
     """
     Deactivate own user.
     """
@@ -111,7 +129,7 @@ async def dactivate_user_me(
     dependencies=[Depends(deps.get_current_active_superuser)],
     response_model=UsersListResponse,
 )
-async def read_users(*, session: deps.SessionDep) -> Any:
+async def read_users(*, session: deps.SessionDep) -> UsersListResponse | HTTPException:
     """
     Retrieve users.
     """
@@ -130,7 +148,9 @@ async def read_users(*, session: deps.SessionDep) -> Any:
     dependencies=[Depends(deps.get_current_active_superuser)],
     response_model=UserResponseObject,
 )
-async def read_user_by_id(*, user_id: int, session: deps.SessionDep) -> Any:
+async def read_user_by_id(
+    *, user_id: int, session: deps.SessionDep
+    ) -> UserResponseObject | HTTPException:
     """
     Get a specific user by id.
     """
@@ -147,7 +167,9 @@ async def read_user_by_id(*, user_id: int, session: deps.SessionDep) -> Any:
     response_model=UserResponseObject,
     status_code=201,
 )
-async def create_user(*, session: deps.SessionDep, user_in: UserCreation) -> Any:
+async def create_user(
+    *, session: deps.SessionDep, user_in: UserCreation
+    ) -> UserResponseObject | HTTPException:
     """
     Create new user.
     """
@@ -183,7 +205,9 @@ async def create_user(*, session: deps.SessionDep, user_in: UserCreation) -> Any
     dependencies=[Depends(deps.get_current_active_superuser)],
     response_model=UserResponseObject,
 )
-async def update_user(*, id: int, session: deps.SessionDep, user_in: UserUpdate) -> Any:
+async def update_user(
+    *, id: int, session: deps.SessionDep, user_in: UserUpdate
+    ) -> UserResponseObject | HTTPException:
     """
     Update some user.
     """
@@ -219,7 +243,7 @@ async def update_user(*, id: int, session: deps.SessionDep, user_in: UserUpdate)
 )
 async def delete_user(
     *, id: int, session: deps.SessionDep, current_user: deps.CurrentUser
-) -> Any:
+) -> DefaultResponseMessage | HTTPException:
     """
     Deactivate some user.
     """

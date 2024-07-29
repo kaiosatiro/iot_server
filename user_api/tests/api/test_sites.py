@@ -12,11 +12,14 @@ class TestGetSites:
     def sitesbatch(self, db, client: TestClient, normal_token_headers) -> tuple[int, int]:
         response = client.get("/users/me", headers=normal_token_headers)
         user_id = response.json()["id"]
+        username = response.json()["username"]
         rng = 10
         for _ in range(rng):
             site = SiteCreation(name=f"Site_{_}")
             crud.create_site(db=db, site_input=site, user_id=user_id)
-        return rng
+        return {
+            "range": rng, "user-id": user_id, "username": username
+        }
 
     def test_get_sites(
             self,
@@ -25,20 +28,49 @@ class TestGetSites:
             sitesbatchrange
     ) -> None:
 
-        response = client.get("/sites/", headers=normal_token_headers)
+        response = client.get("/sites/user", headers=normal_token_headers)
 
         assert response.status_code == 200
-        assert response.json()["count"] == sitesbatchrange, "Should be the count define in the fixture"
+        assert response.json()["count"] == sitesbatchrange["range"], "Should be the count define in the fixture"
+        assert response.json()["user_id"] == sitesbatchrange["user-id"], "Should be the last site id"
+        assert response.json()["username"] == sitesbatchrange["username"], "Should be the last site name"
         assert response.json()["data"], "Should return a list of sites"
 
     def test_get_sites_no_token(self, client: TestClient) -> None:
-        response = client.get("/sites/")
+        response = client.get("/sites/user")
         assert response.status_code == 401
 
     def test_get_sites_no_sites(self, client: TestClient, superuser_token_headers: dict) -> None:
-        response = client.get("/sites/", headers=superuser_token_headers)
+        response = client.get("/sites/user", headers=superuser_token_headers)
         assert response.status_code == 200
         assert response.json()["count"] == 0, "Should be 0"
+
+
+class TestGetSite:
+    @pytest.fixture(autouse=True)
+    def site_id(self, db, client: TestClient, normal_token_headers) -> int:
+        site = SiteCreation(name="Site_1")
+        response = client.post("/sites/", headers=normal_token_headers, json=site.model_dump())
+        return response.json()["id"]
+
+    def test_get_site(
+            self,
+            client: TestClient,
+            normal_token_headers: dict,
+            site_id: int
+    ) -> None:
+        response = client.get(f"/sites/{site_id}", headers=normal_token_headers)
+
+        assert response.status_code == 200
+        assert response.json()["id"] == site_id
+
+    def test_get_site_no_token(self, client: TestClient, site_id: int) -> None:
+        response = client.get(f"/sites/{site_id}")
+        assert response.status_code == 401
+
+    def test_get_wrong_site(self, client: TestClient, normal_token_headers: dict) -> None:
+        response = client.get("/sites/999999", headers=normal_token_headers)
+        assert response.status_code == 404
 
 
 class TestCreateSite:
@@ -68,6 +100,7 @@ class TestCreateSite:
         response = client.post("/sites/", headers=normal_token_headers)
 
         assert response.status_code == 422
+    
 
 
 class TestPatchSite:

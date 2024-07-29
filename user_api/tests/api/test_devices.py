@@ -7,7 +7,7 @@ from src.models import Device, DeviceCreation, SiteCreation, UserCreation
 
 
 class TestGetDevices:
-    @pytest.fixture(name="devicesbatchrange", autouse=True, scope="class")
+    @pytest.fixture(autouse=True, scope="class")
     def devicesbatch(self, db: Session, client: TestClient, normal_token_headers) -> tuple[int, int]:
         response = client.get("/users/me", headers=normal_token_headers)
         user_id = response.json()["id"]
@@ -31,19 +31,25 @@ class TestGetDevices:
             )
             crud.create_device(db=db, device_input=device)
 
-        return rng
+        return {
+            "range": rng,
+            "user_id": user_id,
+            "username": response.json()["username"]
+        }
 
     def test_get_devices(
             self,
             client: TestClient,
             normal_token_headers: dict,
-            devicesbatchrange
+            devicesbatch
     ) -> None:
 
         response = client.get("/devices/", headers=normal_token_headers)
 
         assert response.status_code == 200
-        assert response.json()["count"] == devicesbatchrange, "Define in the fixture"
+        assert response.json()["count"] == devicesbatch["range"], "Define in the fixture"
+        assert response.json()["user_id"] == devicesbatch["user_id"], "Should be the last user id"
+        assert response.json()["username"] == devicesbatch["username"], "Should be the last username"
         assert response.json()["data"], "Should return a list of devices"
 
     def test_get_devices_no_token(self, client: TestClient) -> None:
@@ -54,6 +60,77 @@ class TestGetDevices:
         response = client.get("/devices/", headers=superuser_token_headers)
         assert response.status_code == 200
         assert response.json()["count"] == 0, "Should be 0"
+
+
+class TestGetDevice:
+    @pytest.fixture(autouse=True, scope="class")
+    def devicesbatch(self, db: Session, client: TestClient, normal_token_headers) -> dict:
+        response = client.get("/users/me", headers=normal_token_headers)
+        user_id = response.json()["id"]
+
+        site = SiteCreation(name="Site", description="Description")
+        site = crud.create_site(
+            db=db,
+            site_input=site,
+            user_id=user_id
+            )
+
+        device = DeviceCreation(
+            user_id=user_id,
+            site_id=site.id,
+            name="Device",
+            model="Model",
+            type="Type",
+            description="Description",
+        )
+        device = crud.create_device(db=db, device_input=device)
+
+        return {"device_id": device.id, "site_id": site.id, "user_id": user_id}
+
+    def test_get_device(
+            self,
+            client: TestClient,
+            normal_token_headers: dict,
+            devicesbatch
+    ) -> None:
+
+        device_id = devicesbatch["device_id"]
+        response = client.get(f"/devices/{device_id}", headers=normal_token_headers)
+
+        assert response.status_code == 200
+        assert response.json()["name"] == "Device"
+
+    def test_get_device_no_token(self, client: TestClient) -> None:
+        response = client.get("/devices/1")
+        assert response.status_code == 401
+
+    def test_get_device_not_found(
+            self, client: TestClient, normal_token_headers: dict) -> None:
+        response = client.get("/devices/999", headers=normal_token_headers)
+        assert response.status_code == 404
+
+    def test_get_device_wrong_user(
+            self,
+            db: Session, client: TestClient,
+            normal_token_headers: dict) -> None:
+
+        u = UserCreation(email="email", username="random_lower_string()", password="random_lower_string()")
+        user = crud.create_user(db=db, user_input=u)
+        s = SiteCreation(name="Site", description="Description")
+        site = crud.create_site(db=db, site_input=s, user_id=user.id)
+
+        d = DeviceCreation(
+            user_id=user.id, # <<< user ID from different user to be use in the request
+            site_id=site.id,
+            name="Device",
+            model="Model",
+            type="Type",
+            description="Description",
+        )
+        device = crud.create_device(db=db, device_input=d)
+
+        response = client.get(f"/devices/{device.id}", headers=normal_token_headers)
+        assert response.status_code == 403
 
 
 class TestGetDevicePerSite:
@@ -81,7 +158,14 @@ class TestGetDevicePerSite:
             )
             crud.create_device(db=db, device_input=device)
 
-        return {"range": rng, "site_id": site.id, "user_id": user_id}
+        return {
+            "range": rng,
+            "site_id": site.id,
+            "site-name":site.name ,
+            "user_id": user_id,
+            "username": response.json()["username"]
+        }
+    
 
     def test_get_devices_per_site(
             self,
@@ -94,6 +178,10 @@ class TestGetDevicePerSite:
 
         assert response.status_code == 200
         assert response.json()["count"] == devicesbatch["range"], "Define in the fixture"
+        assert response.json()["site_id"] == site_id, "Should be the last site id"
+        assert response.json()["site_name"] == devicesbatch["site-name"], "Should be the last site name"
+        assert response.json()["user_id"] == devicesbatch["user_id"], "Should be the last user id"
+        assert response.json()["username"] == devicesbatch["username"], "Should be the last username"
         assert response.json()["data"], "Should return a list of devices"
 
     def test_get_devices_per_site_no_token(self, client: TestClient) -> None:

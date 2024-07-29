@@ -11,7 +11,7 @@ from pydantic import ValidationError
 from src.core import security
 from src.core.config import settings
 from src.core.db import Session, engine
-from src.models import TokenPayload, User
+from src.models import TokenPayload, User, DefaultResponseMessage
 
 
 def get_db() -> Generator[Session, None, None]:
@@ -55,3 +55,10 @@ def get_current_active_superuser(current_user: CurrentUser) -> User:
     if not current_user.is_superuser:
         raise HTTPException(status_code=403, detail="Not enough privileges")
     return current_user
+
+responses_401 = {"description": "Unauthorized", "model": DefaultResponseMessage}
+responses_403 = {"description": "Forbidden", "model": DefaultResponseMessage}
+responses_404 = {"description": "Not Found", "model": DefaultResponseMessage}
+responses_409 = {"description": "Conflict", "model": DefaultResponseMessage}
+responses_422 = {"description": "Not Found", "model": DefaultResponseMessage}
+

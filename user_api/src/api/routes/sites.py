@@ -1,5 +1,4 @@
 import logging
-from typing import Any
 
 from fastapi import APIRouter, HTTPException
 from pydantic import ValidationError
@@ -19,34 +18,19 @@ from src.models import (
 router = APIRouter()
 
 
-@router.get("/", response_model=SitesListResponse)
-async def get_sites(
-    session: deps.SessionDep,
-    current_user: deps.CurrentUser
-) -> Any:
-    """
-    Retrieve Sites.
-"""
-    logger = logging.getLogger("GET sites/")
-
-    count_statement = (
-        select(func.count()).select_from(Site).where(Site.user_id == current_user.id))
-    count = session.exec(count_statement).one()
-
-    Siteslist = crud.get_sites_by_user_id(db=session, user_id=current_user.id)
-
-    return SitesListResponse(data=Siteslist, count=count)
-
-
-@router.post("/", response_model=SiteResponse, status_code=201)
-async def create_a_site(
+@router.post(
+        "/",
+        responses={401: deps.responses_401, 403: deps.responses_403},
+        response_model=SiteResponse, status_code=201
+        )
+async def create_site(
     *,
     session: deps.SessionDep,
     site_in: SiteCreation,
     current_user: deps.CurrentUser
 ) -> SiteResponse | HTTPException:
     """
-    Create a new Site.
+    Create a new Site with a logged User. The **"name"** is required.
     """
     logger = logging.getLogger("POST sites/")
     try:
@@ -57,8 +41,60 @@ async def create_a_site(
     return site
 
 
-@router.patch("/{site_id}", response_model=SiteResponse)
-async def update_a_site(
+@router.get(
+        "/user",
+        responses={401: deps.responses_401, 403: deps.responses_403},
+        response_model=SitesListResponse)
+async def get_all_sites_from_user(
+    session: deps.SessionDep,
+    current_user: deps.CurrentUser,
+) -> SitesListResponse | HTTPException:
+    """
+    Retrieve all Sites from a logged User.
+    """
+    logger = logging.getLogger("GET sites/user")
+
+    count_statement = (
+        select(func.count()).select_from(Site).where(Site.user_id == current_user.id))
+    count = session.exec(count_statement).one()
+
+    Siteslist = crud.get_sites_by_user_id(db=session, user_id=current_user.id)
+    return SitesListResponse(
+        user_id=current_user.id,
+        username=current_user.username,
+        count=count,
+        data=Siteslist
+    )
+
+
+@router.get(
+        "/{site_id}",
+        responses={401: deps.responses_401, 403: deps.responses_403, 404: deps.responses_404},
+        response_model=Site)
+async def get_information_from_site(
+    site_id: int,
+    session: deps.SessionDep,
+    current_user: deps.CurrentUser,
+) -> Site | HTTPException:
+    """
+    Retrieve a Site by ID from a logged User.
+    """
+    logger = logging.getLogger("GET sites/user")
+
+    site = session.get(Site, site_id)
+    if not site:
+        raise HTTPException(status_code=404, detail="Site not found")
+    elif site.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not enough permissions")
+    
+    return site
+
+
+@router.patch(
+        "/{site_id}",
+        responses={404: deps.responses_404, 403: deps.responses_403},
+        response_model=SiteResponse)
+async def update_site(
     *,
     session: deps.SessionDep,
     site_id: int,
@@ -66,7 +102,7 @@ async def update_a_site(
     current_user: deps.CurrentUser
 ) -> SiteResponse | HTTPException:
     """
-    Update a Site.
+    Update a Site information by its ID from a logged User.
     """
     logger = logging.getLogger("PATCH sites/")
     site = session.get(Site, site_id)
@@ -85,15 +121,19 @@ async def update_a_site(
     return site
 
 
-@router.delete("/{site_id}", response_model=DefaultResponseMessage)
-async def delete_a_site(
+@router.delete(
+        "/{site_id}",
+        responses={404: deps.responses_404, 403: deps.responses_403},
+        response_model=DefaultResponseMessage
+        )
+async def delete_site(
     *,
     session: deps.SessionDep,
     site_id: int,
     current_user: deps.CurrentUser
 ) -> DefaultResponseMessage | HTTPException:
     """
-    Delete a Site.
+    Delete Site, **it will** delete its devices and **consequently** its messages.
     """
     logger = logging.getLogger("DELETE sites/")
     site = session.get(Site, site_id)
@@ -106,4 +146,3 @@ async def delete_a_site(
 
     crud.delete_site(db=session, site=site)
     return DefaultResponseMessage(message="Site deleted successfully")
-

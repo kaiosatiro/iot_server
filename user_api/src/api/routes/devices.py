@@ -16,17 +16,21 @@ from src.models import (
     Site,
 )
 
+
 router = APIRouter()
 
 
-@router.get("/", response_model=DevicesListResponse)
-async def get_devices(
+@router.get(
+        "/",
+        responses={401: deps.responses_401},
+        response_model=DevicesListResponse)
+async def get_user_devices(
     *,
     session: deps.SessionDep,
     current_user: deps.CurrentUser,
 ) -> DevicesListResponse | HTTPException:
     """
-    Retrieve Devices.
+    Retrieve all Devices from logged User.
     """
     logger = logging.getLogger("GET devices/")
 
@@ -36,22 +40,57 @@ async def get_devices(
 
     deviceslist = crud.get_devices_by_user_id(db=session, user_id=current_user.id)
 
-    return DevicesListResponse(data=deviceslist, count=count)
+    return DevicesListResponse(
+        user_id=current_user.id,
+        username=current_user.username,
+        count=count,
+        data=deviceslist
+    )
 
 
-@router.get("/site/{site_id}", response_model=DevicesListResponse)
-async def get_devices_per_site(
+@router.get(
+        "/{device_id}",
+        responses={401: deps.responses_401, 404: deps.responses_404, 403: deps.responses_403}, 
+        response_model=DeviceResponse)
+async def get_device_information(
+    *,
+    device_id: int,
+    session: deps.SessionDep,
+    current_user: deps.CurrentUser,
+) -> Device | HTTPException:
+    """
+    Retrieve a Device information by ID.
+    """
+    logger = logging.getLogger("GET devices/")
+
+    device = session.get(Device, device_id)
+    if not device:
+        raise HTTPException(status_code=404, detail="Device not found")
+
+    if device.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not enough permissions")
+
+    return device
+
+
+@router.get(
+        "/site/{site_id}",
+        responses={404: deps.responses_404, 403: deps.responses_403}, 
+        response_model=DevicesListResponse)
+async def get_site_devices(
     *,
     site_id: int,
     session: deps.SessionDep,
     current_user: deps.CurrentUser
 ) -> DevicesListResponse | HTTPException:
     """
-    Create a new Device.
+    Get all devices from the specific Site.
+    The site must belong to the logged User.
     """
     logger = logging.getLogger("POST devices/")
 
-    if session.get(Site, site_id) is None:
+    site = session.get(Site, site_id)
+    if not site:
         raise HTTPException(status_code=404, detail="Site not found")
 
     count_statement = (
@@ -64,18 +103,28 @@ async def get_devices_per_site(
 
     device = crud.get_devices_by_site_id(db=session, site_id=site_id)
 
-    return DevicesListResponse(data=device, count=count)
+    return DevicesListResponse(
+        user_id=current_user.id,
+        username=current_user.username,
+        site_id=site_id,
+        site_name=site.name,
+        count=count,
+        data=device
+    )
 
 
-@router.post("/site", response_model=DeviceResponse, status_code=201)
-async def create_a_device(
+@router.post(
+        "/site",
+        responses={404: deps.responses_404, 403: deps.responses_403},
+        response_model=DeviceResponse, status_code=201)
+async def create_device(
     *,
     session: deps.SessionDep,
     device_in: DeviceCreation,
     current_user: deps.CurrentUser
 ) -> DeviceResponse | HTTPException:
     """
-    Create a new Device.
+    Create a new Device, **"name"** and **"site_id"** are required.
     """
     logger = logging.getLogger("POST devices/")
 
@@ -97,8 +146,11 @@ async def create_a_device(
     return device
 
 
-@router.patch("/{device_id}", response_model=DeviceResponse)
-async def update_a_device(
+@router.patch(
+        "/{device_id}",
+        responses={404: deps.responses_404, 403: deps.responses_403},
+        response_model=DeviceResponse)
+async def update_device(
     *,
     session: deps.SessionDep,
     device_id: int,
@@ -106,7 +158,7 @@ async def update_a_device(
     current_user: deps.CurrentUser
 ) -> DeviceResponse | HTTPException:
     """
-    Update a Device.
+    Update the Device information.
     """
     logger = logging.getLogger("PATCH devices/")
 
@@ -126,15 +178,19 @@ async def update_a_device(
     return device
 
 
-@router.delete("/{device_id}", response_model=DefaultResponseMessage)
-async def delete_a_device(
+@router.delete(
+        "/{device_id}",
+        responses={404: deps.responses_404, 403: deps.responses_403},
+        response_model=DefaultResponseMessage)
+async def delete_device(
     *,
     session: deps.SessionDep,
     device_id: int,
     current_user: deps.CurrentUser
 ) -> DefaultResponseMessage | HTTPException:
     """
-    Delete a Device.
+    Delete a Device by its ID and **consequently** all its messages.
+    
     """
     logger = logging.getLogger("DELETE devices/")
 
@@ -150,15 +206,19 @@ async def delete_a_device(
     return DefaultResponseMessage(message="Device deleted")
 
 
-@router.delete("/site/{site_id}", response_model=DefaultResponseMessage)
-async def delete_devices_per_site(
+@router.delete(
+        "/site/{site_id}",
+        responses={404: deps.responses_404, 403: deps.responses_403, 401: deps.responses_401},
+        response_model=DefaultResponseMessage)
+async def delete_site_devices(
     *,
     session: deps.SessionDep,
     site_id: int,
     current_user: deps.CurrentUser
 ) -> DefaultResponseMessage | HTTPException:
     """
-    Delete all Devices from a Site.
+    Delete all Devices from a Site, **consequently** all its messages. 
+    The site must belong to the logged User. 
     """
     logger = logging.getLogger("DELETE devices/site/")
 

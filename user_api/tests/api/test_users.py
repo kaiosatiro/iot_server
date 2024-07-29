@@ -418,7 +418,7 @@ class TestPatchMePassword:
                 "current_password": settings.FIRST_SUPERUSER_PASSWORD,
             },
         )
-        assert response.status_code == 422
+        assert response.status_code == 409
         assert response.json() == {
             "detail": "New password cannot be the same as the current one"
         }

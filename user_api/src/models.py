@@ -5,6 +5,7 @@ from sqlmodel import Field, Relationship, SQLModel
 
 
 class BaseModel(SQLModel):
+    # id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     id: int | None = Field(default=None, primary_key=True)
     created_on: datetime | None = Field(
         default=None,
@@ -45,6 +46,10 @@ class DeviceResponse(DeviceBase):
 
 
 class DevicesListResponse(SQLModel):
+    user_id: int
+    username: str
+    site_id: int | None = None
+    site_name: str | None = None
     data: list["DeviceResponse"]
     count: int
 
@@ -71,20 +76,23 @@ class MessageCreation(MessageBase):
     pass
 
 
-class MessageResponse(MessageBase):
+class MessageResponse(SQLModel):
     id: int
-    created_on: datetime
+    inserted_on: datetime
+    message: dict
 
 
 class MessagesListResponse(SQLModel):
-    data: list["MessageResponse"]
+    device_id: int
+    device_name: str
     count: int
+    data: list["MessageResponse"]
 
 
 class Message(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True, index=False)  # index=False?
     message: dict = Field(nullable=False, sa_type=sa.JSON)
-    created_on: datetime | None = Field(
+    inserted_on: datetime | None = Field(
         default=None,
         sa_type=sa.TIMESTAMP(timezone=True),
         sa_column_kwargs={"server_default": sa.func.now()},
@@ -118,8 +126,10 @@ class SiteResponse(SiteBase):
 
 
 class SitesListResponse(SQLModel):
-    data: list["SiteResponse"]
+    user_id: int
+    username: str
     count: int
+    data: list["SiteResponse"]    
 
 
 class Site(SiteBase, BaseModel, table=True):

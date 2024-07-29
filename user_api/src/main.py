@@ -13,31 +13,27 @@ logger = getLogger(__name__)
 tags_metadata = [
     {
         "name": "Login",
-        "description": "Operations with users. The **login** logic is also here.",
+        "description": "To authenticate and get an access token.",
     },
     {
         "name": "Users",
-        "description": "Operations with users. The **login** logic is also here.",
+        "description": "Operations with Users. **Needs** to be authenticated.",
     },
     {
         "name": "Sites",
-        "description": "Operations with users. The **login** logic is also here.",
+        "description": "Operations with Sites. **Needs** to be authenticated.",
     },
     {
         "name": "Devices",
-        "description": "Operations with users. The **login** logic is also here.",
+        "description": "Operations with Devices. **Needs** to be authenticated.",
     },
     {
         "name": "Messages",
-        "description": "Operations with users. The **login** logic is also here.",
+        "description": "Retrive and delete Messages from devices. **Needs** to be authenticated.",
     },
     {
         "name": "Admin",
-        "description": "Manage items. So _fancy_ they have their own docs.",
-        "externalDocs": {
-            "description": "Items external docs",
-            "url": "https://fastapi.tiangolo.com/",
-        },
+        "description": "Manage Users. Super User **Needs** to be authenticated.",
     },
 ]
 
@@ -69,7 +65,7 @@ async def lifespan(app: FastAPI):
     logger.info("ShutDown")
 
 
-@app.get("/")
+@app.get("/", include_in_schema=False)
 async def root():
     logger.info("Root")
     return {"TEST": "PACMAN"}
@@ -87,7 +83,7 @@ async def root():
 # Users:
 # - GET /users/me - 200 | 404
 # - PATCH /users/me/ - 200 | 422 | 404 | 409
-# - PATCH /users/me/password - 200 | 422 | 404 |
+# - PATCH /users/me/password - 200 | 409 | 404 | 422
 # - DELETE /users/me - 200 | 403 | 404
 
 # Admin:
@@ -101,20 +97,26 @@ async def root():
 # - GET /devices - 200 | 404 | 403
 
 # Sites:
-# - GET /sites - 200 | 401
+# - GET /sites/user - 200 | 401
+# - GET /sites/{site_id} - 200 | 403 | 404
 # - POST /sites - 201 | 400 | 403
 # - PATCH /sites/{site_id} - 200 | 400 | 403 | 404
 # - DELETE /sites/{site_id} - 200 | 403 | 404
 
 # Devices:
 # - GET /devices - 200 | 404 | 403
+# - GET /devices/{device_id} - 200 | 404 | 403
 # - GET /devices/site/{site_id} - 200 | 403 | 404
 # - POST /devices/site - 201 | 400 | 403
 # - PATCH /devices/{device_id} - 200 | 422  | 403  | 404
 # - DELETE /devices/{device_id} - 200 | 404
-# - DELETE /devices/site/{site_id} - 200 | 404
+# - DELETE /devices/site/{site_id} - 200 |
+# - POST /sites - 201 | 400 | 403
+# - PATCH /sites/{site_id} - 200 | 400 | 403 | 404
+# - DELETE /sites/{site_id} - 200 | 403 | 404
 
 # Messages:
+# - GET /messages/{message_id} - 200 | 404 | 403
 # - GET /messages/device/{device_id}?from=from&to=to&limit=limit&offset=offset - 200 | 404 | 401 | 403
 # - DELETE /messages/{message_id} - 200 | 404 | 403
 # - DELETE /messages/device/{device_id}?from=from&to=to&all=true - 200 | 404

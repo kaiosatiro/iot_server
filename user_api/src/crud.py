@@ -228,8 +228,8 @@ def get_messages(
         select(Message)
         .where(
             Message.device_id == device_id,
-            Message.created_on >= start_date,
-            Message.created_on <= end_date,
+            Message.inserted_on >= start_date,
+            Message.inserted_on <= end_date,
         )
         .offset(offset)
         .limit(limit)
@@ -267,8 +267,8 @@ def delete_messages_by_period(
     """
     statement = select(Message).where(
         Message.device_id == device_id,
-        Message.created_on >= start_date,
-        Message.created_on <= end_date,
+        Message.inserted_on >= start_date,
+        Message.inserted_on <= end_date,
     )
     session_messages = db.exec(statement).all()
     for message in session_messages:

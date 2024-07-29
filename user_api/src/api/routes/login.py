@@ -9,15 +9,21 @@ import src.api.dependencies as deps
 import src.core.security as security
 import src.crud as crud
 from src.core.config import settings
-from src.models import Token
+from src.models import Token, DefaultResponseMessage
+
 
 router = APIRouter()
 
 
-@router.post("/access-token")
+@router.post("/access-token", responses={401: deps.responses_401})
 async def access_token(
     session: deps.SessionDep, form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
 ) -> Token:
+    """
+    OAuth2 compatible token login, get an access token for future requests
+    USERNAME
+    PASSWORD
+    """
     logger = logging.getLogger("/access-token")
 
     user = crud.authenticate_user(
