@@ -57,7 +57,7 @@ async def get_device_information(
     device_id: int,
     session: deps.SessionDep,
     current_user: deps.CurrentUser,
-) -> Device | HTTPException:
+) -> DeviceResponse | HTTPException:
     """
     Retrieve a Device information by ID.
     """
@@ -158,7 +158,8 @@ async def update_device(
     current_user: deps.CurrentUser
 ) -> DeviceResponse | HTTPException:
     """
-    Update the Device information.
+    Update the Device information. If the **"site_id"** is changed,
+    the new Site must belong to the logged User.
     """
     logger = logging.getLogger("PATCH devices/")
 
@@ -168,6 +169,11 @@ async def update_device(
 
     if device.user_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not enough permissions")
+
+    if device_in.site_id:
+        site = session.get(Site, device_in.site_id)
+        if site is None or site.user_id != current_user.id:
+            raise HTTPException(status_code=404, detail="Site not found")
 
     try:
         device = crud.update_device(db=session, db_device=device, device_new_input=device_in)

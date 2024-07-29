@@ -70,12 +70,12 @@ async def get_all_sites_from_user(
 @router.get(
         "/{site_id}",
         responses={401: deps.responses_401, 403: deps.responses_403, 404: deps.responses_404},
-        response_model=Site)
+        response_model=SiteResponse)
 async def get_information_from_site(
     site_id: int,
     session: deps.SessionDep,
     current_user: deps.CurrentUser,
-) -> Site | HTTPException:
+) -> SiteResponse | HTTPException:
     """
     Retrieve a Site by ID from a logged User.
     """

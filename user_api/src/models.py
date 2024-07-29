@@ -32,9 +32,39 @@ class DeviceCreation(DeviceBase):
     user_id: int | None = None
     site_id: int
 
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "name": "Home humidity sensor",
+                    "model": "300x humidity sensor",
+                    "type": "sensor",
+                    "description": "A humidity sensor for home use",
+                    "site_id": 1,
+                    "user_id": 1,
+                }
+            ]
+        }
+    }
+
 
 class DeviceUpdate(DeviceBase):
+    site_id: int | None = None
     name: str | None = None
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {   
+                    "name": "Home humidity sensor",
+                    "model": "300x humidity sensor",
+                    "type": "sensor",
+                    "description": "A humidity sensor for home use",
+                    "site_id": 15,
+                }
+            ]
+        }
+    }
 
 
 class DeviceResponse(DeviceBase):
@@ -44,6 +74,24 @@ class DeviceResponse(DeviceBase):
     created_on: datetime
     updated_on: datetime | None = None
 
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "id": 1,
+                    "name": "Home humidity sensor",
+                    "model": "300x humidity sensor",
+                    "type": "sensor",
+                    "description": "A humidity sensor for home use",
+                    "site_id": 1,
+                    "user_id": 1,
+                    "created_on": "2024-07-12T15:00:00Z",
+                    "updated_on": "2024-07-12T15:00:00Z",
+                }
+            ]
+        }
+    }
+    
 
 class DevicesListResponse(SQLModel):
     user_id: int
@@ -52,6 +100,31 @@ class DevicesListResponse(SQLModel):
     site_name: str | None = None
     data: list["DeviceResponse"]
     count: int
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "user_id": 1,
+                    "username": "user",
+                    "count": 1,
+                    "data": [
+                        {
+                            "id": 1,
+                            "name": "Home humidity sensor",
+                            "model": "300x humidity sensor",
+                            "type": "sensor",
+                            "description": "A humidity sensor for home use",
+                            "site_id": 1,
+                            "user_id": 1,
+                            "created_on": "2024-07-12T15:00:00Z",
+                            "updated_on": "2024-07-12T15:00:00Z",
+                        }
+                    ],
+                }
+            ]
+        }
+    }
 
 
 class Device(DeviceBase, BaseModel, table=True):
@@ -81,6 +154,25 @@ class MessageResponse(SQLModel):
     inserted_on: datetime
     message: dict
 
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "id": 1,
+                    "inserted_on": "2024-07-12T15:00:00Z",
+                    "message": {
+                        "deviceId": "12345",
+                        "sensorId": "humiditySensor01",
+                        "timestamp": "2024-07-12T15:00:00Z",
+                        "type": "humidity",
+                        "unit": "percent",
+                        "value": 45.2,
+                    },
+                }
+            ]
+        }
+    }
+
 
 class MessagesListResponse(SQLModel):
     device_id: int
@@ -88,6 +180,32 @@ class MessagesListResponse(SQLModel):
     count: int
     data: list["MessageResponse"]
 
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "device_id": 1,
+                    "device_name": "Home humidity sensor",
+                    "count": 1,
+                    "data": [
+                        {
+                            "id": 1,
+                            "inserted_on": "2024-07-12T15:00:00Z",
+                            "message": {
+                                "deviceId": "12345",
+                                "sensorId": "humiditySensor01",
+                                "timestamp": "2024-07-12T15:00:00Z",
+                                "type": "humidity",
+                                "unit": "percent",
+                                "value": 45.2,
+                            },
+                        }
+                    ],
+                }
+            ]
+        }
+    }
+    
 
 class Message(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True, index=False)  # index=False?
@@ -114,9 +232,31 @@ class SiteBase(SQLModel):
 class SiteCreation(SiteBase):
     pass
 
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "name": "Home",
+                    "description": "Home site",
+                }
+            ]
+        }
+    }
+
 
 class SiteUpdate(SiteBase):
     name: str | None = None
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "name": "Home",
+                    "description": "Home site",
+                }
+            ]
+        }
+    }
 
 
 class SiteResponse(SiteBase):
@@ -124,12 +264,47 @@ class SiteResponse(SiteBase):
     created_on: datetime
     updated_on: datetime | None = None
 
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "id": 1,
+                    "name": "Home",
+                    "description": "Home site",
+                    "created_on": "2024-07-12T15:00:00Z",
+                    "updated_on": "2024-07-12T15:00:00Z",
+                }
+            ]
+        }
+    }
+
 
 class SitesListResponse(SQLModel):
     user_id: int
     username: str
     count: int
-    data: list["SiteResponse"]    
+    data: list["SiteResponse"]
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "user_id": 1,
+                    "username": "user",
+                    "count": 1,
+                    "data": [
+                        {
+                            "id": 1,
+                            "name": "Home",
+                            "description": "Home site",
+                            "created_on": "2024-07-12T15:00:00Z",
+                            "updated_on": "2024-07-12T15:00:00Z",
+                        }
+                    ],
+                }
+            ]
+        }
+    }
 
 
 class Site(SiteBase, BaseModel, table=True):
@@ -153,11 +328,39 @@ class UserBase(SQLModel):
 class UserCreation(UserBase):
     password: str
 
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "username": "user",
+                    "email": "johndoe@mail.com",
+                    "password": "password",
+                    "about": "I am a user",
+                    "is_superuser": False,
+                }
+            ]
+        }
+    }
+
 
 class UserUpdate(UserBase):
     id: int | None = None
     username: str | None = None
     email: str | None = None
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "id": 1,
+                    "username": "newusername",
+                    "email": "newemail@email.com",
+                    "about": "I am a user",
+                    "is_superuser": True,
+                }
+            ]
+        }
+    }
 
 
 class UserUpdateMe(SQLModel):
@@ -165,13 +368,36 @@ class UserUpdateMe(SQLModel):
     email: str | None = None
     about: str | None = None
 
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "username": "newuser",
+                    "email": "newemail@email.com",
+                    "about": "I am a user"
+                }
+            ]
+        }
+    }
+
 
 class UpdatePassword(SQLModel):
     current_password: str
     new_password: str
 
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "current_password": "password",
+                    "new_password": "new_password",
+                }
+            ]
+        }
+    }
 
-class UserResponseObject(SQLModel):
+
+class UserResponse(SQLModel):
     id: int
     username: str
     email: str
@@ -180,10 +406,48 @@ class UserResponseObject(SQLModel):
     updated_on: datetime | None = None
     is_active: bool
 
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "id": 1,
+                    "username": "user",
+                    "email": "johndoe@email.com",
+                    "about": "I am a user",
+                    "created_on": "2024-07-12T15:00:00Z",
+                    "updated_on": "2024-07-12T15:00:00Z",
+                    "is_active": True,
+                }
+            ]
+        }
+    }
+
+
 
 class UsersListResponse(SQLModel):
-    data: list["UserResponseObject"]
+    data: list["UserResponse"]
     count: int
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "count": 1,
+                    "data": [
+                        {
+                            "id": 1,
+                            "username": "user",
+                            "email": "johndoe@email.com",
+                            "about": "I am a user",
+                            "created_on": "2024-07-12T15:00:00Z",
+                            "updated_on": "2024-07-12T15:00:00Z",
+                            "is_active": True,
+                        }
+                    ],
+                }
+            ]
+        }
+    }
 
 
 class User(UserBase, BaseModel, table=True):

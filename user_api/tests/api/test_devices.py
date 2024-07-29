@@ -355,6 +355,35 @@ class TestUpdateDevice:
 
         assert response.status_code == 200
         assert response.json()["name"] == "New Device"
+    
+    def test_update_device_site_id(
+            self, client: TestClient, db,
+            devicesbatch, normal_token_headers: dict) -> None:
+        
+        device_id = devicesbatch["device_id"]
+        #Create a new site
+        site = SiteCreation(name="Site", description="Description")
+        new_site = crud.create_site(db=db, site_input=site, user_id=devicesbatch["user_id"])
+               
+        device = {
+            "site_id": new_site.id,
+        }
+        response = client.patch(f"/devices/{device_id}", headers=normal_token_headers, json=device)
+
+        assert response.status_code == 200
+        assert response.json()["site_id"] == new_site.id
+
+    def test_update_device_wrong_site_id(
+            self, client: TestClient,
+            devicesbatch, normal_token_headers: dict) -> None:
+        
+        device_id = devicesbatch["device_id"]
+        device = {
+            "site_id": 999,
+        }
+        
+        response = client.patch(f"/devices/{device_id}", headers=normal_token_headers, json=device)
+        assert response.status_code == 404   
 
     def test_update_device_no_token(self, client: TestClient) -> None:
         response = client.patch("/devices/1")

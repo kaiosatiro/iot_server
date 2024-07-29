@@ -14,7 +14,7 @@ from src.models import (
     UpdatePassword,
     User,
     UserCreation,
-    UserResponseObject,
+    UserResponse,
     UsersListResponse,
     UserUpdate,
     UserUpdateMe,
@@ -26,7 +26,7 @@ router = APIRouter()
 @router.get(
         "/me",
         tags=["Users"],
-        response_model=UserResponseObject,
+        response_model=UserResponse,
         responses={401: deps.responses_401, 403: deps.responses_403}
 )
 async def read_me(*, current_user: deps.CurrentUser) -> User | HTTPException:
@@ -40,12 +40,12 @@ async def read_me(*, current_user: deps.CurrentUser) -> User | HTTPException:
 @router.patch(
         "/me",
         tags=["Users"],
-        response_model=UserResponseObject,
+        response_model=UserResponse,
         responses={401: deps.responses_401, 403: deps.responses_403, 409: deps.responses_409}
 )
 def update_me(
     *, session: deps.SessionDep, user_in: UserUpdateMe, current_user: deps.CurrentUser
-) -> UserResponseObject | HTTPException:
+) -> UserResponse | HTTPException:
     """
     Update own user.
     """
@@ -146,11 +146,11 @@ async def read_users(*, session: deps.SessionDep) -> UsersListResponse | HTTPExc
     "/{user_id}",
     tags=["Admin"],
     dependencies=[Depends(deps.get_current_active_superuser)],
-    response_model=UserResponseObject,
+    response_model=UserResponse,
 )
 async def read_user_by_id(
     *, user_id: int, session: deps.SessionDep
-    ) -> UserResponseObject | HTTPException:
+    ) -> UserResponse | HTTPException:
     """
     Get a specific user by id.
     """
@@ -164,14 +164,14 @@ async def read_user_by_id(
     "/",
     tags=["Admin"],
     dependencies=[Depends(deps.get_current_active_superuser)],
-    response_model=UserResponseObject,
+    response_model=UserResponse,
     status_code=201,
 )
 async def create_user(
     *, session: deps.SessionDep, user_in: UserCreation
-    ) -> UserResponseObject | HTTPException:
+    ) -> UserResponse | HTTPException:
     """
-    Create new user.
+    Create new user. The **name**, **email** and **password** are required.
     """
     user = crud.get_user_by_email(db=session, email=user_in.email)
     if user:
@@ -203,11 +203,11 @@ async def create_user(
     "/{id}",
     tags=["Admin"],
     dependencies=[Depends(deps.get_current_active_superuser)],
-    response_model=UserResponseObject,
+    response_model=UserResponse,
 )
 async def update_user(
     *, id: int, session: deps.SessionDep, user_in: UserUpdate
-    ) -> UserResponseObject | HTTPException:
+    ) -> UserResponse | HTTPException:
     """
     Update some user.
     """
