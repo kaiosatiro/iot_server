@@ -1,14 +1,14 @@
 from contextlib import asynccontextmanager
-from logging import getLogger
+import logging
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from asgi_correlation_id import CorrelationIdMiddleware
+from asgi_correlation_id.middleware import is_valid_uuid4
 
 from src.api.main import api_router
 from src.core.config import settings
 from src.logger.setup import setup_logging
 
-setup_logging()
-logger = getLogger(__name__)
 
 tags_metadata = [
     {
@@ -66,7 +66,7 @@ app = FastAPI(
     contact={
         "name": "Caio Satiro",
         "url": "https://github.com/kaiosatiro",
-        "email": "gaiusSatyr@gmail.com",
+        "email": "gaiusSatyr@mail.com",
     },
     swagger_ui_parameters={"operationsSorter": "method"},
     root_path=settings.API_V1_STR,
@@ -74,19 +74,32 @@ app = FastAPI(
 )
 
 app.include_router(api_router)
+app.add_middleware(
+    CorrelationIdMiddleware,
+    header_name='X-Request-ID',
+    update_request_header=True,
+    # generator=lambda: uuid.uuid4().hex,
+    validator=is_valid_uuid4,
+    # transformer=lambda a: a,
+)
+
+setup_logging()
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    logger = logging.getLogger("lifespan")
     logger.info("StartUP")
     yield
     logger.info("ShutDown")
 
 
 @app.get("/", include_in_schema=False)
-async def root():
+async def root(request: Request):
+    logger = logging.getLogger("root")
     logger.info("Root")
-    return {"TEST": "PACMAN"}
+    logger.info("Request ID: %s", request.headers["x-request-id"])
+    return {"TEST": "PACMAN", "request_id": request.headers["x-request-id"]}
 
 
 # Login:

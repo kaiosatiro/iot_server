@@ -1,18 +1,27 @@
 from src.core.config import settings
 
+
 LOG_CONFIG = {
     "version": 1,
-    "disable_existing_loggers": "false",
+    "disable_existing_loggers": False,
+    'filters': {
+       'correlation_id': {
+           '()': 'asgi_correlation_id.CorrelationIdFilter',
+           'uuid_length': 8 if settings.ENVIRONMENT == 'local' else 32,
+           'default_value': '-',
+       },
+   },
     "formatters": {
         "simple": {
-            "format": "USER-API [%(levelname)s |%(module)s| L%(lineno)d] %(asctime)s: %(message)s",
-            "datefmt": "%Y-%m-%d %H:%M:%S",
+            "format": "USER-API [%(levelname)s |%(name)s| L%(lineno)d] %(asctime)s [%(correlation_id)s]: %(message)s",
+            "datefmt": "%H:%M:%S",
         }
     },
     "handlers": {
         "stderr": {
             "class": "logging.StreamHandler",
             "level": "WARNING",
+            # "filters": ["correlation_id"],
             "formatter": "simple",
             "stream": "ext://sys.stderr",
         },
@@ -21,6 +30,7 @@ LOG_CONFIG = {
             "level": settings.LOG_LEVEL,
             "host": settings.RABBITMQ_DNS,
             "port": "5672",
+            # "filters": ["correlation_id"],
             "formatter": "simple",
             "exchange": "logs",
             "routing_key_formatter": lambda key: "log.userapi",
@@ -32,7 +42,10 @@ LOG_CONFIG = {
             "class": "logging.handlers.QueueHandler",
             "handlers": ["stderr", "queue"],
             "respect_handler_level": "true",
+            "filters": ["correlation_id"],
         },
     },
-    "loggers": {"root": {"level": settings.LOG_LEVEL, "handlers": ["queue_handler"]}},
+    "loggers": {
+        "root": {"level": settings.LOG_LEVEL, "handlers": ["queue_handler"]},
+        },
 }

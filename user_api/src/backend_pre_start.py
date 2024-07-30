@@ -8,7 +8,7 @@ from src.core.db import engine
 from src.logger.setup import setup_logging
 
 setup_logging()
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("Pre Start")
 
 max_tries = 60 * 5  # 5 minutes
 wait_seconds = 1

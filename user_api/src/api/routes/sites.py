@@ -33,6 +33,8 @@ async def create_site(
     Create a new Site with a logged User. The **"name"** is required.
     """
     logger = logging.getLogger("POST sites/")
+    logger.info("User %s is creating a new site", current_user.username)
+
     try:
         site = crud.create_site(db=session, site_input=site_in, user_id=current_user.id)
     except ValidationError as e:
@@ -53,6 +55,7 @@ async def get_all_sites_from_user(
     Retrieve all Sites from a logged User.
     """
     logger = logging.getLogger("GET sites/user")
+    logger.info("User %s is retrieving all sites", current_user.username)
 
     count_statement = (
         select(func.count()).select_from(Site).where(Site.user_id == current_user.id))
@@ -80,6 +83,7 @@ async def get_information_from_site(
     Retrieve a Site by ID from a logged User.
     """
     logger = logging.getLogger("GET sites/user")
+    logger.info("User %s is retrieving site %s", current_user.username, site_id)
 
     site = session.get(Site, site_id)
     if not site:
@@ -105,6 +109,8 @@ async def update_site(
     Update a Site information by its ID from a logged User.
     """
     logger = logging.getLogger("PATCH sites/")
+    logger.info("User %s is updating site %s", current_user.username, site_id)
+
     site = session.get(Site, site_id)
 
     if not site:
@@ -136,6 +142,8 @@ async def delete_site(
     Delete Site, **it will** delete its devices and **consequently** its messages.
     """
     logger = logging.getLogger("DELETE sites/")
+    logger.info("User %s is deleting site %s", current_user.username, site_id)
+
     site = session.get(Site, site_id)
 
     if not site:

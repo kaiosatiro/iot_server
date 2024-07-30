@@ -25,6 +25,7 @@ async def access_token(
     PASSWORD
     """
     logger = logging.getLogger("/access-token")
+    logger.info("User %s is trying to authenticate", form_data.username)
 
     user = crud.authenticate_user(
         db=session, username=form_data.username, password=form_data.password
@@ -39,4 +40,6 @@ async def access_token(
         subject=user.id,
         expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
     )
+
+    logger.info("User %s authenticated successfully", form_data.username)
     return Token(access_token=token)

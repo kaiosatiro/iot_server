@@ -1,3 +1,5 @@
+import logging
+
 from sqlmodel import Session, create_engine, select
 from sqlmodel.pool import StaticPool
 
@@ -13,9 +15,12 @@ engine = create_engine(str(settings.SQL_DATABASE_URI), poolclass=StaticPool)
 
 def init_db(session: Session) -> None:
     from sqlmodel import SQLModel
-
+    
+    logger = logging.getLogger("init_db")
+    logger.info("Creating database tables")
     SQLModel.metadata.create_all(engine)
 
+    logger.info("Creating first superuser")
     user = session.exec(
         select(User).where(User.email == settings.FIRST_SUPERUSER_EMAIL)
     ).first()

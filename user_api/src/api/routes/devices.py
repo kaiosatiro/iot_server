@@ -1,6 +1,6 @@
 import logging
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from pydantic import ValidationError
 from sqlmodel import func, select
 
@@ -27,12 +27,13 @@ router = APIRouter()
 async def get_user_devices(
     *,
     session: deps.SessionDep,
-    current_user: deps.CurrentUser,
+    current_user: deps.CurrentUser
 ) -> DevicesListResponse | HTTPException:
     """
     Retrieve all Devices from logged User.
     """
     logger = logging.getLogger("GET devices/")
+    logger.info("getting all devices from user %s", current_user.username)
 
     count_statement = (
         select(func.count()).select_from(Device).where(Device.user_id == current_user.id))
@@ -40,6 +41,7 @@ async def get_user_devices(
 
     deviceslist = crud.get_devices_by_user_id(db=session, user_id=current_user.id)
 
+    # if logger.isEnabledFor(logging.DEBUG): logger.debug(f"Count: {count}")
     return DevicesListResponse(
         user_id=current_user.id,
         username=current_user.username,
@@ -62,6 +64,7 @@ async def get_device_information(
     Retrieve a Device information by ID.
     """
     logger = logging.getLogger("GET devices/")
+    logger.info("getting device %s from user %s", device_id, current_user.username)
 
     device = session.get(Device, device_id)
     if not device:
@@ -69,7 +72,7 @@ async def get_device_information(
 
     if device.user_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not enough permissions")
-
+    
     return device
 
 
@@ -88,6 +91,7 @@ async def get_site_devices(
     The site must belong to the logged User.
     """
     logger = logging.getLogger("POST devices/")
+    logger.info("getting all devices from site %s from user %s", site_id, current_user.username)
 
     site = session.get(Site, site_id)
     if not site:
@@ -127,6 +131,7 @@ async def create_device(
     Create a new Device, **"name"** and **"site_id"** are required.
     """
     logger = logging.getLogger("POST devices/")
+    logger.info("Creating device %s from user %s", device_in.name, current_user)
 
     site = session.get(Site, device_in.site_id)
 
@@ -162,6 +167,7 @@ async def update_device(
     the new Site must belong to the logged User.
     """
     logger = logging.getLogger("PATCH devices/")
+    logger.info("Updating device %s from user %s", device_id, current_user.username)
 
     device = session.get(Device, device_id)
     if not device:
@@ -199,6 +205,7 @@ async def delete_device(
     
     """
     logger = logging.getLogger("DELETE devices/")
+    logger.info("Deleting device %s from user %s", device_id, current_user.username)
 
     device = session.get(Device, device_id)
     if not device:
@@ -227,6 +234,7 @@ async def delete_site_devices(
     The site must belong to the logged User. 
     """
     logger = logging.getLogger("DELETE devices/site/")
+    logger.info("Deleting all devices from site %s from user %s", site_id, current_user.username)
 
     site = session.get(Site, site_id)
     if not site:

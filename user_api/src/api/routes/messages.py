@@ -25,6 +25,7 @@ async def get_message_by_id(
     Retrieve by Message ID. The message must belong to a logged user's device.
     """
     logger = logging.getLogger("GET messages/{message_id}")
+    logger.info("User %s is retrieving message %s", current_user.username, message_id)
 
     message = session.get(Message, message_id)
     if not message:
@@ -63,6 +64,7 @@ async def get_messages_from_device(
     Offset: default: 0
     """
     logger = logging.getLogger("GET messages/device/{device_id}")
+    logger.info("User %s is retrieving messages from device %s", current_user.username, device_id)
 
     device = session.get(Device, device_id)
     if not device:
@@ -103,6 +105,7 @@ async def delete_message_by_id(
     Delete by Message ID
     """
     logger = logging.getLogger("DELETE messages/{message_id}")
+    logger.info("User %s is deleting message %s", current_user.username, message_id)
 
     message = session.get(Message, message_id)
     if not message:
@@ -140,8 +143,8 @@ async def delete_messages_from_device(
         Only date: '2024-07-22' %Y-%m-%d,
     All:default=False *** Delete ALL messages from the device ***
     """
-
     logger = logging.getLogger("DELETE messages/device/{device_id}")
+    logger.info("User %s is deleting messages from device %s", current_user.username, device_id)
 
     device = session.get(Device, device_id)
     if not device:

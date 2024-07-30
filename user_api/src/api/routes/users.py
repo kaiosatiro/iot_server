@@ -33,7 +33,8 @@ async def read_me(*, current_user: deps.CurrentUser) -> User | HTTPException:
     """
     Get current user.
     """
-    logger = logging.getLogger("users/me")  # use generate custom id?
+    logger = logging.getLogger("users/me")
+    logger.info("User %s is reading its own information", current_user.username)
     return current_user
 
 
@@ -50,6 +51,7 @@ def update_me(
     Update own user.
     """
     logger = logging.getLogger("PATCH users/me")
+    logger.info("User %s is updating its own information", current_user.username)
 
     if user_in.email:
         existing_user = crud.get_user_by_email(db=session, email=user_in.email)
@@ -83,12 +85,7 @@ def update_my_password(
     Update own password.
     """
     logger = logging.getLogger("PATCH users/me/password")
-
-    logger.debug(body.current_password)
-    logger.debug(body.new_password)
-    logger.debug(get_password_hash(body.current_password))
-    logger.debug(get_password_hash(body.new_password))
-    logger.debug(current_user.hashed_password)
+    logger.info("User %s is updating its own password", current_user.username)
 
     if not verify_password(body.current_password, current_user.hashed_password):
         raise HTTPException(status_code=401, detail="Incorrect password")
@@ -107,13 +104,15 @@ def update_my_password(
         response_model=DefaultResponseMessage,
         responses={401: deps.responses_401, 403: deps.responses_403}
 )
-
 async def deactivate_me(
     session: deps.SessionDep, current_user: deps.CurrentUser
 ) -> DefaultResponseMessage | HTTPException:
     """
     Deactivate own user.
     """
+    logger = logging.getLogger("DELETE users/me")
+    logger.info("User %s is deactivating itself", current_user.username)
+
     if current_user.is_superuser:
         raise HTTPException(
             status_code=403, detail="Super users are not allowed to delete themselves"
@@ -133,6 +132,9 @@ async def read_users(*, session: deps.SessionDep) -> UsersListResponse | HTTPExc
     """
     Retrieve users.
     """
+    logger = logging.getLogger("GET users/")
+    logger.info("Admin is retrieving all users")
+
     count_statement = select(func.count()).select_from(User)
     count = session.exec(count_statement).one()
 
@@ -154,6 +156,9 @@ async def read_user_by_id(
     """
     Get a specific user by id.
     """
+    logger = logging.getLogger("GET users/{id}")
+    logger.info("Admin is retrieving user %s", user_id)
+
     user = session.get(User, user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -173,6 +178,9 @@ async def create_user(
     """
     Create new user. The **name**, **email** and **password** are required.
     """
+    logger = logging.getLogger("POST users/")
+    logger.info("Admin is creating a new user")
+
     user = crud.get_user_by_email(db=session, email=user_in.email)
     if user:
         raise HTTPException(
@@ -212,6 +220,7 @@ async def update_user(
     Update some user.
     """
     logger = logging.getLogger("PATCH users/{id}")
+    logger.info("Admin is updating user %s", id)
 
     user = session.get(User, id)
 
@@ -220,9 +229,9 @@ async def update_user(
 
     try:
         user = crud.update_user(db=session, db_user=user, user_new_input=user_in)
+        
     except IntegrityError as e:
         match = re.search(r"Key \((.*?)\)", str(e.orig))
-
         if match:
             key_info = match.group(1)
             logger.error(e.orig)
@@ -247,6 +256,9 @@ async def delete_user(
     """
     Deactivate some user.
     """
+    logger = logging.getLogger("DELETE users/{id}")
+    logger.info("Admin is deactivating user %s", id)
+
     user = session.get(User, id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
