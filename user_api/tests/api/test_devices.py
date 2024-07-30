@@ -99,6 +99,7 @@ class TestGetDevice:
 
         assert response.status_code == 200
         assert response.json()["name"] == "Device"
+        assert response.json()["token"]
 
     def test_get_device_no_token(self, client: TestClient) -> None:
         response = client.get("/devices/1")
@@ -253,6 +254,7 @@ class TestCreateDevice:
 
         assert response.status_code == 201
         assert response.json()["name"] == "Device"
+        assert response.json()["token"]
 
         #  Without user_id
         device = {
@@ -266,6 +268,7 @@ class TestCreateDevice:
 
         assert response.status_code == 201
         assert response.json()["name"] == "Device"
+        assert response.json()["token"]
 
     def test_create_device_no_token(self, client: TestClient) -> None:
         response = client.post("/devices/site")

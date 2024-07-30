@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from sqlmodel import Session, select
 
 import src.core.security as security
+from src.utils import generate_random_number
 
 from .models import (
     Device,
@@ -20,9 +21,15 @@ from .models import (
 
 # -------------------------- USER -----------------------------------
 def create_user(*, db: Session, user_input: UserCreation) -> User:
+    _id = generate_random_number(10000, 99999)
+    while db.get(User, _id):
+       _id = generate_random_number(10000, 99999)
     user = User.model_validate(
         user_input,
-        update={"hashed_password": security.get_password_hash(user_input.password)},
+        update={
+            "hashed_password": security.get_password_hash(user_input.password),
+            "id": _id,
+            },
     )
     db.add(user)
     db.commit()
@@ -87,7 +94,10 @@ def authenticate_user(*, db: Session, username: str, password: str) -> User | No
 
 # -------------------------- SITE -----------------------------------
 def create_site(*, db: Session, site_input: SiteCreation, user_id: int) -> Site:
-    site = Site.model_validate(site_input, update={"user_id": user_id})
+    _id = generate_random_number(1000000, 9999999)
+    while db.get(Site, _id):
+       _id = generate_random_number(1000000, 9999999)
+    site = Site.model_validate(site_input, update={"user_id": user_id, "id": _id})
     db.add(site)
     db.commit()
     db.refresh(site)
@@ -130,7 +140,16 @@ def delete_sites_from_user(*, db: Session, user_id: int) -> None:
 
 # -------------------------- DEVICE -----------------------------------
 def create_device(*, db: Session, device_input: DeviceCreation) -> Device:
-    device = Device.model_validate(device_input)
+    _id = generate_random_number(1000000000, 2147483645)
+    while db.get(Device, _id):
+       _id = generate_random_number(1000000000, 2147483645)
+    device = Device.model_validate(
+        device_input,
+        update={
+            "id": _id,
+            "token": security.create_device_access_token(_id)
+            }
+        )
     db.add(device)
     db.commit()
     db.refresh(device)

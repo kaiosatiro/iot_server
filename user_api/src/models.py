@@ -5,8 +5,7 @@ from sqlmodel import Field, Relationship, SQLModel
 
 
 class BaseModel(SQLModel):
-    # id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    id: int | None = Field(default=None, primary_key=True)
+    id: int = Field(primary_key=True, nullable=False)
     created_on: datetime | None = Field(
         default=None,
         sa_type=sa.TIMESTAMP(timezone=True),
@@ -27,6 +26,8 @@ class DeviceBase(SQLModel):
     type: str | None = Field(default=None, max_length=55)
     description: str | None = Field(default=None, max_length=255)
 
+    token: str | None = Field(default=None, max_length=255)
+
 
 class DeviceCreation(DeviceBase):
     user_id: int | None = None
@@ -40,8 +41,8 @@ class DeviceCreation(DeviceBase):
                     "model": "300x humidity sensor",
                     "type": "sensor",
                     "description": "A humidity sensor for home use",
-                    "site_id": 1,
-                    "user_id": 1,
+                    "site_id": 1234567,
+                    "user_id": 12345,
                 }
             ]
         }
@@ -60,7 +61,7 @@ class DeviceUpdate(DeviceBase):
                     "model": "300x humidity sensor",
                     "type": "sensor",
                     "description": "A humidity sensor for home use",
-                    "site_id": 15,
+                    "site_id": 1234567,
                 }
             ]
         }
@@ -71,6 +72,7 @@ class DeviceResponse(DeviceBase):
     id: int
     user_id: int
     site_id: int
+    token: str
     created_on: datetime
     updated_on: datetime | None = None
 
@@ -78,13 +80,14 @@ class DeviceResponse(DeviceBase):
         "json_schema_extra": {
             "examples": [
                 {
-                    "id": 1,
+                    "id": 1234567890,
+                    "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.SWIEkIwXWo2slD671P44qv4K57vx4a5MW6POyzL-FJg",
                     "name": "Home humidity sensor",
                     "model": "300x humidity sensor",
                     "type": "sensor",
                     "description": "A humidity sensor for home use",
-                    "site_id": 1,
-                    "user_id": 1,
+                    "site_id": 1234567,
+                    "user_id": 12345,
                     "created_on": "2024-07-12T15:00:00Z",
                     "updated_on": "2024-07-12T15:00:00Z",
                 }
@@ -105,18 +108,19 @@ class DevicesListResponse(SQLModel):
         "json_schema_extra": {
             "examples": [
                 {
-                    "user_id": 1,
+                    "user_id": 12345,
                     "username": "user",
                     "count": 1,
                     "data": [
                         {
-                            "id": 1,
+                            "id": 1234567890,
+                            "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.SWIEkIwXWo2slD671P44qv4K57vx4a5MW6POyzL-FJg",                            
                             "name": "Home humidity sensor",
                             "model": "300x humidity sensor",
                             "type": "sensor",
                             "description": "A humidity sensor for home use",
-                            "site_id": 1,
-                            "user_id": 1,
+                            "site_id": 1234567,
+                            "user_id": 12345,
                             "created_on": "2024-07-12T15:00:00Z",
                             "updated_on": "2024-07-12T15:00:00Z",
                         }
@@ -158,10 +162,10 @@ class MessageResponse(SQLModel):
         "json_schema_extra": {
             "examples": [
                 {
-                    "id": 1,
+                    "id": 1234567890123456,
                     "inserted_on": "2024-07-12T15:00:00Z",
                     "message": {
-                        "deviceId": "12345",
+                        "deviceId": 1234567890,
                         "sensorId": "humiditySensor01",
                         "timestamp": "2024-07-12T15:00:00Z",
                         "type": "humidity",
@@ -184,15 +188,15 @@ class MessagesListResponse(SQLModel):
         "json_schema_extra": {
             "examples": [
                 {
-                    "device_id": 1,
+                    "device_id": 1234567890,
                     "device_name": "Home humidity sensor",
                     "count": 1,
                     "data": [
                         {
-                            "id": 1,
+                            "id": 1234567890123456,
                             "inserted_on": "2024-07-12T15:00:00Z",
                             "message": {
-                                "deviceId": "12345",
+                                "deviceId": 1234567890,
                                 "sensorId": "humiditySensor01",
                                 "timestamp": "2024-07-12T15:00:00Z",
                                 "type": "humidity",
@@ -205,10 +209,18 @@ class MessagesListResponse(SQLModel):
             ]
         }
     }
-    
+
+
+ID_SEQUENCE_MSG = sa.Sequence('message_id_seq', start=1223372036854775, increment=3)
+
 
 class Message(SQLModel, table=True):
-    id: int | None = Field(default=None, primary_key=True, index=False)  # index=False?
+    id: int | None = Field(default=None,
+        sa_column=sa.Column(
+        sa.BigInteger, ID_SEQUENCE_MSG, primary_key=True,
+        server_default=ID_SEQUENCE_MSG.next_value()
+        )
+    )
     message: dict = Field(nullable=False, sa_type=sa.JSON)
     inserted_on: datetime | None = Field(
         default=None,
@@ -268,7 +280,7 @@ class SiteResponse(SiteBase):
         "json_schema_extra": {
             "examples": [
                 {
-                    "id": 1,
+                    "id": 1234567,
                     "name": "Home",
                     "description": "Home site",
                     "created_on": "2024-07-12T15:00:00Z",
@@ -289,12 +301,12 @@ class SitesListResponse(SQLModel):
         "json_schema_extra": {
             "examples": [
                 {
-                    "user_id": 1,
+                    "user_id": 12345,
                     "username": "user",
                     "count": 1,
                     "data": [
                         {
-                            "id": 1,
+                            "id": 1234567,
                             "name": "Home",
                             "description": "Home site",
                             "created_on": "2024-07-12T15:00:00Z",
@@ -352,7 +364,7 @@ class UserUpdate(UserBase):
         "json_schema_extra": {
             "examples": [
                 {
-                    "id": 1,
+                    "id": 12345,
                     "username": "newusername",
                     "email": "newemail@email.com",
                     "about": "I am a user",
@@ -410,7 +422,7 @@ class UserResponse(SQLModel):
         "json_schema_extra": {
             "examples": [
                 {
-                    "id": 1,
+                    "id": 12345,
                     "username": "user",
                     "email": "johndoe@email.com",
                     "about": "I am a user",
@@ -435,7 +447,7 @@ class UsersListResponse(SQLModel):
                     "count": 1,
                     "data": [
                         {
-                            "id": 1,
+                            "id": 12345,
                             "username": "user",
                             "email": "johndoe@email.com",
                             "about": "I am a user",

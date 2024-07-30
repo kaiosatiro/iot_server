@@ -1,4 +1,5 @@
 from datetime import datetime
+import random
 
 
 def validate_datetime(date_str):
@@ -14,3 +15,7 @@ def validate_datetime(date_str):
         except ValueError:
             continue
     return False
+
+
+def generate_random_number(start: int, end: int) -> int:
+    return random.randint(start, end)

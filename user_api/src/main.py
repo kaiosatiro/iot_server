@@ -37,25 +37,43 @@ tags_metadata = [
     },
 ]
 
+description = """
+ChimichangApp API helps you do awesome stuff. 🚀
+
+## Items
+
+You can **read items**.
+
+## Users
+
+You will be able to:
+
+* **Create users** (_not implemented_).
+* **Read users** (_not implemented_).
+"""
+
 app = FastAPI(
-    # debug=True,
     title=settings.PROJECT_NAME,
     openapi_tags=tags_metadata,
-    swagger_ui_parameters={"operationsSorter": "method"},
     # summary=
-    # description=
+    description=description,
     version=settings.VERSION,
-    # openapi_url=f"{settings.API_V1_STR}/openapi.json",
+    license_info={
+        "name": "Apache 2.0",
+        "identifier": "MIT",
+    },
     # terms_of_service=
-    # contact=
-    # license_info=
+    contact={
+        "name": "Caio Satiro",
+        "url": "https://github.com/kaiosatiro",
+        "email": "gaiusSatyr@gmail.com",
+    },
+    swagger_ui_parameters={"operationsSorter": "method"},
     root_path=settings.API_V1_STR,
     root_path_in_servers=True,
 )
 
-app.include_router(
-    api_router,
-)
+app.include_router(api_router)
 
 
 @asynccontextmanager
@@ -70,12 +88,6 @@ async def root():
     logger.info("Root")
     return {"TEST": "PACMAN"}
 
-
-# if __name__ == '__main__':
-#     setup_logging()
-#     logger = getLogger(__name__)
-#     uvicorn.run(app, host="0.0.0.0", port=8000)
-#     logger.info("Starting the User API service")
 
 # Login:
 # - POST /access-token - 200 | 401 Unauthorized

@@ -14,6 +14,7 @@ def test_create_device(db: Session, userfix: dict, sitefix: dict, devicefix) -> 
     device_in = DeviceCreation(**devicefix, user_id=user.id, site_id=site.id)
     device = crud.create_device(db=db, device_input=device_in)
 
+    assert device.token
     assert device.name == device_in.name, "Device name does not match"
     assert device.model == device_in.model, "Device model does not match"
     assert device.type == device_in.type, "Device type does not match"
