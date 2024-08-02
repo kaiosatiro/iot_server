@@ -19,7 +19,7 @@ jobs:
     name: Quality Assurance
     uses: ./.github/workflows/qa.yml
 
-  Deploy to staging
+  #Deploy to staging
   deploy:
     runs-on: ubuntu-latest
     environment: staging
