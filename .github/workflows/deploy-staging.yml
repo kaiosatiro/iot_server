@@ -21,7 +21,7 @@ jobs:
 
   #Deploy to staging
   deploy:
-    depends-on: [ test, quality-assurance ]
+    needs: test
     runs-on: ubuntu-latest
     environment: staging
     steps:
