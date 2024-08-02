@@ -17,7 +17,7 @@ services:
   
   userapi:
     environment:
-      - ENV=dev
+      - ENVIRONMENT=dev
       - LOG_LEVEL=DEBUG
     volumes:
       - type: bind

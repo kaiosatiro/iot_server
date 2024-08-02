@@ -15,7 +15,7 @@ engine = create_engine(str(settings.SQL_DATABASE_URI), poolclass=StaticPool)
 
 def init_db(session: Session) -> None:
     from sqlmodel import SQLModel
-    
+
     logger = logging.getLogger("init_db")
     logger.info("Creating database tables")
     SQLModel.metadata.create_all(engine)

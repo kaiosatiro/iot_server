@@ -6,13 +6,13 @@ from sqlmodel import Field, Relationship, SQLModel
 
 class BaseModel(SQLModel):
     id: int = Field(primary_key=True, nullable=False)
-    created_on: datetime | None = Field(
+    created_on: str = Field(
         default=None,
         sa_type=sa.TIMESTAMP(timezone=True),
         sa_column_kwargs={"server_default": sa.func.now()},
         nullable=False,
     )
-    updated_on: datetime | None = Field(
+    updated_on: str = Field(
         default=None,
         sa_type=sa.TIMESTAMP(timezone=True),
         sa_column_kwargs={"onupdate": sa.func.now(), "server_default": sa.func.now()},
@@ -56,7 +56,7 @@ class DeviceUpdate(DeviceBase):
     model_config = {
         "json_schema_extra": {
             "examples": [
-                {   
+                {
                     "name": "Home humidity sensor",
                     "model": "300x humidity sensor",
                     "type": "sensor",
@@ -81,7 +81,7 @@ class DeviceResponse(DeviceBase):
             "examples": [
                 {
                     "id": 1234567890,
-                    "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.SWIEkIwXWo2slD671P44qv4K57vx4a5MW6POyzL-FJg",
+                    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.SWIEkIwXWo2slD671P44qv4K57vx4a5MW6POyzL-FJg",
                     "name": "Home humidity sensor",
                     "model": "300x humidity sensor",
                     "type": "sensor",
@@ -94,7 +94,7 @@ class DeviceResponse(DeviceBase):
             ]
         }
     }
-    
+
 
 class DevicesListResponse(SQLModel):
     user_id: int
@@ -114,7 +114,7 @@ class DevicesListResponse(SQLModel):
                     "data": [
                         {
                             "id": 1234567890,
-                            "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.SWIEkIwXWo2slD671P44qv4K57vx4a5MW6POyzL-FJg",                            
+                            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.SWIEkIwXWo2slD671P44qv4K57vx4a5MW6POyzL-FJg",
                             "name": "Home humidity sensor",
                             "model": "300x humidity sensor",
                             "type": "sensor",
@@ -211,18 +211,21 @@ class MessagesListResponse(SQLModel):
     }
 
 
-ID_SEQUENCE_MSG = sa.Sequence('message_id_seq', start=1223372036854775, increment=3)
+ID_SEQUENCE_MSG = sa.Sequence("message_id_seq", start=1223372036854775, increment=3)
 
 
 class Message(SQLModel, table=True):
-    id: int | None = Field(default=None,
+    id: int | None = Field(
+        default=None,
         sa_column=sa.Column(
-        sa.BigInteger, ID_SEQUENCE_MSG, primary_key=True,
-        server_default=ID_SEQUENCE_MSG.next_value()
-        )
+            sa.BigInteger,
+            ID_SEQUENCE_MSG,
+            primary_key=True,
+            server_default=ID_SEQUENCE_MSG.next_value(),
+        ),
     )
     message: dict = Field(nullable=False, sa_type=sa.JSON)
-    inserted_on: datetime | None = Field(
+    inserted_on: str = Field(
         default=None,
         sa_type=sa.TIMESTAMP(timezone=True),
         sa_column_kwargs={"server_default": sa.func.now()},
@@ -386,7 +389,7 @@ class UserUpdateMe(SQLModel):
                 {
                     "username": "newuser",
                     "email": "newemail@email.com",
-                    "about": "I am a user"
+                    "about": "I am a user",
                 }
             ]
         }
@@ -435,7 +438,6 @@ class UserResponse(SQLModel):
     }
 
 
-
 class UsersListResponse(SQLModel):
     data: list["UserResponse"]
     count: int
@@ -482,6 +484,11 @@ class TokenPayload(SQLModel):
 
 class DefaultResponseMessage(SQLModel):
     message: str
+
+
+class NewPassword(SQLModel):
+    token: str
+    new_password: str
 
 
 # class UserRoleLink(SQLModel, table=True):

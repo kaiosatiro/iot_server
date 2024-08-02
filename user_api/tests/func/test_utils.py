@@ -14,11 +14,11 @@ from src.utils import validate_datetime
         ("2024-07-22", True),            # Missing time
         ("13:00:44", False),              # Missing date
         ("2024-07-22 13:00", False),      # Missing seconds
-        ("2024-07-22 13:00:44.123", False), # Extra milliseconds
+        ("2024-07-22 13:00:44.123", False),  # Extra milliseconds
         ("2024/07/22 13:00:44", False),  # Wrong date separator
         ("2024-07-22T13:00:44", False),  # Wrong datetime separator
-        ("2024-07-22 13:00:44 ", False), # Trailing space
-        (" 2024-07-22 13:00:44", False), # Leading space
+        ("2024-07-22 13:00:44 ", False),  # Trailing space
+        (" 2024-07-22 13:00:44", False),  # Leading space
         ("2024-07-22 13:00:44Z", False),  # Timezone
         ("2024-07-22 13:00:44+03:00", False),  # Timezone
         ("fasdfgasd", False),            # Invalid

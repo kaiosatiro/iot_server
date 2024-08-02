@@ -1,19 +1,18 @@
 from src.core.config import settings
 
-
 LOG_CONFIG = {
     "version": 1,
     "disable_existing_loggers": False,
-    'filters': {
-       'correlation_id': {
-           '()': 'asgi_correlation_id.CorrelationIdFilter',
-           'uuid_length': 8 if settings.ENVIRONMENT == 'local' else 32,
-           'default_value': '-',
-       },
-   },
+    "filters": {
+        "correlation_id": {
+            "()": "asgi_correlation_id.CorrelationIdFilter",
+            "uuid_length": 8 if settings.ENVIRONMENT == "dev" else 32,
+            "default_value": "-",
+        },
+    },
     "formatters": {
         "simple": {
-            "format": "USER-API [%(levelname)s |%(name)s| L%(lineno)d] %(asctime)s [%(correlation_id)s]: %(message)s",
+            "format": "USER-API [%(levelname)s] [%(name)s | L%(lineno)d] %(asctime)s [%(correlation_id)s]: %(message)s",
             "datefmt": "%H:%M:%S",
         }
     },
@@ -47,5 +46,5 @@ LOG_CONFIG = {
     },
     "loggers": {
         "root": {"level": settings.LOG_LEVEL, "handlers": ["queue_handler"]},
-        },
+    },
 }

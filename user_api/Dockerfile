@@ -12,18 +12,14 @@ RUN pip install --no-cache-dir poetry
 
 COPY ./pyproject.toml ./poetry.lock* /app/
 
-ARG ENV
-RUN bash -c "if [ $ENV == 'production' ] ; then poetry install --no-root --only main; else poetry install --no-root ; fi"
+ARG ENVIRONMENT
+RUN bash -c "if [ $ENVIRONMENT == 'production' ] ; then poetry install --no-root --only main; else poetry install --no-root ; fi"
 
 ENV PYTHONPATH=/app
 
-# COPY ./scripts/ /app/
-
 # COPY ./alembic.ini /app/
 
-# COPY ./prestart.sh /app/
-
-# COPY ./tests-start.sh /app/
+COPY ./prestart.sh /app/
 
 COPY . /app/
 

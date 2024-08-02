@@ -1,6 +1,5 @@
 import logging
 import re
-from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.exc import IntegrityError
@@ -8,7 +7,9 @@ from sqlmodel import func, select
 
 import src.api.dependencies as deps
 from src import crud
-from src.core.security import get_password_hash, verify_password
+from src.core.config import settings
+from src.core.security import verify_password
+from src.mail.utils import generate_new_account_email, send_email
 from src.models import (
     DefaultResponseMessage,
     UpdatePassword,
@@ -24,10 +25,10 @@ router = APIRouter()
 
 
 @router.get(
-        "/me",
-        tags=["Users"],
-        response_model=UserResponse,
-        responses={401: deps.responses_401, 403: deps.responses_403}
+    "/me",
+    tags=["Users"],
+    response_model=UserResponse,
+    responses={401: deps.responses_401, 403: deps.responses_403},
 )
 async def read_me(*, current_user: deps.CurrentUser) -> User | HTTPException:
     """
@@ -39,14 +40,18 @@ async def read_me(*, current_user: deps.CurrentUser) -> User | HTTPException:
 
 
 @router.patch(
-        "/me",
-        tags=["Users"],
-        response_model=UserResponse,
-        responses={401: deps.responses_401, 403: deps.responses_403, 409: deps.responses_409}
+    "/me",
+    tags=["Users"],
+    response_model=UserResponse,
+    responses={
+        401: deps.responses_401,
+        403: deps.responses_403,
+        409: deps.responses_409,
+    },
 )
 def update_me(
     *, session: deps.SessionDep, user_in: UserUpdateMe, current_user: deps.CurrentUser
-) -> UserResponse | HTTPException:
+) -> User | HTTPException:
     """
     Update own user.
     """
@@ -73,10 +78,14 @@ def update_me(
 
 
 @router.patch(
-        "/me/password",
-        tags=["Users"],
-        response_model=DefaultResponseMessage,
-        responses={401: deps.responses_401, 403: deps.responses_403, 409: deps.responses_409}
+    "/me/password",
+    tags=["Users"],
+    response_model=DefaultResponseMessage,
+    responses={
+        401: deps.responses_401,
+        403: deps.responses_403,
+        409: deps.responses_409,
+    },
 )
 def update_my_password(
     *, session: deps.SessionDep, body: UpdatePassword, current_user: deps.CurrentUser
@@ -95,14 +104,15 @@ def update_my_password(
             status_code=409, detail="New password cannot be the same as the current one"
         )
 
-    if crud.update_password(db=session, user=current_user, new_password=body.new_password):
-        return DefaultResponseMessage(message="Password updated successfully")
+    crud.update_password(db=session, user=current_user, new_password=body.new_password)
+    return DefaultResponseMessage(message="Password updated successfully")
 
 
 @router.delete(
-        "/me", tags=["Users"],
-        response_model=DefaultResponseMessage,
-        responses={401: deps.responses_401, 403: deps.responses_403}
+    "/me",
+    tags=["Users"],
+    response_model=DefaultResponseMessage,
+    responses={401: deps.responses_401, 403: deps.responses_403},
 )
 async def deactivate_me(
     session: deps.SessionDep, current_user: deps.CurrentUser
@@ -152,7 +162,7 @@ async def read_users(*, session: deps.SessionDep) -> UsersListResponse | HTTPExc
 )
 async def read_user_by_id(
     *, user_id: int, session: deps.SessionDep
-    ) -> UserResponse | HTTPException:
+) -> User | HTTPException:
     """
     Get a specific user by id.
     """
@@ -174,9 +184,9 @@ async def read_user_by_id(
 )
 async def create_user(
     *, session: deps.SessionDep, user_in: UserCreation
-    ) -> UserResponse | HTTPException:
+) -> User | HTTPException:
     """
-    Create new user. The **name**, **email** and **password** are required.
+    Create new user. The **name**, **email** and **password** are required. An email is sent.
     """
     logger = logging.getLogger("POST users/")
     logger.info("Admin is creating a new user")
@@ -195,15 +205,15 @@ async def create_user(
         )
 
     user = crud.create_user(db=session, user_input=user_in)
-    # if settings.emails_enabled and user_in.email:
-    #     email_data = generate_new_account_email(
-    #         email_to=user_in.email, username=user_in.email, password=user_in.password
-    #     )
-    #     send_email(
-    #         email_to=user_in.email,
-    #         subject=email_data.subject,
-    #         html_content=email_data.html_content,
-    #     )
+    if settings.emails_enabled and user_in.email:
+        email_data = generate_new_account_email(
+            email_to=user_in.email, username=user_in.email, password=user_in.password
+        )
+        send_email(
+            email_to=user_in.email,
+            subject=email_data.subject,
+            html_content=email_data.html_content,
+        )
     return user
 
 
@@ -215,7 +225,7 @@ async def create_user(
 )
 async def update_user(
     *, id: int, session: deps.SessionDep, user_in: UserUpdate
-    ) -> UserResponse | HTTPException:
+) -> User | HTTPException:
     """
     Update some user.
     """
@@ -229,7 +239,7 @@ async def update_user(
 
     try:
         user = crud.update_user(db=session, db_user=user, user_new_input=user_in)
-        
+
     except IntegrityError as e:
         match = re.search(r"Key \((.*?)\)", str(e.orig))
         if match:

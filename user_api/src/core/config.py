@@ -1,12 +1,10 @@
 import secrets
 from typing import Literal
 
-from pydantic import (
-    PostgresDsn,
-    computed_field,
-)
+from pydantic import PostgresDsn, computed_field, model_validator
 from pydantic_core import MultiHostUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from typing_extensions import Self
 
 
 class Settings(BaseSettings):
@@ -16,15 +14,34 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/userapi/v1"
     VERSION: str = "0.1.0"
     SECRET_KEY: str = secrets.token_urlsafe(32)
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # a day
-    # DOMAIN: str = "localhost"
-    ENVIRONMENT: Literal["local", "staging", "production"] = "local"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # seven days
+    EMAIL_RESET_TOKEN_EXPIRE_HOURS: int = 48  # 48 hours
+    DOMAIN: str = "localhost"
+    ENVIRONMENT: Literal["dev", "staging", "production"] = "dev"
+    LOG_LEVEL: str = "INFO"
 
-    PROJECT_NAME: str
+    @computed_field  # type: ignore
+    @property
+    def server_host(self) -> str:
+        # Use HTTPS for anything other than local development
+        if self.ENVIRONMENT == "dev":
+            return f"http://{self.DOMAIN}"
+        return f"https://{self.DOMAIN}"
+
+    PROJECT_NAME: str = "iot-api"
+    USERS_OPEN_REGISTRATION: bool = False
+
+    # DB | Queue
+    FIRST_SUPERUSER_EMAIL: (
+        str  # TODO: update type to EmailStr when sqlmodel supports it
+    )
+    FIRST_SUPERUSERNAME: str
+    FIRST_SUPERUSER_PASSWORD: str
 
     RABBITMQ_DNS: str = "rabbitmq"
-
-    LOG_LEVEL: str = "INFO"
+    # RABBITMQ_PORT: int = 5672
+    # RABBITMQ_USER: str
+    # RABBITMQ_PASSWORD: str
 
     POSTGRES_SERVER: str
     POSTGRES_PORT: int = 5432
@@ -32,7 +49,7 @@ class Settings(BaseSettings):
     POSTGRES_PASSWORD: str
     POSTGRES_DB: str = "app"
 
-    @computed_field
+    @computed_field  # type: ignore
     @property
     def SQL_DATABASE_URI(self) -> PostgresDsn:
         return MultiHostUrl.build(
@@ -44,35 +61,35 @@ class Settings(BaseSettings):
             path=self.POSTGRES_DB,
         )
 
-    FIRST_SUPERUSER_EMAIL: str
-    FIRST_SUPERUSERNAME: str
-    FIRST_SUPERUSER_PASSWORD: str
-    # USERS_OPEN_REGISTRATION: bool = False
+    # Email Config
+    SMTP_TLS: bool = True
+    SMTP_SSL: bool = False
 
-    # def _check_default_secret(self, var_name: str, value: str | None) -> None:
-    #     if value == "changethis":
-    #         message = (
-    #             f'The value of {var_name} is "changethis", '
-    #             "for security, please change it, at least for deployments."
-    #         )
-    #         if self.ENVIRONMENT == "local":
-    #             warn(message, stacklevel=1)
-    #         else:
-    #             raise ValueError(message)
+    SMTP_PORT: int = 587
+    SMTP_HOST: str | None = None
+    SMTP_USER: str | None = None
+    SMTP_PASSWORD: str | None = None
 
-    # @model_validator(mode="after")
-    # def _enforce_non_default_secrets(self) -> Self:
-    #     self._check_default_secret("SECRET_KEY", self.SECRET_KEY)
-    #     self._check_default_secret("POSTGRES_PASSWORD", self.POSTGRES_PASSWORD)
-    #     self._check_default_secret(
-    #         "FIRST_SUPERUSER_PASSWORD", self.FIRST_SUPERUSER_PASSWORD
-    #     )
+    EMAILS_FROM_EMAIL: str | None = (
+        "test@email.com"  # TODO: update type to EmailStr when sqlmodel supports it
+    )
+    EMAILS_FROM_NAME: str | None = None
 
-    #     return self
+    @model_validator(mode="after")
+    def _set_default_emails_from(self) -> Self:
+        if not self.EMAILS_FROM_NAME:
+            self.EMAILS_FROM_NAME = self.PROJECT_NAME
+        return self
+
+    @computed_field  # type: ignore
+    @property
+    def emails_enabled(self) -> bool:
+        return bool(
+            self.SMTP_HOST and self.EMAILS_FROM_EMAIL
+        )  # (self.EMAILS_FROM_EMAIL != "test@email.com")
 
 
 settings = Settings()
 
 if __name__ == "__main__":
     print(settings.dict())
-    print(settings.SQLALCHEMY_DATABASE_URI)

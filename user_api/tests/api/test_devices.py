@@ -121,7 +121,7 @@ class TestGetDevice:
         site = crud.create_site(db=db, site_input=s, user_id=user.id)
 
         d = DeviceCreation(
-            user_id=user.id, # <<< user ID from different user to be use in the request
+            user_id=user.id,  # <<< user ID from different user to be use in the request
             site_id=site.id,
             name="Device",
             model="Model",
@@ -162,11 +162,10 @@ class TestGetDevicePerSite:
         return {
             "range": rng,
             "site_id": site.id,
-            "site-name":site.name ,
+            "site-name": site.name,
             "user_id": user_id,
             "username": response.json()["username"]
         }
-    
 
     def test_get_devices_per_site(
             self,
@@ -233,7 +232,7 @@ class TestCreateDevice:
             self,
             db: Session, client: TestClient,
             devicesbatch, normal_token_headers: dict
-        ) -> None:
+    ) -> None:
 
         user_id = devicesbatch["user_id"]
         site = crud.create_site(
@@ -358,16 +357,16 @@ class TestUpdateDevice:
 
         assert response.status_code == 200
         assert response.json()["name"] == "New Device"
-    
+
     def test_update_device_site_id(
             self, client: TestClient, db,
             devicesbatch, normal_token_headers: dict) -> None:
-        
+
         device_id = devicesbatch["device_id"]
-        #Create a new site
+        # Create a new site
         site = SiteCreation(name="Site", description="Description")
         new_site = crud.create_site(db=db, site_input=site, user_id=devicesbatch["user_id"])
-               
+
         device = {
             "site_id": new_site.id,
         }
@@ -379,14 +378,14 @@ class TestUpdateDevice:
     def test_update_device_wrong_site_id(
             self, client: TestClient,
             devicesbatch, normal_token_headers: dict) -> None:
-        
+
         device_id = devicesbatch["device_id"]
         device = {
             "site_id": 999,
         }
-        
+
         response = client.patch(f"/devices/{device_id}", headers=normal_token_headers, json=device)
-        assert response.status_code == 404   
+        assert response.status_code == 404
 
     def test_update_device_no_token(self, client: TestClient) -> None:
         response = client.patch("/devices/1")
@@ -414,7 +413,7 @@ class TestUpdateDevice:
         site = crud.create_site(db=db, site_input=s, user_id=user.id)
 
         d = DeviceCreation(
-            user_id=user.id, # <<< user ID from different user to be use in the request
+            user_id=user.id,  # <<< user ID from different user to be use in the request
             site_id=site.id,
             name="Device",
             model="Model",
@@ -478,7 +477,7 @@ class TestDeleteDevice:
         site = crud.create_site(db=db, site_input=s, user_id=user.id)
 
         d = DeviceCreation(
-            user_id=user.id, # <<< user ID from different user to be use in the request
+            user_id=user.id,  # <<< user ID from different user to be use in the request
             site_id=site.id,
             name="Device",
             model="Model",
@@ -548,7 +547,7 @@ class TestDeleteAllDevice:
 
         d = DeviceCreation(
             user_id=user.id,
-            site_id=site.id, # <<< user ID from different user to be use in the request
+            site_id=site.id,  # <<< user ID from different user to be use in the request
             name="Device",
             model="Model",
             type="Type",

@@ -19,16 +19,14 @@ router = APIRouter()
 
 
 @router.post(
-        "/",
-        responses={401: deps.responses_401, 403: deps.responses_403},
-        response_model=SiteResponse, status_code=201
-        )
+    "/",
+    responses={401: deps.responses_401, 403: deps.responses_403},
+    response_model=SiteResponse,
+    status_code=201,
+)
 async def create_site(
-    *,
-    session: deps.SessionDep,
-    site_in: SiteCreation,
-    current_user: deps.CurrentUser
-) -> SiteResponse | HTTPException:
+    *, session: deps.SessionDep, site_in: SiteCreation, current_user: deps.CurrentUser
+) -> Site | HTTPException:
     """
     Create a new Site with a logged User. The **"name"** is required.
     """
@@ -44,9 +42,10 @@ async def create_site(
 
 
 @router.get(
-        "/user",
-        responses={401: deps.responses_401, 403: deps.responses_403},
-        response_model=SitesListResponse)
+    "/user",
+    responses={401: deps.responses_401, 403: deps.responses_403},
+    response_model=SitesListResponse,
+)
 async def get_all_sites_from_user(
     session: deps.SessionDep,
     current_user: deps.CurrentUser,
@@ -58,7 +57,8 @@ async def get_all_sites_from_user(
     logger.info("User %s is retrieving all sites", current_user.username)
 
     count_statement = (
-        select(func.count()).select_from(Site).where(Site.user_id == current_user.id))
+        select(func.count()).select_from(Site).where(Site.user_id == current_user.id)
+    )
     count = session.exec(count_statement).one()
 
     Siteslist = crud.get_sites_by_user_id(db=session, user_id=current_user.id)
@@ -66,19 +66,24 @@ async def get_all_sites_from_user(
         user_id=current_user.id,
         username=current_user.username,
         count=count,
-        data=Siteslist
+        data=Siteslist,
     )
 
 
 @router.get(
-        "/{site_id}",
-        responses={401: deps.responses_401, 403: deps.responses_403, 404: deps.responses_404},
-        response_model=SiteResponse)
+    "/{site_id}",
+    responses={
+        401: deps.responses_401,
+        403: deps.responses_403,
+        404: deps.responses_404,
+    },
+    response_model=SiteResponse,
+)
 async def get_information_from_site(
     site_id: int,
     session: deps.SessionDep,
     current_user: deps.CurrentUser,
-) -> SiteResponse | HTTPException:
+) -> Site | HTTPException:
     """
     Retrieve a Site by ID from a logged User.
     """
@@ -90,21 +95,22 @@ async def get_information_from_site(
         raise HTTPException(status_code=404, detail="Site not found")
     elif site.user_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not enough permissions")
-    
+
     return site
 
 
 @router.patch(
-        "/{site_id}",
-        responses={404: deps.responses_404, 403: deps.responses_403},
-        response_model=SiteResponse)
+    "/{site_id}",
+    responses={404: deps.responses_404, 403: deps.responses_403},
+    response_model=SiteResponse,
+)
 async def update_site(
     *,
     session: deps.SessionDep,
     site_id: int,
     site_in: SiteUpdate,
-    current_user: deps.CurrentUser
-) -> SiteResponse | HTTPException:
+    current_user: deps.CurrentUser,
+) -> Site | HTTPException:
     """
     Update a Site information by its ID from a logged User.
     """
@@ -128,15 +134,12 @@ async def update_site(
 
 
 @router.delete(
-        "/{site_id}",
-        responses={404: deps.responses_404, 403: deps.responses_403},
-        response_model=DefaultResponseMessage
-        )
+    "/{site_id}",
+    responses={404: deps.responses_404, 403: deps.responses_403},
+    response_model=DefaultResponseMessage,
+)
 async def delete_site(
-    *,
-    session: deps.SessionDep,
-    site_id: int,
-    current_user: deps.CurrentUser
+    *, session: deps.SessionDep, site_id: int, current_user: deps.CurrentUser
 ) -> DefaultResponseMessage | HTTPException:
     """
     Delete Site, **it will** delete its devices and **consequently** its messages.

@@ -1,73 +1,27 @@
-from contextlib import asynccontextmanager
 import logging
+from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Request
 from asgi_correlation_id import CorrelationIdMiddleware
 from asgi_correlation_id.middleware import is_valid_uuid4
+from fastapi import FastAPI, Request
 
+import src.doc as doc
 from src.api.main import api_router
 from src.core.config import settings
 from src.logger.setup import setup_logging
 
-
-tags_metadata = [
-    {
-        "name": "Login",
-        "description": "To authenticate and get an access token.",
-    },
-    {
-        "name": "Users",
-        "description": "Operations with Users. **Needs** to be authenticated.",
-    },
-    {
-        "name": "Sites",
-        "description": "Operations with Sites. **Needs** to be authenticated.",
-    },
-    {
-        "name": "Devices",
-        "description": "Operations with Devices. **Needs** to be authenticated.",
-    },
-    {
-        "name": "Messages",
-        "description": "Retrive and delete Messages from devices. **Needs** to be authenticated.",
-    },
-    {
-        "name": "Admin",
-        "description": "Manage Users. Super User **Needs** to be authenticated.",
-    },
-]
-
-description = """
-ChimichangApp API helps you do awesome stuff. 🚀
-
-## Items
-
-You can **read items**.
-
-## Users
-
-You will be able to:
-
-* **Create users** (_not implemented_).
-* **Read users** (_not implemented_).
-"""
+setup_logging()
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
-    openapi_tags=tags_metadata,
+    openapi_tags=doc.TAGS_METADATA,
     # summary=
-    description=description,
+    description=doc.DESCRIPTION,
     version=settings.VERSION,
-    license_info={
-        "name": "Apache 2.0",
-        "identifier": "MIT",
-    },
+    license_info=doc.LICENSE_INFO,
     # terms_of_service=
-    contact={
-        "name": "Caio Satiro",
-        "url": "https://github.com/kaiosatiro",
-        "email": "gaiusSatyr@mail.com",
-    },
+    contact=doc.CONTACT,
     swagger_ui_parameters={"operationsSorter": "method"},
     root_path=settings.API_V1_STR,
     root_path_in_servers=True,
@@ -76,18 +30,16 @@ app = FastAPI(
 app.include_router(api_router)
 app.add_middleware(
     CorrelationIdMiddleware,
-    header_name='X-Request-ID',
+    header_name="X-Request-ID",
     update_request_header=True,
     # generator=lambda: uuid.uuid4().hex,
     validator=is_valid_uuid4,
     # transformer=lambda a: a,
 )
 
-setup_logging()
-
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan() -> AsyncGenerator[None, None]:
     logger = logging.getLogger("lifespan")
     logger.info("StartUP")
     yield
@@ -95,7 +47,7 @@ async def lifespan(app: FastAPI):
 
 
 @app.get("/", include_in_schema=False)
-async def root(request: Request):
+async def root(request: Request) -> dict[str, str]:
     logger = logging.getLogger("root")
     logger.info("Root")
     logger.info("Request ID: %s", request.headers["x-request-id"])
@@ -103,7 +55,10 @@ async def root(request: Request):
 
 
 # Login:
-# - POST /access-token - 200 | 401 Unauthorized
+# - POST /access-token - 200 | 401
+# - POST /login/test-token - 200 | 401
+# - POST /password-recovery/{email} - 200 | 404 | 400
+# - POST /reset-password - 200 | 400 | 401 | 404
 
 # Users:
 # - GET /users/me - 200 | 404

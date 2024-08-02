@@ -30,10 +30,10 @@ test-local: lint;
 
 lint:
 	@echo "Running linteron Logging"
-	flake8 logging/ --count --exit-zero --max-complexity=10 --max-line-length=150 --statistics --exclude=.venv
-	flake8 logging/ --count --select=E9,F63,F7,F82 --show-source --statistics --exclude=.venv
+	flake8 logging/src --count --exit-zero --max-complexity=10 --max-line-length=150 --statistics --exclude=.venv
+	flake8 logging/src --count --select=E9,F63,F7,F82 --show-source --statistics --exclude=.venv
 
 	@echo "Running linter on UserAPI"
-	flake8 user_api/ --count --exit-zero --max-complexity=10 --max-line-length=150 --statistics --exclude=.venv
-	flake8 user_api/ --count --select=E9,F63,F7,F82 --show-source --statistics --exclude=.venv
+	flake8 user_api/src --count --exit-zero --max-complexity=10 --max-line-length=150 --statistics --exclude=.venv
+	flake8 user_api/src --count --select=E9,F63,F7,F82 --show-source --statistics --exclude=.venv
 

@@ -100,7 +100,6 @@ class TestCreateSite:
         response = client.post("/sites/", headers=normal_token_headers)
 
         assert response.status_code == 422
-    
 
 
 class TestPatchSite:

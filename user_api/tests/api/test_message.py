@@ -13,6 +13,7 @@ from src.models import (
     UserCreation,
 )
 
+
 class TestGetMessages:
     @pytest.fixture()
     def batch(self, db: Session, client: TestClient, normal_token_headers) -> tuple[int, int]:
@@ -24,7 +25,7 @@ class TestGetMessages:
 
         device = DeviceCreation(
                 user_id=user_id, site_id=site.id,
-                name=f"Device", model=f"Model",
+                name="Device", model="Model",
                 type="Type", description="Description")
 
         device = crud.create_device(db=db, device_input=device)
@@ -53,7 +54,7 @@ class TestGetMessages:
     def test_get_messages_by_device_id(
             self, client: TestClient,
             normal_token_headers, batch
-        ) -> None:
+    ) -> None:
 
         response = client.get(f"/messages/device/{batch['device_id']}", headers=normal_token_headers)
 
@@ -67,8 +68,8 @@ class TestGetMessages:
             self,
             client: TestClient,
             normal_token_headers
-        ) -> None:
-        response = client.get(f"/messages/device/0", headers=normal_token_headers)
+    ) -> None:
+        response = client.get("/messages/device/0", headers=normal_token_headers)
         assert response.status_code == 404
 
     def test_get_messages_by_device_id_unauthorized(self, client: TestClient, batch) -> None:
@@ -77,14 +78,14 @@ class TestGetMessages:
 
     def test_get_messages_by_device_id_forbidden(self, client: TestClient, batch) -> None:
         response = client.get(f"/messages/device/{batch['device_id']}",
-                               headers={"Authorization": "Bearer 123"})
+                              headers={"Authorization": "Bearer 123"})
         assert response.status_code == 403
 
     def test_get_messages_wrong_user(
             self,
-            db:Session, client: TestClient,
+            db: Session, client: TestClient,
             userfix, batch
-        ) -> None:
+    ) -> None:
 
         crud.create_user(db=db, user_input=UserCreation(**userfix))
         response = client.post(
@@ -284,7 +285,7 @@ class TestDeleteMessage:
 
         device = DeviceCreation(
                 user_id=user_id, site_id=site.id,
-                name=f"Device", model=f"Model",
+                name="Device", model="Model",
                 type="Type", description="Description")
 
         device = crud.create_device(db=db, device_input=device)
@@ -307,7 +308,7 @@ class TestDeleteMessage:
     def test_delete_message_per_message_id(
             self, db: Session, client: TestClient,
             normal_token_headers, batch
-        ) -> None:
+    ) -> None:
 
         response = client.get(f"/messages/device/{batch['device_id']}", headers=normal_token_headers)
 
@@ -326,8 +327,8 @@ class TestDeleteMessage:
             self,
             client: TestClient,
             normal_token_headers
-        ) -> None:
-        response = client.delete(f"/messages/999", headers=normal_token_headers)
+    ) -> None:
+        response = client.delete("/messages/999", headers=normal_token_headers)
         assert response.status_code == 404
 
     def test_delete_message_per_message_id_unauthorized(self, client: TestClient, batch) -> None:
@@ -336,18 +337,18 @@ class TestDeleteMessage:
 
     def test_delete_message_per_id_wrong_user(
             self,
-            db:Session, client: TestClient,
+            db: Session, client: TestClient,
             userfix, batch, normal_token_headers
-        ) -> None:
+    ) -> None:
 
-        #Get a message ID
+        # Get a message ID
         response = client.get(f"/messages/device/{batch['device_id']}", headers=normal_token_headers)
         assert response.status_code == 200
         assert response.json()["count"] == batch["range"], "Set in the fixture"
         message_id = response.json()["data"][0]["id"]
         assert message_id
 
-        #Create a different user
+        # Create a different user
         crud.create_user(db=db, user_input=UserCreation(**userfix))
         response = client.post(
             "/access-token",
@@ -355,10 +356,10 @@ class TestDeleteMessage:
         assert response.status_code == 200
         assert response.json()["access_token"]
 
-        #Try to delete a message from a different user
+        # Try to delete a message from a different user
         token_from_different_user = response.json()["access_token"]
         response = client.delete(f"/messages/{message_id}",
-                               headers={"Authorization": f"Bearer {token_from_different_user}"})
+                                 headers={"Authorization": f"Bearer {token_from_different_user}"})
         assert response.status_code == 403
 
 
@@ -394,9 +395,9 @@ class TestDeleteMessages:
         return {"site_id": site.id, "user_id": user_id, "device_id": device.id, "range": range_number}
 
     def test_delete_messages_per_device_id(
-            self, db: Session, client: TestClient,
+            self, client: TestClient,
             normal_token_headers, batch
-        ) -> None:
+    ) -> None:
 
         response = client.delete(
             f"/messages/device/{batch['device_id']}", headers=normal_token_headers)
@@ -410,7 +411,7 @@ class TestDeleteMessages:
             self,
             client: TestClient,
             normal_token_headers
-        ) -> None:
+    ) -> None:
         response = client.delete("/messages/device/999", headers=normal_token_headers)
         assert response.status_code == 404
 
@@ -420,11 +421,11 @@ class TestDeleteMessages:
 
     def test_delete_messages_per_device_id_wrong_user(
             self,
-            db:Session, client: TestClient,
+            db: Session, client: TestClient,
             userfix, batch
-        ) -> None:
+    ) -> None:
 
-        #Create a different user
+        # Create a different user
         crud.create_user(db=db, user_input=UserCreation(**userfix))
         response = client.post(
             "/access-token",
@@ -432,10 +433,10 @@ class TestDeleteMessages:
         assert response.status_code == 200
         assert response.json()["access_token"]
 
-        #Try to delete a message from a different user
+        # Try to delete a message from a different user
         token_from_different_user = response.json()["access_token"]
         response = client.delete(f"/messages/device/{batch['device_id']}",
-                               headers={"Authorization": f"Bearer {token_from_different_user}"})
+                                 headers={"Authorization": f"Bearer {token_from_different_user}"})
         assert response.status_code == 403
 
     def test_delete_messages_per_device_id_with_period(
@@ -560,35 +561,35 @@ class TestGetMessage:
         message_id = messages[0].id
 
         return message_id
-    
+
     def test_get_message_by_id(
             self, client: TestClient,
             normal_token_headers, batch
-        ) -> None:
+    ) -> None:
 
         response = client.get(f"/messages/{batch}", headers=normal_token_headers)
         assert response.status_code == 200
         assert response.json()["id"] == batch
-    
+
     def test_get_message_by_id_not_found(
             self,
             client: TestClient,
             normal_token_headers
-        ) -> None:
+    ) -> None:
         response = client.get("/messages/999", headers=normal_token_headers)
         assert response.status_code == 404
 
     def test_get_message_by_id_unauthorized(self, client: TestClient, batch) -> None:
         response = client.get(f"/messages/{batch}")
         assert response.status_code == 401
-    
+
     def test_get_message_by_id_wrong_user(
             self,
-            db:Session, client: TestClient,
+            db: Session, client: TestClient,
             userfix, batch
-        ) -> None:
+    ) -> None:
 
-        #Create a different user
+        # Create a different user
         crud.create_user(db=db, user_input=UserCreation(**userfix))
         response = client.post(
             "/access-token",
@@ -596,8 +597,8 @@ class TestGetMessage:
         assert response.status_code == 200
         assert response.json()["access_token"]
 
-        #Try to delete a message from a different user
+        # Try to delete a message from a different user
         token_from_different_user = response.json()["access_token"]
         response = client.get(f"/messages/{batch}",
-                               headers={"Authorization": f"Bearer {token_from_different_user}"})
+                              headers={"Authorization": f"Bearer {token_from_different_user}"})
         assert response.status_code == 403

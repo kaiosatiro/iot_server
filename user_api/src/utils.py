@@ -1,8 +1,8 @@
-from datetime import datetime
 import random
+from datetime import datetime
 
 
-def validate_datetime(date_str):
+def validate_datetime(date_str: str) -> bool:
     formats = [
         "%Y-%m-%d %H:%M:%S",
         "%Y-%m-%d",

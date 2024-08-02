@@ -6,9 +6,10 @@ jobs:
     runs-on: ubuntu-latest
     environment: test
     env:
-      ENV: ${{ vars.ENV }}
+      ENVIRONMENT: ${{ vars.ENVIRONMENT }}
       LOG_INFO_LOCAL_PATH: ${{ vars.LOG_INFO_LOCAL_PATH }}
-      
+      LOG_LEVEL: ${{ vars.LOG_LEVEL }}
+
       POSTGRES_PORT: ${{ vars.POSTGRES_PORT }}
       POSTGRES_USER: ${{ vars.POSTGRES_USER }}
       POSTGRES_PASSWORD: ${{ vars.POSTGRES_PASSWORD }}
@@ -18,6 +19,8 @@ jobs:
       FIRST_SUPERUSER_EMAIL: ${{ vars.FIRST_SUPERUSER_EMAIL }}
       FIRST_SUPERUSER_PASSWORD: ${{ vars.FIRST_SUPERUSER_PASSWORD }}
       PROJECT_NAME: ${{ vars.PROJECT_NAME }}
+
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -35,8 +38,9 @@ jobs:
       - name: Create env file
         id: create-env
         run: |
-          echo ENV=$ENV >> .env
+          echo ENVIRONMENT=$ENVIRONMENT >> .env
           echo LOG_INFO_LOCAL_PATH=$LOG_INFO_LOCAL_PATH > .env
+          echo LOG_LEVEL=$LOG_LEVEL > .env
           echo POSTGRES_PORT=$POSTGRES_PORT > .env
           echo POSTGRES_USER=$POSTGRES_USER > .env
           echo POSTGRES_PASSWORD=$POSTGRES_PASSWORD > .env

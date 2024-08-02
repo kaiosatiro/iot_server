@@ -1,3 +1,4 @@
+from collections.abc import Sequence
 from datetime import datetime, timedelta
 
 from sqlmodel import Session, select
@@ -16,6 +17,7 @@ from .models import (
     User,
     UserCreation,
     UserUpdate,
+    UserUpdateMe,
 )
 
 
@@ -23,13 +25,13 @@ from .models import (
 def create_user(*, db: Session, user_input: UserCreation) -> User:
     _id = generate_random_number(10000, 99999)
     while db.get(User, _id):
-       _id = generate_random_number(10000, 99999)
+        _id = generate_random_number(10000, 99999)
     user = User.model_validate(
         user_input,
         update={
             "hashed_password": security.get_password_hash(user_input.password),
             "id": _id,
-            },
+        },
     )
     db.add(user)
     db.commit()
@@ -37,7 +39,9 @@ def create_user(*, db: Session, user_input: UserCreation) -> User:
     return user
 
 
-def update_user(*, db: Session, db_user: User, user_new_input: UserUpdate) -> User:
+def update_user(
+    *, db: Session, db_user: User, user_new_input: UserUpdate | UserUpdateMe
+) -> User:
     user_data = user_new_input.model_dump(exclude_unset=True)
     db_user.sqlmodel_update(user_data)
     db.add(db_user)
@@ -96,7 +100,7 @@ def authenticate_user(*, db: Session, username: str, password: str) -> User | No
 def create_site(*, db: Session, site_input: SiteCreation, user_id: int) -> Site:
     _id = generate_random_number(1000000, 9999999)
     while db.get(Site, _id):
-       _id = generate_random_number(1000000, 9999999)
+        _id = generate_random_number(1000000, 9999999)
     site = Site.model_validate(site_input, update={"user_id": user_id, "id": _id})
     db.add(site)
     db.commit()
@@ -119,7 +123,7 @@ def get_site_by_name(*, db: Session, name: str) -> Site | None:
     return session_site
 
 
-def get_sites_by_user_id(*, db: Session, user_id: int) -> list[Site]:
+def get_sites_by_user_id(*, db: Session, user_id: int) -> Sequence[Site]:
     statement = select(Site).where(Site.user_id == user_id)
     session_sites = db.exec(statement).all()
     return session_sites
@@ -142,14 +146,12 @@ def delete_sites_from_user(*, db: Session, user_id: int) -> None:
 def create_device(*, db: Session, device_input: DeviceCreation) -> Device:
     _id = generate_random_number(1000000000, 2147483645)
     while db.get(Device, _id):
-       _id = generate_random_number(1000000000, 2147483645)
+        _id = generate_random_number(1000000000, 2147483645)
+
     device = Device.model_validate(
         device_input,
-        update={
-            "id": _id,
-            "token": security.create_device_access_token(_id)
-            }
-        )
+        update={"id": _id, "token": security.create_device_access_token(_id)},
+    )
     db.add(device)
     db.commit()
     db.refresh(device)
@@ -173,25 +175,25 @@ def get_device_by_name(*, db: Session, name: str) -> Device | None:
     return session_device
 
 
-def get_devices_by_type(*, db: Session, type: str, user_id: int) -> list[Device]:
+def get_devices_by_type(*, db: Session, type: str, user_id: int) -> Sequence[Device]:
     statement = select(Device).where(Device.type == type, Device.user_id == user_id)
     session_devices = db.exec(statement).all()
     return session_devices
 
 
-def get_devices_by_model(*, db: Session, model: str, user_id: int) -> list[Device]:
+def get_devices_by_model(*, db: Session, model: str, user_id: int) -> Sequence[Device]:
     statement = select(Device).where(Device.model == model, Device.user_id == user_id)
     session_devices = db.exec(statement).all()
     return session_devices
 
 
-def get_devices_by_user_id(*, db: Session, user_id: int) -> list[Device]:
+def get_devices_by_user_id(*, db: Session, user_id: int) -> Sequence[Device]:
     statement = select(Device).where(Device.user_id == user_id)
     session_devices = db.exec(statement).all()
     return session_devices
 
 
-def get_devices_by_site_id(*, db: Session, site_id: int) -> list[Device]:
+def get_devices_by_site_id(*, db: Session, site_id: int) -> Sequence[Device]:
     statement = select(Device).where(Device.site_id == site_id)
     session_devices = db.exec(statement).all()
     return session_devices
@@ -229,11 +231,11 @@ def get_messages(
     *,
     db: Session,
     device_id: int,
-    start_date: str = datetime.now() - timedelta(hours=24),
-    end_date: str = datetime.now() + timedelta(hours=1),
+    start_date: str = str(datetime.now() - timedelta(hours=24)),
+    end_date: str = str(datetime.now() + timedelta(hours=1)),
     limit: int = 100,
     offset: int = 0,
-) -> list[Message]:
+) -> Sequence[Message]:
     """
     By Period and Device ID
     Defaut: Period of 24 hours
@@ -276,7 +278,7 @@ def delete_messages_by_period(
     *,
     db: Session,
     device_id: int,
-    start_date: str = datetime.now() - timedelta(hours=24),
+    start_date: str = str(datetime.now() - timedelta(hours=24)),
     end_date: str,
 ) -> None:
     """

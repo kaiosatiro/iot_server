@@ -71,7 +71,10 @@ services:
       - "8000:8000"
     environment:
       - PROJECT_NAME=${PROJECT_NAME}
-      - ENV=${ENV}
+      - ENVIRONMENT=${ENVIRONMENT}
+      - DOMAIN=${DOMAIN}
+      - API_V1_STR=${API_V1_STR}
+      - VERSION=${VERSION}
       #Database
       - POSTGRES_SERVER=db
       - POSTGRES_PORT=${POSTGRES_PORT}
@@ -84,6 +87,16 @@ services:
       - FIRST_SUPERUSER_PASSWORD=${FIRST_SUPERUSER_PASSWORD} # change to secret
       #RabbitMQ
       - RABBITMQ_DNS=${RABBITMQ_DNS}
+      #Email
+      - SMTP_TLS=${SMTP_TLS}
+      - SMTP_SSL=${SMTP_SSL}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - EMAILS_FROM_EMAIL=${EMAILS_FROM_EMAIL}
+      - EMAILS_FROM_NAME=${EMAILS_FROM_NAME}
+
     depends_on:
       rabbitmq:
         condition: service_healthy
