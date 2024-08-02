@@ -17,14 +17,9 @@ services:
       - .env
     environment:
       - PGDATA=/var/lib/postgresql/data/pgdata
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD?Variable not set}
-      - POSTGRES_USER=${POSTGRES_USER?Variable not set}
-      - POSTGRES_DB=${POSTGRES_DB?Variable not set}
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER?Variable not set}"]
-      interval: 5s
-      timeout: 5s
-      retries: 3
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_DB=${POSTGRES_DB}
   
   adminer:
     image: adminer
@@ -45,9 +40,9 @@ services:
       - internal_network
     healthcheck:
       test: ["CMD", "rabbitmqctl", "status"]
-      interval: 5s
-      timeout: 5s
-      retries: 3
+      interval: 10s
+      timeout: 15s
+      retries: 15
 
   logging:
     build: ./logging
@@ -102,13 +97,4 @@ services:
         condition: service_healthy
         restart: true
       db:
-        condition: service_healthy
-        restart: true
-
-  
-
-
-
-
-
-
+        condition: service_started

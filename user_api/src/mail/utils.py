@@ -32,7 +32,8 @@ def send_email(*, email_to: str, subject: str = "", html_content: str = "") -> N
     logger.info("Sending email")
     if not settings.emails_enabled:
         logger.critical("no provided configuration for email variables")
-
+        return
+    
     message = emails.Message(
         subject=subject,
         html=html_content,

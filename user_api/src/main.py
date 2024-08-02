@@ -11,7 +11,18 @@ from src.api.main import api_router
 from src.core.config import settings
 from src.logger.setup import setup_logging
 
+
 setup_logging()
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+    logger = logging.getLogger("lifespan")
+    logger.info("StartUP")
+    logger.info(settings.SQL_DATABASE_URI)
+    yield
+    logger.info("ShutDown")
+
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -25,6 +36,7 @@ app = FastAPI(
     swagger_ui_parameters={"operationsSorter": "method"},
     root_path=settings.API_V1_STR,
     root_path_in_servers=True,
+    lifespan=lifespan,
 )
 
 app.include_router(api_router)
@@ -36,14 +48,6 @@ app.add_middleware(
     validator=is_valid_uuid4,
     # transformer=lambda a: a,
 )
-
-
-@asynccontextmanager
-async def lifespan() -> AsyncGenerator[None, None]:
-    logger = logging.getLogger("lifespan")
-    logger.info("StartUP")
-    yield
-    logger.info("ShutDown")
 
 
 @app.get("/", include_in_schema=False)

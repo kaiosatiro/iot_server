@@ -70,9 +70,8 @@ class Settings(BaseSettings):
     SMTP_USER: str | None = None
     SMTP_PASSWORD: str | None = None
 
-    EMAILS_FROM_EMAIL: str | None = (
-        "test@email.com"  # TODO: update type to EmailStr when sqlmodel supports it
-    )
+    EMAILS_FROM_EMAIL: str | None = None  # TODO: update type to EmailStr when sqlmodel supports it
+
     EMAILS_FROM_NAME: str | None = None
 
     @model_validator(mode="after")
