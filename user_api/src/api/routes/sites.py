@@ -38,6 +38,8 @@ async def create_site(
     except ValidationError as e:
         logger.info(e)
         raise HTTPException(status_code=422, detail="Bad body format")
+
+    logger.info("Site %s created successfully", site.name)
     return site
 
 
@@ -62,6 +64,8 @@ async def get_all_sites_from_user(
     count = session.exec(count_statement).one()
 
     Siteslist = crud.get_sites_by_user_id(db=session, user_id=current_user.id)
+
+    logger.info("Returning %s sites", count)
     return SitesListResponse(
         user_id=current_user.id,
         username=current_user.username,
@@ -96,6 +100,7 @@ async def get_information_from_site(
     elif site.user_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
+    logger.info("Returning site %s", site_id)
     return site
 
 
@@ -130,6 +135,8 @@ async def update_site(
     except ValidationError as e:
         logger.info(e)
         raise HTTPException(status_code=422, detail="Bad body format")
+
+    logger.info("Site %s updated", site_id)
     return site
 
 
@@ -156,4 +163,6 @@ async def delete_site(
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
     crud.delete_site(db=session, site=site)
+
+    logger.info("Site %s deleted", site_id)
     return DefaultResponseMessage(message="Site deleted successfully")

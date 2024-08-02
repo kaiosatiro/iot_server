@@ -1,121 +1,121 @@
-# name: Deploy
+name: Deploy
 
-# on:
-#   push:
-#     branches: [ "main" ]
-#   pull_request:
-#     branches: [ "main" ]
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
-# concurrency:
-#   group: master
-#   cancel-in-progress: true
+concurrency:
+  group: master
+  cancel-in-progress: true
 
-# jobs:
-#   test:
-#     name: Tests
-#     uses: ./.github/workflows/test.yml
+jobs:
+  test:
+    name: Tests
+    uses: ./.github/workflows/test.yml
     
-#   quality-assurance:
-#     name: Quality Assurance
-#     uses: ./.github/workflows/qa.yml
+  quality-assurance:
+    name: Quality Assurance
+    uses: ./.github/workflows/qa.yml
 
-#   #Deploy to staging
-#   deploy:
-#     depends-on: [ test, quality-assurance ]
-#     runs-on: ubuntu-latest
-#     environment: staging
-#     steps:
-#       - name: Test
-#         run: echo "Testing..."
+  #Deploy to staging
+  deploy:
+    depends-on: [ test, quality-assurance ]
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - name: Test
+        run: echo "Testing..."
 
-#       - name: Configure SSH
-#         env:
-#           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-#           SSH_HOST: ${{ secrets.SSH_HOST }}
-#           SSH_USER: ${{ secrets.SSH_USER }}
-#         run: |
-#           mkdir -p ~/.ssh
-#           echo "$SSH_PRIVATE_KEY" > ~/.ssh/github
-#           chmod 600 ~/.ssh/github
-#           echo "SSH_HOST: '$SSH_HOST'"
-#           echo "SSH_USER: '$SSH_USER'"
-#           cat >> ~/.ssh/config << END
-#           Host Target
-#             HostName $SSH_HOST
-#             User $SSH_USER
-#             IdentityFile ~/.ssh/github
-#             LogLevel ERROR
-#             StrictHostKeyChecking no
-#           END
+      - name: Configure SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/github
+          chmod 600 ~/.ssh/github
+          echo "SSH_HOST: '$SSH_HOST'"
+          echo "SSH_USER: '$SSH_USER'"
+          cat >> ~/.ssh/config << END
+          Host Target
+            HostName $SSH_HOST
+            User $SSH_USER
+            IdentityFile ~/.ssh/github
+            LogLevel ERROR
+            StrictHostKeyChecking no
+          END
 
-#       - name: Create env file
-#         id: create-env
-#         env:
-#           SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      - name: Create env file
+        id: create-env
+        env:
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
 
-#           ENVIRONMENT: ${{ vars.ENVIRONMENT }}
-#           LOG_INFO_LOCAL_PATH: ${{ vars.LOG_INFO_LOCAL_PATH }}
-#           LOG_LEVEL: ${{ vars.LOG_LEVEL }}
+          ENVIRONMENT: ${{ vars.ENVIRONMENT }}
+          LOG_INFO_LOCAL_PATH: ${{ vars.LOG_INFO_LOCAL_PATH }}
+          LOG_LEVEL: ${{ vars.LOG_LEVEL }}
 
-#           PROJECT_NAME: ${{ vars.PROJECT_NAME }}
-#           DOMAIN: ${{ vars.DOMAIN }}
-#           API_V1_STR: ${{ vars.API_V1_STR }}
-#           VERSION: ${{ vars.VERSION }}
+          PROJECT_NAME: ${{ vars.PROJECT_NAME }}
+          DOMAIN: ${{ vars.DOMAIN }}
+          API_V1_STR: ${{ vars.API_V1_STR }}
+          VERSION: ${{ vars.VERSION }}
 
-#           RABBITMQ_DNS: ${{ vars.RABBITMQ_DNS }}
-#           POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
-#           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-#           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-#           POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          RABBITMQ_DNS: ${{ vars.RABBITMQ_DNS }}
+          POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
 
-#           FIRST_SUPERUSERNAME: ${{ secrets.FIRST_SUPERUSERNAME }}
-#           FIRST_SUPERUSER_EMAIL: ${{ secrets.FIRST_SUPERUSER_EMAIL }}
-#           FIRST_SUPERUSER_PASSWORD: ${{ secrets.FIRST_SUPERUSER_PASSWORD }}
+          FIRST_SUPERUSERNAME: ${{ secrets.FIRST_SUPERUSERNAME }}
+          FIRST_SUPERUSER_EMAIL: ${{ secrets.FIRST_SUPERUSER_EMAIL }}
+          FIRST_SUPERUSER_PASSWORD: ${{ secrets.FIRST_SUPERUSER_PASSWORD }}
 
-#           SMTP_PORT: ${{ vars.SMTP_PORT }}
-#           SMTP_HOST: ${{ vars.SMTP_HOST }}
-#           SMTP_USER: ${{ vars.SMTP_USER }}
-#           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
-#           EMAILS_FROM_EMAIL: ${{ secrets.EMAILS_FROM_EMAIL }}
-#           EMAILS_FROM_NAME: ${{ vars.EMAILS_FROM_NAME }}
+          SMTP_PORT: ${{ vars.SMTP_PORT }}
+          SMTP_HOST: ${{ vars.SMTP_HOST }}
+          SMTP_USER: ${{ vars.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          EMAILS_FROM_EMAIL: ${{ secrets.EMAILS_FROM_EMAIL }}
+          EMAILS_FROM_NAME: ${{ vars.EMAILS_FROM_NAME }}
 
-#         run: |
-#           echo SECRET_KEY=$SECRET_KEY >> .env
-#           echo ENVIRONMENT=$ENVIRONMENT >> .env
-#           echo LOG_INFO_LOCAL_PATH=$LOG_INFO_LOCAL_PATH >> .env
-#           echo LOG_LEVEL=$LOG_LEVEL >> .env
+        run: |
+          echo SECRET_KEY=$SECRET_KEY >> .env
+          echo ENVIRONMENT=$ENVIRONMENT >> .env
+          echo LOG_INFO_LOCAL_PATH=$LOG_INFO_LOCAL_PATH >> .env
+          echo LOG_LEVEL=$LOG_LEVEL >> .env
           
-#           echo PROJECT_NAME=$PROJECT_NAME >> .env
-#           echo API_V1_STR=$API_V1_STR >> .env
-#           echo DOMAIN=$DOMAIN >> .env
-#           echo VERSION=$VERSION >> .env
+          echo PROJECT_NAME=$PROJECT_NAME >> .env
+          echo API_V1_STR=$API_V1_STR >> .env
+          echo DOMAIN=$DOMAIN >> .env
+          echo VERSION=$VERSION >> .env
 
-#           echo POSTGRES_PORT=$POSTGRES_PORT >> .env
-#           echo POSTGRES_USER=$POSTGRES_USER >> .env
-#           echo POSTGRES_PASSWORD=$POSTGRES_PASSWORD >> .env
-#           echo POSTGRES_DB=$POSTGRES_DB >> .env
-#           echo FIRST_SUPERUSERNAME=$FIRST_SUPERUSERNAME >> .env
-#           echo FIRST_SUPERUSER_EMAIL=$FIRST_SUPERUSER_EMAIL >> .env
-#           echo FIRST_SUPERUSER_PASSWORD=$FIRST_SUPERUSER_PASSWORD >> .env
+          echo POSTGRES_PORT=$POSTGRES_PORT >> .env
+          echo POSTGRES_USER=$POSTGRES_USER >> .env
+          echo POSTGRES_PASSWORD=$POSTGRES_PASSWORD >> .env
+          echo POSTGRES_DB=$POSTGRES_DB >> .env
+          echo FIRST_SUPERUSERNAME=$FIRST_SUPERUSERNAME >> .env
+          echo FIRST_SUPERUSER_EMAIL=$FIRST_SUPERUSER_EMAIL >> .env
+          echo FIRST_SUPERUSER_PASSWORD=$FIRST_SUPERUSER_PASSWORD >> .env
 
-#           echo SMTP_TLS= >> .env
-#           echo SMTP_SSL= >> .env
-#           echo SMTP_PORT=$SMTP_PORT >> .env
-#           echo SMTP_HOST=$SMTP_HOST >> .env
-#           echo SMTP_USER=$SMTP_USER >> .env
-#           echo SMTP_PASSWORD=$SMTP_PASSWORD >> .env
-#           echo EMAILS_FROM_EMAIL=$EMAILS_FROM_EMAIL >> .env
-#           echo EMAILS_FROM_NAME=$EMAILS_FROM_NAME >> .env
+          echo SMTP_TLS= >> .env
+          echo SMTP_SSL= >> .env
+          echo SMTP_PORT=$SMTP_PORT >> .env
+          echo SMTP_HOST=$SMTP_HOST >> .env
+          echo SMTP_USER=$SMTP_USER >> .env
+          echo SMTP_PASSWORD=$SMTP_PASSWORD >> .env
+          echo EMAILS_FROM_EMAIL=$EMAILS_FROM_EMAIL >> .env
+          echo EMAILS_FROM_NAME=$EMAILS_FROM_NAME >> .env
 
-#       - name: Pull repository
-#         run: |
-#           ssh Target "cd iot_server && git pull origin main"
+      - name: Pull repository
+        run: |
+          ssh Target "cd iot_server && git pull origin main"
 
-#       - name: Send env file
-#         run: |
-#           scp .env Target:iot_server/.env
+      - name: Send env file
+        run: |
+          scp .env Target:iot_server/.env
 
-#       - name: Deploy
-#         if: steps.create-env.outcome == 'success'
-#         run: |
-#             ssh Target "cd iot_server && make compose-down && make compose-prod"
+      - name: Deploy
+        if: steps.create-env.outcome == 'success'
+        run: |
+            ssh Target "cd iot_server && make compose-down && make compose-prod"

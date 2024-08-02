@@ -74,6 +74,8 @@ def update_me(
     current_user = crud.update_user(
         db=session, db_user=current_user, user_new_input=user_in
     )
+
+    logger.info("User %s updated successfully", current_user.username)
     return current_user
 
 
@@ -105,6 +107,8 @@ def update_my_password(
         )
 
     crud.update_password(db=session, user=current_user, new_password=body.new_password)
+
+    logger.info("Password updated successfully")
     return DefaultResponseMessage(message="Password updated successfully")
 
 
@@ -129,6 +133,7 @@ async def deactivate_me(
         )
     crud.deactivate_user(db=session, user=current_user)
 
+    logger.info("User %s deactivated successfully", current_user.username)
     return DefaultResponseMessage(message="User deactivated successfully")
 
 
@@ -151,6 +156,7 @@ async def read_users(*, session: deps.SessionDep) -> UsersListResponse | HTTPExc
     statement = select(User)
     users = session.exec(statement).all()
 
+    logger.info("Returning %s users", count)
     return UsersListResponse(data=users, count=count)
 
 
@@ -172,6 +178,8 @@ async def read_user_by_id(
     user = session.get(User, user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+
+    logger.info("Returning user %s", user_id)
     return user
 
 
@@ -214,6 +222,8 @@ async def create_user(
             subject=email_data.subject,
             html_content=email_data.html_content,
         )
+
+    logger.info("User %s created successfully", user.id)
     return user
 
 
@@ -251,6 +261,8 @@ async def update_user(
         raise HTTPException(
             status_code=409, detail=f"This {key_info} already exists in the system."
         )
+
+    logger.info("User %s updated successfully", id)
     return user
 
 
@@ -282,4 +294,6 @@ async def delete_user(
         )
 
     crud.deactivate_user(db=session, user=user)
+
+    logger.info("User %s deactivated successfully", id)
     return DefaultResponseMessage(message="User deactivated successfully")

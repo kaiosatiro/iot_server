@@ -41,6 +41,7 @@ async def get_user_devices(
     deviceslist = crud.get_devices_by_user_id(db=session, user_id=current_user.id)
 
     # if logger.isEnabledFor(logging.DEBUG): logger.debug(f"Count: {count}")
+    logger.info("Returning %s devices", count)
     return DevicesListResponse(
         user_id=current_user.id,
         username=current_user.username,
@@ -77,6 +78,7 @@ async def get_device_information(
     if device.user_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
+    logger.info("Returning device %s", device_id)
     return device
 
 
@@ -111,6 +113,7 @@ async def get_site_devices(
 
     device = crud.get_devices_by_site_id(db=session, site_id=site_id)
 
+    logger.info("Returning %s devices from site %s", count, site_id)
     return DevicesListResponse(
         user_id=current_user.id,
         username=current_user.username,
@@ -154,6 +157,7 @@ async def create_device(
         logger.info(e)
         raise HTTPException(status_code=422, detail="Bad body format")
 
+    logger.info("Device %s created", device.id)
     return device
 
 
@@ -196,6 +200,7 @@ async def update_device(
         logger.info(e)
         raise HTTPException(status_code=422, detail="Bad body format")
 
+    logger.info("Device %s updated", device_id)
     return device
 
 
@@ -223,6 +228,7 @@ async def delete_device(
 
     crud.delete_device(db=session, device=device)
 
+    logger.info("Device %s deleted", device_id)
     return DefaultResponseMessage(message="Device deleted")
 
 
@@ -256,4 +262,5 @@ async def delete_site_devices(
 
     crud.delete_devices_per_site_id(db=session, site_id=site_id)
 
+    logger.info("Devices from site %s deleted", site_id)
     return DefaultResponseMessage(message="Devices deleted")

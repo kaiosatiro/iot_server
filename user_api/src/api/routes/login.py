@@ -82,6 +82,8 @@ def recover_password(email: str, session: deps.SessionDep) -> DefaultResponseMes
         subject=email_data.subject,
         html_content=email_data.html_content,
     )
+
+    logger.info("Password recovery email sent")
     return DefaultResponseMessage(message="Password recovery email sent")
 
 
@@ -109,4 +111,6 @@ def reset_password(
         raise HTTPException(status_code=401, detail="Inactive user")
 
     crud.update_password(db=session, user=user, new_password=body.new_password)
+
+    logger.info("Password updated successfully")
     return DefaultResponseMessage(message="Password updated successfully")

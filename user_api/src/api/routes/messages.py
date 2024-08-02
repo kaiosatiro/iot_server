@@ -35,6 +35,7 @@ async def get_message_by_id(
     if device and device.user_id != current_user.id:
         raise HTTPException(status_code=403, detail="Forbidden")
 
+    logger.info("Returning message %s", message_id)
     return message
 
 
@@ -93,9 +94,11 @@ async def get_messages_from_device(
         limit=limit,
         offset=offset,
     )
+    len_msg = len(messages)
 
+    logger.info("Returning %s messages", len_msg)
     return MessagesListResponse(
-        device_id=device_id, device_name=device.name, count=len(messages), data=messages
+        device_id=device_id, device_name=device.name, count=len_msg, data=messages
     )
 
 
@@ -123,6 +126,8 @@ async def delete_message_by_id(
 
     session.delete(message)
     session.commit()
+
+    logger.info("Message %s deleted successfully", message_id)
     return DefaultResponseMessage(message="Message deleted")
 
 
@@ -173,4 +178,5 @@ async def delete_messages_from_device(
             db=session, device_id=device_id, start_date=from_, end_date=to
         )
 
+    logger.info("Messages from device %s deleted successfully", device_id)
     return DefaultResponseMessage(message="Messages deleted")
