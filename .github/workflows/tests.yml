@@ -9,7 +9,7 @@ jobs:
       ENVIRONMENT: ${{ vars.ENVIRONMENT }}
       LOG_INFO_LOCAL_PATH: ${{ vars.LOG_INFO_LOCAL_PATH }}
       LOG_LEVEL: ${{ vars.LOG_LEVEL }}
-
+      
       POSTGRES_PORT: ${{ vars.POSTGRES_PORT }}
       POSTGRES_USER: ${{ vars.POSTGRES_USER }}
       POSTGRES_PASSWORD: ${{ vars.POSTGRES_PASSWORD }}
@@ -19,7 +19,7 @@ jobs:
       FIRST_SUPERUSER_EMAIL: ${{ vars.FIRST_SUPERUSER_EMAIL }}
       FIRST_SUPERUSER_PASSWORD: ${{ vars.FIRST_SUPERUSER_PASSWORD }}
       PROJECT_NAME: ${{ vars.PROJECT_NAME }}
-
+      USERS_OPEN_REGISTRATION: ${{ vars.USERS_OPEN_REGISTRATION }}
 
     steps:
       - name: Checkout
@@ -48,7 +48,8 @@ jobs:
           echo FIRST_SUPERUSERNAME=$FIRST_SUPERUSERNAME > .env
           echo FIRST_SUPERUSER_EMAIL=$FIRST_SUPERUSER_EMAIL > .env
           echo FIRST_SUPERUSER_PASSWORD=$FIRST_SUPERUSER_PASSWORD > .env
-          echo PROJECT_NAME=$PROJECT_NAME > .env   
+          echo PROJECT_NAME=$PROJECT_NAME > .env  
+          echo USERS_OPEN_REGISTRATION=$USERS_OPEN_REGISTRATION > .env 
       
       - name: Build and run
         run: |

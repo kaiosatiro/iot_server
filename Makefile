@@ -2,7 +2,7 @@
 
 compose-prod:
 	@echo "Starting production environment..."
-	docker compose -f docker-compose.yml up --build -d
+	docker compose -f docker-compose.yml up --build --no-parallel -d
 
 compose-dev-d:
 	@echo "Starting development/test environment..."
@@ -10,7 +10,7 @@ compose-dev-d:
 
 compose-dev:
 	@echo "Starting development/test environment..."
-	docker compose -f docker-compose.yml -f docker-compose-override.yml up --build
+	docker compose -f docker-compose.yml -f docker-compose-override.yml up --build 
 
 compose-down-dev:
 	@echo "Stopping development/test environment..."
