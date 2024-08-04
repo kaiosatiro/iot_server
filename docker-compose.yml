@@ -70,6 +70,7 @@ services:
       - DOMAIN=${DOMAIN}
       - API_V1_STR=${API_V1_STR}
       - VERSION=${VERSION}
+      - USERS_OPEN_REGISTRATION=${USERS_OPEN_REGISTRATION}
       #Database
       - POSTGRES_SERVER=db
       - POSTGRES_PORT=${POSTGRES_PORT}

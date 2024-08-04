@@ -15,6 +15,7 @@ from .models import (
     SiteCreation,
     SiteUpdate,
     User,
+    UserRegister,
     UserCreation,
     UserUpdate,
     UserUpdateMe,
@@ -22,7 +23,7 @@ from .models import (
 
 
 # -------------------------- USER -----------------------------------
-def create_user(*, db: Session, user_input: UserCreation) -> User:
+def create_user(*, db: Session, user_input: UserCreation | UserRegister) -> User:
     _id = generate_random_number(10000, 99999)
     while db.get(User, _id):
         _id = generate_random_number(10000, 99999)

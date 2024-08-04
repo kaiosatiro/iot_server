@@ -340,6 +340,25 @@ class UserBase(SQLModel):
     is_superuser: bool = False
 
 
+# TODO replace email str with EmailStr when sqlmodel supports it
+class UserRegister(SQLModel):
+    email: str
+    username: str
+    password: str
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "username": "johndoe",
+                    "email": "johnyd@mail.com",
+                    "password": "pass1234",
+                }
+            ]
+        }
+    }
+
+
 class UserCreation(UserBase):
     password: str
 

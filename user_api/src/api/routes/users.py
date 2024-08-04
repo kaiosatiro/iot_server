@@ -15,6 +15,7 @@ from src.models import (
     UpdatePassword,
     User,
     UserCreation,
+    UserRegister,
     UserResponse,
     UsersListResponse,
     UserUpdate,
@@ -61,12 +62,15 @@ def update_me(
     if user_in.email:
         existing_user = crud.get_user_by_email(db=session, email=user_in.email)
         if existing_user and existing_user.id != current_user.id:
+            logger.warning("User %s already exists", user_in.email)
             raise HTTPException(
                 status_code=409, detail="User with this email already exists"
             )
+
     if user_in.username:
         existing_user = crud.get_user_by_username(db=session, username=user_in.username)
         if existing_user and existing_user.id != current_user.id:
+            logger.warning("User %s already exists", user_in.username)
             raise HTTPException(
                 status_code=409, detail="User with this username already exists"
             )
@@ -99,9 +103,11 @@ def update_my_password(
     logger.info("User %s is updating its own password", current_user.username)
 
     if not verify_password(body.current_password, current_user.hashed_password):
+        logger.warning("Incorrect password")
         raise HTTPException(status_code=401, detail="Incorrect password")
 
     if body.current_password == body.new_password:
+        logger.warning("New password cannot be the same as the current one")
         raise HTTPException(
             status_code=409, detail="New password cannot be the same as the current one"
         )
@@ -128,6 +134,7 @@ async def deactivate_me(
     logger.info("User %s is deactivating itself", current_user.username)
 
     if current_user.is_superuser:
+        logger.warning("Super users are not allowed to delete themselves")
         raise HTTPException(
             status_code=403, detail="Super users are not allowed to delete themselves"
         )
@@ -137,6 +144,52 @@ async def deactivate_me(
     return DefaultResponseMessage(message="User deactivated successfully")
 
 
+@router.post("/signup", response_model=UserResponse, status_code=201)
+def register_user(session: deps.SessionDep, user_in: UserRegister) -> User:
+    """
+    Create new user without the need to be logged in. All required.
+    """
+    logger = logging.getLogger("POST users/signup")
+    logger.info("User is creating a new account")
+
+    if not settings.USERS_OPEN_REGISTRATION:
+        logger.warning("Open user registration is forbidden on this server")
+        raise HTTPException(
+            status_code=403,
+            detail="Open user registration is forbidden on this server",
+        )
+
+    user = crud.get_user_by_email(db=session, email=user_in.email)
+    if user:
+        logger.warning("Email already exists in the system")
+        raise HTTPException(
+            status_code=409,
+            detail="The user with this email already exists in the system.",
+        )
+    user = crud.get_user_by_username(db=session, username=user_in.username)
+    if user:
+        logger.warning("User %s already exists", user_in.username)
+        raise HTTPException(
+            status_code=409,
+            detail="The user with this username already exists in the system.",
+        )
+
+    user = crud.create_user(db=session, user_input=user_in)
+    if settings.emails_enabled and user_in.email:
+        email_data = generate_new_account_email(
+            email_to=user_in.email, username=user_in.email, password=user_in.password
+        )
+        send_email(
+            email_to=user_in.email,
+            subject=email_data.subject,
+            html_content=email_data.html_content,
+        )
+
+    logger.info("User %s created successfully", user.id)
+    return user
+
+
+# Following endpoints are for superusers only -----------------------------------
 @router.get(
     "/",
     tags=["Admin"],
@@ -289,6 +342,7 @@ async def delete_user(
         raise HTTPException(status_code=404, detail="User already deactivated")
 
     if user == current_user:
+        logger.warning("Super users are not allowed to delete themselves")
         raise HTTPException(
             status_code=403, detail="Super users are not allowed to delete themselves"
         )

@@ -43,8 +43,10 @@ async def access_token(
     )
 
     if not user:
+        logger.warning("User %s failed to authenticate", form_data.username)
         raise HTTPException(status_code=401, detail="Incorrect username or password")
     elif not user.is_active:
+        logger.warning("User %s is inactive", form_data.username)
         raise HTTPException(status_code=401, detail="Inactive user")
 
     token = security.create_access_token(
@@ -67,6 +69,7 @@ def recover_password(email: str, session: deps.SessionDep) -> DefaultResponseMes
     user = crud.get_user_by_email(db=session, email=email)
 
     if not user:
+        logger.warning("User with email %s does not exist", email)
         raise HTTPException(
             status_code=404,
             detail="The user with this email does not exist in the system.",
@@ -99,15 +102,18 @@ def reset_password(
 
     token_decoded_email = security.verify_password_reset_token(token=body.token)
     if not token_decoded_email:
+        logger.warning("Invalid token")
         raise HTTPException(status_code=400, detail="Invalid token")
 
     user = crud.get_user_by_email(db=session, email=token_decoded_email)
     if not user:
+        logger.warning("User with email does not exist")
         raise HTTPException(
             status_code=404,
             detail="The user with this email does not exist in the system.",
         )
-    elif not user.is_active:
+    if not user.is_active:
+        logger.warning("User is inactive")
         raise HTTPException(status_code=401, detail="Inactive user")
 
     crud.update_password(db=session, user=user, new_password=body.new_password)

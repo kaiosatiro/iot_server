@@ -29,4 +29,5 @@ def test_email(email_to: EmailStr) -> Message:
         subject=email_data.subject,
         html_content=email_data.html_content,
     )
+    logger.info("Test email sent to %s", email_to)
     return Message(message="Test email sent")

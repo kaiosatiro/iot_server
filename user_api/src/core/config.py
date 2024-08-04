@@ -11,14 +11,19 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env", env_ignore_empty=True, extra="ignore"
     )
-    API_V1_STR: str = "/userapi/v1"
-    VERSION: str = "0.1.0"
-    SECRET_KEY: str = secrets.token_urlsafe(32)
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # seven days
-    EMAIL_RESET_TOKEN_EXPIRE_HOURS: int = 48  # 48 hours
-    DOMAIN: str = "localhost"
     ENVIRONMENT: Literal["dev", "staging", "production"] = "dev"
     LOG_LEVEL: str = "INFO"
+    VERSION: str = "0.1.0"
+
+    PROJECT_NAME: str = "iot-api"
+    DOMAIN: str = "localhost"
+    API_V1_STR: str = "/userapi/v1"
+    USERS_OPEN_REGISTRATION: bool = False
+
+    SECRET_KEY: str = secrets.token_urlsafe(32)
+
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # seven days
+    EMAIL_RESET_TOKEN_EXPIRE_HOURS: int = 48  # 48 hours
 
     @computed_field  # type: ignore
     @property
@@ -27,9 +32,6 @@ class Settings(BaseSettings):
         if self.ENVIRONMENT == "dev":
             return f"http://{self.DOMAIN}"
         return f"https://{self.DOMAIN}"
-
-    PROJECT_NAME: str = "iot-api"
-    USERS_OPEN_REGISTRATION: bool = False
 
     # DB | Queue
     FIRST_SUPERUSER_EMAIL: (
@@ -70,7 +72,9 @@ class Settings(BaseSettings):
     SMTP_USER: str | None = None
     SMTP_PASSWORD: str | None = None
 
-    EMAILS_FROM_EMAIL: str | None = None  # TODO: update type to EmailStr when sqlmodel supports it
+    EMAILS_FROM_EMAIL: str | None = (
+        None  # TODO: update type to EmailStr when sqlmodel supports it
+    )
 
     EMAILS_FROM_NAME: str | None = None
 

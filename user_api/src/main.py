@@ -9,8 +9,8 @@ from fastapi import FastAPI, Request
 import src.doc as doc
 from src.api.main import api_router
 from src.core.config import settings
+from src.errors import unhandled_exception_handler
 from src.logger.setup import setup_logging
-
 
 setup_logging()
 
@@ -19,7 +19,6 @@ setup_logging()
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     logger = logging.getLogger("lifespan")
     logger.info("StartUP")
-    logger.info(settings.SQL_DATABASE_URI)
     yield
     logger.info("ShutDown")
 
@@ -37,6 +36,7 @@ app = FastAPI(
     root_path=settings.API_V1_STR,
     root_path_in_servers=True,
     lifespan=lifespan,
+    exception_handlers={Exception: unhandled_exception_handler},
 )
 
 app.include_router(api_router)
@@ -50,7 +50,8 @@ app.add_middleware(
 )
 
 
-@app.get("/", include_in_schema=False)
+# Test route ---------------------------------------------------------------
+@app.get("/test/test", include_in_schema=False)
 async def root(request: Request) -> dict[str, str]:
     logger = logging.getLogger("root")
     logger.info("Root")
@@ -65,6 +66,7 @@ async def root(request: Request) -> dict[str, str]:
 # - POST /reset-password - 200 | 400 | 401 | 404
 
 # Users:
+# - POST users/signup - 201 | 403 | 409 | 422
 # - GET /users/me - 200 | 404
 # - PATCH /users/me/ - 200 | 422 | 404 | 409
 # - PATCH /users/me/password - 200 | 409 | 404 | 422

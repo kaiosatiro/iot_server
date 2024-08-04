@@ -205,6 +205,66 @@ class TestCreateUser:
         }
 
 
+class TestUserSignup:
+    def test_user_signup(self, client: TestClient,) -> None:
+        username = random_lower_string()
+        password = random_lower_string()
+        email = random_email()
+        user_in = {"username": username, "email": email, "password": password}
+        response = client.post("/users/signup", json=user_in)
+
+        assert response.status_code == 201
+        assert response.json()["email"] == email
+
+    def test_user_signup_bad_data(self, client: TestClient) -> None:
+        username = random_lower_string()
+        password = random_lower_string()
+        email = random_email()
+        user_in = {"username": username, "password": password}
+        response = client.post("/users/signup", json=user_in)
+
+        assert response.status_code == 422
+
+        user_in = {"username": username, "email": email}
+        response = client.post("/users/signup", json=user_in)
+
+        assert response.status_code == 422
+
+        user_in = {"email": email, "password": password}
+        response = client.post("/users/signup", json=user_in)
+
+        assert response.status_code == 422
+
+    def test_user_signup_email_exists(self, db: Session, client: TestClient) -> None:
+        username = random_lower_string()
+        password = random_lower_string()
+        email = random_email()
+
+        user_in = UserCreation(username=username, email=email, password=password)
+        crud.create_user(db=db, user_input=user_in)
+
+        user_in = {"username": "test", "email": email, "password": password}
+        response = client.post("/users/signup", json=user_in)
+
+        assert response.status_code == 409
+
+    def test_user_signup_username_exists(
+        self, db: Session, client: TestClient
+    ) -> None:
+        username = random_lower_string()
+        password = random_lower_string()
+        email = random_email()
+
+        user = UserCreation(username=username, email=email, password=password)
+        crud.create_user(db=db, user_input=user)
+
+        email = random_email()
+        user_in = {"username": username, "email": "test@mail.com", "password": password}
+        response = client.post("/users/signup", json=user_in)
+
+        assert response.status_code == 409
+
+
 class TestPatchUser:
     def test_patch_user(
         self, db: Session, client: TestClient, superuser_token_headers: dict[str, str]

@@ -17,3 +17,5 @@ src/test.py
 del.py
 Dockerfiletest
 default
+.coverage
+htmlcov/

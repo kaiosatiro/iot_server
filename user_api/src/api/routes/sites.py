@@ -36,7 +36,7 @@ async def create_site(
     try:
         site = crud.create_site(db=session, site_input=site_in, user_id=current_user.id)
     except ValidationError as e:
-        logger.info(e)
+        logger.error(e)
         raise HTTPException(status_code=422, detail="Bad body format")
 
     logger.info("Site %s created successfully", site.name)
@@ -96,8 +96,14 @@ async def get_information_from_site(
 
     site = session.get(Site, site_id)
     if not site:
+        logger.warning("Site %s not found", site_id)
         raise HTTPException(status_code=404, detail="Site not found")
     elif site.user_id != current_user.id:
+        logger.warning(
+            "User %s does not have permissions, site_id %s",
+            current_user.username,
+            site_id,
+        )
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
     logger.info("Returning site %s", site_id)
@@ -125,15 +131,21 @@ async def update_site(
     site = session.get(Site, site_id)
 
     if not site:
+        logger.warning("Site %s not found", site_id)
         raise HTTPException(status_code=404, detail="Site not found")
 
     if site.user_id != current_user.id:
+        logger.warning(
+            "User %s does not have permissions, site_id %s",
+            current_user.username,
+            site_id,
+        )
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
     try:
         site = crud.update_site(db=session, db_site=site, site_new_input=site_in)
     except ValidationError as e:
-        logger.info(e)
+        logger.error(e)
         raise HTTPException(status_code=422, detail="Bad body format")
 
     logger.info("Site %s updated", site_id)
@@ -157,9 +169,15 @@ async def delete_site(
     site = session.get(Site, site_id)
 
     if not site:
+        logger.warning("Site %s not found", site_id)
         raise HTTPException(status_code=404, detail="Site not found")
 
     if site.user_id != current_user.id:
+        logger.warning(
+            "User %s does not have permissions, site_id %s",
+            current_user.username,
+            site_id,
+        )
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
     crud.delete_site(db=session, site=site)

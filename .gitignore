@@ -4,3 +4,5 @@ logs/*
 .pytest_cache/
 .venv/
 doc/schema.sql
+userapi/.coverage
+userapi/htmlcov/

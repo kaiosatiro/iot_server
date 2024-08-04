@@ -29,10 +29,16 @@ async def get_message_by_id(
 
     message = session.get(Message, message_id)
     if not message:
+        logger.warning("Message %s not found", message_id)
         raise HTTPException(status_code=404, detail="Message not found")
 
     device = session.get(Device, message.device_id)
     if device and device.user_id != current_user.id:
+        logger.warning(
+            "User %s does not have permissions, message_id %s",
+            current_user.username,
+            message_id,
+        )
         raise HTTPException(status_code=403, detail="Forbidden")
 
     logger.info("Returning message %s", message_id)
@@ -77,13 +83,20 @@ async def get_messages_from_device(
 
     device = session.get(Device, device_id)
     if not device:
+        logger.warning("Device %s not found", device_id)
         raise HTTPException(status_code=404, detail="Device not found")
 
     if device.user_id != current_user.id:
+        logger.warning(
+            "User %s does not have permissions, device_id %s",
+            current_user.username,
+            device_id,
+        )
         raise HTTPException(status_code=403, detail="Forbidden")
 
     # Validade datetime format
     if not utils.validate_datetime(from_) and not utils.validate_datetime(to):
+        logger.warning("Invalid datetime format")
         raise HTTPException(status_code=422, detail="Invalid datetime format")
 
     messages = crud.get_messages(
@@ -118,10 +131,16 @@ async def delete_message_by_id(
 
     message = session.get(Message, message_id)
     if not message:
+        logger.warning("Message %s not found", message_id)
         raise HTTPException(status_code=404, detail="Message not found")
 
     device = session.get(Device, message.device_id)
     if device and device.user_id != current_user.id:
+        logger.warning(
+            "User %s does not have permissions, message_id %s",
+            current_user.username,
+            message_id,
+        )
         raise HTTPException(status_code=403, detail="Forbidden")
 
     session.delete(message)
@@ -163,15 +182,22 @@ async def delete_messages_from_device(
 
     device = session.get(Device, device_id)
     if not device:
+        logger.warning("Device %s not found", device_id)
         raise HTTPException(status_code=404, detail="Device not found")
 
     if device.user_id != current_user.id:
+        logger.warning(
+            "User %s does not have permissions, device_id %s",
+            current_user.username,
+            device_id,
+        )
         raise HTTPException(status_code=403, detail="Forbidden")
 
     if all:
         crud.delete_all_messages_per_device(db=session, device_id=device_id)
     else:
         if not utils.validate_datetime(from_) and not utils.validate_datetime(to):
+            logger.warning("Invalid datetime format")
             raise HTTPException(status_code=422, detail="Invalid datetime format")
 
         crud.delete_messages_by_period(

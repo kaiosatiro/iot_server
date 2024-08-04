@@ -73,9 +73,15 @@ async def get_device_information(
 
     device = session.get(Device, device_id)
     if not device:
+        logger.warning("Device %s not found", device_id)
         raise HTTPException(status_code=404, detail="Device not found")
 
     if device.user_id != current_user.id:
+        logger.warning(
+            "User %s does not have permissions, device_id %s",
+            current_user.username,
+            device_id,
+        )
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
     logger.info("Returning device %s", device_id)
@@ -101,6 +107,7 @@ async def get_site_devices(
 
     site = session.get(Site, site_id)
     if not site:
+        logger.warning("Site %s not found", site_id)
         raise HTTPException(status_code=404, detail="Site not found")
 
     count_statement = (
@@ -145,16 +152,20 @@ async def create_device(
     site = session.get(Site, device_in.site_id)
 
     if site is None:
+        logger.warning("Site %s not found", device_in.site_id)
         raise HTTPException(status_code=404, detail="Site not found")
 
     if site.user_id != current_user.id:
+        logger.warning(
+            "Site %s does not belong to user %s", site.id, current_user.username
+        )
         raise HTTPException(status_code=403, detail="Site does not belong to user")
 
     try:
         device_in.user_id = current_user.id
         device = crud.create_device(db=session, device_input=device_in)
     except ValidationError as e:
-        logger.info(e)
+        logger.error(e)
         raise HTTPException(status_code=422, detail="Bad body format")
 
     logger.info("Device %s created", device.id)
@@ -182,14 +193,23 @@ async def update_device(
 
     device = session.get(Device, device_id)
     if not device:
+        logger.warning("Device %s not found", device_id)
         raise HTTPException(status_code=404, detail="Device not found")
 
     if device.user_id != current_user.id:
+        logger.warning(
+            "User %s does not have permissions, device_id %s",
+            current_user.username,
+            device_id,
+        )
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
     if device_in.site_id:
         site = session.get(Site, device_in.site_id)
         if site is None or site.user_id != current_user.id:
+            logger.warning(
+                "Site %s not found or does not belong to user", device_in.site_id
+            )
             raise HTTPException(status_code=404, detail="Site not found")
 
     try:
@@ -197,7 +217,7 @@ async def update_device(
             db=session, db_device=device, device_new_input=device_in
         )
     except ValidationError as e:
-        logger.info(e)
+        logger.error(e)
         raise HTTPException(status_code=422, detail="Bad body format")
 
     logger.info("Device %s updated", device_id)
@@ -221,9 +241,15 @@ async def delete_device(
 
     device = session.get(Device, device_id)
     if not device:
+        logger.warning("Device %s not found", device_id)
         raise HTTPException(status_code=404, detail="Device not found")
 
     if device.user_id != current_user.id:
+        logger.warning(
+            "User %s does not have permissions, device_id %s",
+            current_user.username,
+            device_id,
+        )
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
     crud.delete_device(db=session, device=device)
@@ -255,9 +281,15 @@ async def delete_site_devices(
 
     site = session.get(Site, site_id)
     if not site:
+        logger.warning("Site %s not found", site_id)
         raise HTTPException(status_code=404, detail="Site not found")
 
     if site.user_id != current_user.id:
+        logger.warning(
+            "User %s does not have permissions, site_id %s",
+            current_user.username,
+            site_id,
+        )
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
     crud.delete_devices_per_site_id(db=session, site_id=site_id)

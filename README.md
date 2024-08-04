@@ -1,4 +1,6 @@
 # IoT Telemetry Application
+![Tests](https://github.com/mCodingLLC/SlapThatLikeButton-TestingStarterProject/actions/workflows/tests.yml/badge.svg)
+
 :construction: In progress ... :construction:
 
 IoT stands for Internet of Things and represents small, always-connected devices. Smart Homes are a great example of IOT consumers. The typical smart home has a lot of IOT devices such as thermostats, lightbulbs, cameras, electric switches, and lots more. 
