@@ -1,5 +1,7 @@
 # IoT Telemetry Application
-![Tests](https://github.com/mCodingLLC/SlapThatLikeButton-TestingStarterProject/actions/workflows/tests.yml/badge.svg)
+![Tests](https://github.com/kaiosatiro/iot_server/actions/workflows/tests.yml/badge.svg)
+![QA](https://github.com/kaiosatiro/iot_server/actions/workflows/qa.yml/badge.svg)
+
 
 :construction: In progress ... :construction:
 

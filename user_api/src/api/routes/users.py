@@ -1,7 +1,7 @@
 import logging
 import re
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import func, select
 
@@ -144,8 +144,12 @@ async def deactivate_me(
     return DefaultResponseMessage(message="User deactivated successfully")
 
 
-@router.post("/signup", response_model=UserResponse, status_code=201)
-def register_user(session: deps.SessionDep, user_in: UserRegister) -> User:
+@router.post("/signup", tags=["Users"], response_model=UserResponse, status_code=201)
+def register_user(
+    session: deps.SessionDep,
+    user_in: UserRegister,
+    background_tasks: BackgroundTasks,
+) -> User:
     """
     Create new user without the need to be logged in. All required.
     """
@@ -176,13 +180,14 @@ def register_user(session: deps.SessionDep, user_in: UserRegister) -> User:
 
     user = crud.create_user(db=session, user_input=user_in)
     if settings.emails_enabled and user_in.email:
-        email_data = generate_new_account_email(
-            email_to=user_in.email, username=user_in.email, password=user_in.password
-        )
-        send_email(
+        background_tasks.add_task(
+            send_email,
             email_to=user_in.email,
-            subject=email_data.subject,
-            html_content=email_data.html_content,
+            email_object=generate_new_account_email(
+                email_to=user_in.email,
+                username=user_in.email,
+                password=user_in.password,
+            ),
         )
 
     logger.info("User %s created successfully", user.id)
@@ -244,7 +249,10 @@ async def read_user_by_id(
     status_code=201,
 )
 async def create_user(
-    *, session: deps.SessionDep, user_in: UserCreation
+    *,
+    session: deps.SessionDep,
+    user_in: UserCreation,
+    background_tasks: BackgroundTasks,
 ) -> User | HTTPException:
     """
     Create new user. The **name**, **email** and **password** are required. An email is sent.
@@ -267,13 +275,14 @@ async def create_user(
 
     user = crud.create_user(db=session, user_input=user_in)
     if settings.emails_enabled and user_in.email:
-        email_data = generate_new_account_email(
-            email_to=user_in.email, username=user_in.email, password=user_in.password
-        )
-        send_email(
+        background_tasks.add_task(
+            send_email,
             email_to=user_in.email,
-            subject=email_data.subject,
-            html_content=email_data.html_content,
+            email_object=generate_new_account_email(
+                email_to=user_in.email,
+                username=user_in.email,
+                password=user_in.password,
+            ),
         )
 
     logger.info("User %s created successfully", user.id)

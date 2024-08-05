@@ -51,7 +51,7 @@ app.add_middleware(
 
 
 # Test route ---------------------------------------------------------------
-@app.get("/test/test", include_in_schema=False)
+@app.get("/test/", include_in_schema=False)
 async def root(request: Request) -> dict[str, str]:
     logger = logging.getLogger("root")
     logger.info("Root")

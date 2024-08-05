@@ -28,11 +28,20 @@ def render_email_template(*, template_name: str, context: dict[str, Any]) -> str
     return html_content
 
 
-def send_email(*, email_to: str, subject: str = "", html_content: str = "") -> None:
-    logger.info("Sending email")
-    if not settings.emails_enabled:
+def send_email(
+    *,
+    email_to: str,
+    subject: str = "",
+    html_content: str = "",
+    email_object: EmailData = None,
+) -> None:
+    logger.info("Sending email function")
+    if not settings.emails_enabled and settings.ENVIRONMENT != "dev":
         logger.critical("no provided configuration for email variables")
-        return
+
+    if email_object:
+        subject = email_object.subject
+        html_content = email_object.html_content
 
     logger.info("Preparing email")
     message = emails.Message(
@@ -54,9 +63,14 @@ def send_email(*, email_to: str, subject: str = "", html_content: str = "") -> N
 
     logger.info("Sending email message")
     response = message.send(to=email_to, smtp=smtp_options)
-    logger.info(
-        f"Send email result code: {response.status_code} - {response.status_text}"
-    )
+    if response.status_code not in {250}:
+        logger.error(
+            f"An error occurred while sending email: {response.status_code} - {response.status_text}"
+        )
+    else:
+        logger.info(
+            f"Send email result code: {response.status_code} - {response.status_text}"
+        )
 
 
 def generate_test_email(email_to: str) -> EmailData:

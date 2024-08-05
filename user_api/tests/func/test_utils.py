@@ -1,6 +1,7 @@
 import pytest
 
 from src.utils import validate_datetime
+from src.mail.utils import send_email, EmailData
 
 
 @pytest.mark.parametrize(
@@ -26,3 +27,14 @@ from src.utils import validate_datetime
 )
 def test_validate_datetime(date_str, expected):
     assert validate_datetime(date_str) == expected
+
+
+@pytest.mark.parametrize(
+    "email_to, subject, html_content, email_object",
+    [
+        ("test@example.com", "Test Subject", "<html><body>Test Content</body></html>", None),
+        ("test@example.com", "", "", EmailData(html_content="<html><body>Test Content</body></html>", subject="Test Subject")),
+    ]
+)
+def test_send_email(email_to, subject, html_content, email_object):
+    send_email(email_to=email_to, subject=subject, html_content=html_content, email_object=email_object)

@@ -98,8 +98,6 @@ class TestResetPassword:
         }
 
         response = client.post("/reset-password", json=data)
-        import logging
-        logging.error(response.json())
         assert response.status_code == 200
 
         user = crud.get_user_by_email(db=db, email=email)

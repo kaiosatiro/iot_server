@@ -15,8 +15,8 @@ from .models import (
     SiteCreation,
     SiteUpdate,
     User,
-    UserRegister,
     UserCreation,
+    UserRegister,
     UserUpdate,
     UserUpdateMe,
 )
