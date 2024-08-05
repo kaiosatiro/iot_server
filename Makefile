@@ -2,7 +2,7 @@
 
 compose-prod:
 	@echo "Starting production environment..."
-	docker compose -f docker-compose.yml up --build --no-parallel -d
+	docker compose -f docker-compose.yml up --build -d
 
 compose-dev-d:
 	@echo "Starting development/test environment..."
