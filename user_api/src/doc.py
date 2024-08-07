@@ -27,7 +27,7 @@ TAGS_METADATA = [
 
 DESCRIPTION = """
 IoT Server Aplication.
-User API. 🚀 I
+User API. 🚀
 """
 
 LICENSE_INFO = {

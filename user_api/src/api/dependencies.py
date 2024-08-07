@@ -37,6 +37,7 @@ def get_current_user(session: SessionDep, token: TokenDep) -> User:
         token_data = TokenPayload(**payload)
 
     except (InvalidTokenError, ValidationError):
+        logger.error("Could not validate credentials")
         raise HTTPException(
             status_code=403,
             detail="Could not validate credentials",
@@ -44,9 +45,11 @@ def get_current_user(session: SessionDep, token: TokenDep) -> User:
 
     user = session.get(User, token_data.sub)
     if not user:
+        logger.error("User %s not found", token_data.sub)
         raise HTTPException(status_code=404, detail="User not found")
 
     if not user.is_active:
+        logger.error("User %s is inactive", token_data.sub)
         raise HTTPException(status_code=401, detail="Inactive user")
     return user
 
@@ -55,7 +58,10 @@ CurrentUser = Annotated[User, Depends(get_current_user)]
 
 
 def get_current_active_superuser(current_user: CurrentUser) -> User:
+    logger = logging.getLogger("get_current_active_superuser")
+    logger.info("Getting current active superuser")
     if not current_user.is_superuser:
+        logger.error("User %s is not a superuser", current_user.id)
         raise HTTPException(status_code=403, detail="Not enough privileges")
     return current_user
 

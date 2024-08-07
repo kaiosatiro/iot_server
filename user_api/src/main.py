@@ -12,6 +12,7 @@ from src.core.config import settings
 from src.errors import unhandled_exception_handler
 from src.logger.setup import setup_logging
 
+
 setup_logging()
 
 
@@ -37,6 +38,9 @@ app = FastAPI(
     root_path_in_servers=True,
     lifespan=lifespan,
     exception_handlers={Exception: unhandled_exception_handler},
+    servers=[
+        {"url": "/listener/v1"},
+    ]
 )
 
 app.include_router(api_router)
@@ -53,7 +57,7 @@ app.add_middleware(
 # Test route ---------------------------------------------------------------
 @app.get("/test/", include_in_schema=False)
 async def root(request: Request) -> dict[str, str]:
-    logger = logging.getLogger("root")
+    logger = logging.getLogger("Test Route")
     logger.info("Root")
     logger.info("Request ID: %s", request.headers["x-request-id"])
     return {"TEST": "PACMAN", "request_id": request.headers["x-request-id"]}
