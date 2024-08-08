@@ -1,5 +1,5 @@
 # IoT Telemetry Application
-![Tests](https://github.com/kaiosatiro/iot_server/actions/workflows/tests.yml/badge.svg)
+![Test](https://github.com/kaiosatiro/iot_server/actions/workflows/test.yml/badge.svg)
 ![QA](https://github.com/kaiosatiro/iot_server/actions/workflows/qa.yml/badge.svg)
 
 

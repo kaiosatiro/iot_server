@@ -1,8 +1,8 @@
 .env
 .venv
 src/logs/*
-src/__pycache__/
-tests/__pycache__/
+**/__pycache__/
 .pytest_cache
 tests/load_test.py
 .ruff_cache
+**/del.py

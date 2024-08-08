@@ -49,3 +49,9 @@ async def root(request: Request) -> dict[str, str]:
     logger.info("Root")
     logger.info("Request ID: %s", request.headers["x-request-id"])
     return {"TEST": "PACMAN", "request_id": request.headers["x-request-id"]}
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(app, host="localhost", port=8100)

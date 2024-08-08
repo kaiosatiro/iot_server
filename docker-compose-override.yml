@@ -24,15 +24,15 @@ services:
         source: ./user_api
         target: /app
   
-  # receiver:
-  #   build: ./receiver
-  #   environment:
-  #     - ENVIRONMENT=dev
-  #     - LOG_LEVEL=DEBUG
-  #   volumes:
-  #     - type: bind
-  #       source: ./receiver
-  #       target: /app
+  receiver:
+    build: ./receiver
+    environment:
+      - ENVIRONMENT=dev
+      - LOG_LEVEL=DEBUG
+    volumes:
+      - type: bind
+        source: ./receiver
+        target: /app
 
 
 

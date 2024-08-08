@@ -100,23 +100,23 @@ services:
       db:
         condition: service_started
     
-  # receiver:
-  #   build: ./receiver
-  #   networks:
-  #     - default
-  #     - internal_network
-  #   ports:
-  #     - "8100:8000"
-  #   environment:
-  #     - PROJECT_NAME=${PROJECT_NAME}
-  #     - ENVIRONMENT=${ENVIRONMENT}
-  #     - DOMAIN=${DOMAIN}
-  #     - RECEIVER_API_V1_STR=${RECEIVER_API_V1_STR}
-  #     - RECEIVER_VERSION=${RECEIVER_VERSION}
-  #     #RabbitMQ
-  #     - RABBITMQ_DNS=${RABBITMQ_DNS}
+  receiver:
+    build: ./receiver
+    networks:
+      - default
+      - internal_network
+    ports:
+      - "8100:8000"
+    environment:
+      - PROJECT_NAME=${PROJECT_NAME}
+      - ENVIRONMENT=${ENVIRONMENT}
+      - DOMAIN=${DOMAIN}
+      - RECEIVER_API_V1_STR=${RECEIVER_API_V1_STR}
+      - RECEIVER_VERSION=${RECEIVER_VERSION}
+      #RabbitMQ
+      - RABBITMQ_DNS=${RABBITMQ_DNS}
 
-  #   depends_on:
-  #     rabbitmq:
-  #       condition: service_healthy
-  #       restart: true
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+        restart: true

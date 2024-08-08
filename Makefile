@@ -6,15 +6,15 @@ compose-prod:
 
 compose-dev-d:
 	@echo "Starting development/test environment..."
-	docker compose -f docker-compose.yml -f docker-compose-override.yml up --build -d
+	docker compose -f docker-compose.yml -f docker-compose-override.yml up --build -d $(s)
 
 compose-dev:
 	@echo "Starting development/test environment..."
-	docker compose -f docker-compose.yml -f docker-compose-override.yml up --build 
+	docker compose -f docker-compose.yml -f docker-compose-override.yml up --build $(s)
 
 compose-down-dev:
 	@echo "Stopping development/test environment..."
-	docker compose down -v --remove-orphans
+	docker compose down -v --remove-orphans $(s)
 
 compose-down:
 	@echo "Stopping development/test environment..."

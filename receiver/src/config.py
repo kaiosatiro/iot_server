@@ -23,7 +23,7 @@ class Settings(BaseSettings):
     # RABBITMQ_USER: str = "guest"
     # RABBITMQ_PASSWORD: str = "guest"
 
-    ALGORITHM = "HS256"
+    ALGORITHM: str = "HS256"
 
 settings = Settings()
 
