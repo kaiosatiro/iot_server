@@ -35,8 +35,8 @@ def puller(msg_handler: Handler):
     channel = connection.channel()
 
     logger.debug("Declaring exchange and queue")
-    channel.exchange_declare(exchange='logs', exchange_type='topic', durable=True)
-    result = channel.queue_declare(queue='', durable=True)
+    channel.exchange_declare(exchange='logs', exchange_type='topic', duable=True)
+    result = channel.queue_declare(queue='logs', durable=True)
 
     logger.debug("Binding queue to exchange")
     queue_name = result.method.queue

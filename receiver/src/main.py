@@ -10,7 +10,7 @@ from src.route.router import router
 from src.config import settings
 from src.errors import unhandled_exception_handler
 from src.logger.setup import setup_logging
-
+from src.message_handler import MessageHandler
 
 setup_logging()
 
@@ -19,7 +19,8 @@ setup_logging()
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     logger = logging.getLogger("lifespan")
     logger.info("StartUP")
-    yield
+    message_handler = MessageHandler()
+    yield {"message_handler": message_handler}
     logger.info("ShutDown")
 
 

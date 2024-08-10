@@ -6,3 +6,4 @@ logs/*
 doc/schema.sql
 userapi/.coverage
 userapi/htmlcov/
+**/del.py

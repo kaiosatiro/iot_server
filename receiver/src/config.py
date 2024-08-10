@@ -18,10 +18,15 @@ class Settings(BaseSettings):
 
     SECRET_KEY: str = secrets.token_urlsafe(32)
 
-    RABBITMQ_DNS: str = "rabbitmq"
+    RABBITMQ_DNS: str = "localhost"
     RABBITMQ_PORT: int = 5672
     # RABBITMQ_USER: str = "guest"
     # RABBITMQ_PASSWORD: str = "guest"
+
+    MESSAGES_EXCHANGE: str = "messages"
+    MESSAGES_QUEUE: str = "messages"
+    MESSAGES_ROUTING_KEY: str = "messages.receiver"
+    MESSAGES_DECLARE_EXCHANGE: bool = True
 
     ALGORITHM: str = "HS256"
 

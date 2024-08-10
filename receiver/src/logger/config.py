@@ -1,4 +1,6 @@
 from src.config import settings
+from src.publishers.channels import LogChannel
+
 
 LOG_CONFIG = {
     "version": 1,
@@ -20,22 +22,19 @@ LOG_CONFIG = {
         "stderr": {
             "class": "logging.StreamHandler",
             "level": "WARNING",
-            # "filters": ["correlation_id"],
             "formatter": "simple",
             "stream": "ext://sys.stderr",
         },
         "queue": {
-            "class": "python_logging_rabbitmq.RabbitMQHandler",
+            "class": "src.logger.handler.LogHandler",
+            "channel": LogChannel(),
             "level": settings.LOG_LEVEL,
-            "host": settings.RABBITMQ_DNS,
-            "port": "5672",
-            # "filters": ["correlation_id"],
             "formatter": "simple",
             "exchange": "logs",
-            "routing_key_formatter": lambda key: "log.receiver",
+            "queue": "logs",
+            "routing_key": "logs.receiver",
+            "content_type": "text/plain",
             "declare_exchange": True,
-            # "record_fields":['app', 'levelname', 'module', 'asctime', 'msg'],
-            # "fields":{'app': 'USERAPI'},
         },
         "queue_handler": {
             "class": "logging.handlers.QueueHandler",

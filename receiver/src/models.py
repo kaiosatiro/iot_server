@@ -12,7 +12,3 @@ class TokenPayload(BaseModel):
 
 class DefaultResponseMessage(BaseModel):
     message: str
-
-
-class Device(BaseModel):
-    device_id: int
