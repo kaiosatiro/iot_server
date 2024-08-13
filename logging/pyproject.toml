@@ -1,34 +1,23 @@
 [tool.poetry]
-name = "user-api"
+name = "logging"
 version = "0.1.0"
 description = ""
 authors = ["kaiosatiro <kaiosatiro@gmail.com>"]
+license = "MIT"
 readme = "README.md"
 package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.12"
-fastapi = "^0.111.1"
-python-logging-rabbitmq = "^2.3.0"
 pika = "^1.3.2"
-sqlmodel = "^0.0.21"
-psycopg2-binary = "^2.9.9"
-passlib = "^1.7.4"
-tenacity = "^8.5.0"
-pydantic-settings = "^2.3.4"
-pyjwt = "^2.8.0"
-asgi-correlation-id = "^4.3.1"
-jinja2 = "^3.1.4"
-emails = "^0.6"
-
+pydantic-settings = "^2.4.0"
+tenacity = "^9.0.0"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^8.2.2"
-flake8 = "^7.1.0"
-ruff = "^0.5.5"
-mypy = "^1.11.0"
-pre-commit = "^3.8.0"
-coverage = "^7.6.0"
+pytest = "^8.3.2"
+flake8 = "^7.1.1"
+ruff = "^0.5.7"
+mypy = "^1.11.1"
 
 [build-system]
 requires = ["poetry-core"]
@@ -36,11 +25,11 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.mypy]
 strict = true
-exclude = ["venv", ".venv", "alembic"]
+exclude = ["venv", ".venv"]
 
 [tool.ruff]
 target-version = "py312"
-exclude = ["venv", ".venv", "alembic"]
+exclude = ["venv", ".venv"]
 
 [tool.ruff.lint]
 select = [

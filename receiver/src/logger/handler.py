@@ -1,28 +1,28 @@
 import logging
-from copy import copy
+from logging import Formatter, LogRecord
 
-from src.publishers.abs import ABSQueueChannel
+from src.publishers.channels import LogChannel
 
 
 class LogHandler(logging.Handler):
     def __init__(
         self,
-        channel: ABSQueueChannel,
-        level = logging.NOTSET,
-        formatter = None,
-        exchange: str = 'logs',
-        queue: str = 'logs',
-        routing_key: str = None,
-        content_type:str = 'text/plain',
+        channel: LogChannel,
+        level: int = logging.NOTSET,
+        formatter: Formatter | None = None,
+        exchange: str = "logs",
+        queue: str = "logs",
+        routing_key: str | None = None,
+        content_type: str = "text/plain",
         declare_exchange: bool = False,
     ):
-        super(LogHandler, self).__init__(level=level)
+        super().__init__(level=level)
 
         self.formatter = formatter
         self.exchange = exchange
         self.channel = channel
         self.queue = queue
-        self.routing_key = routing_key if routing_key else 'log.*'
+        self.routing_key = routing_key if routing_key else "log.*"
         self.content_type = content_type
         self.exchange_declare = declare_exchange
 
@@ -32,16 +32,16 @@ class LogHandler(logging.Handler):
         # Acquire a thread lock.
         self.createLock()
 
-    def setup_channel(self):
+    def setup_channel(self) -> None:
         # Set logger if something went wrong connecting to the channel.
         handler = logging.StreamHandler()
         handler.setFormatter(self.formatter)
 
-        logger = logging.getLogger('setup_log_channel')
+        logger = logging.getLogger("setup_log_channel")
         logger.addHandler(handler)
         logger.propagate = False
         logger.setLevel(logging.WARNING)
-        
+
         logger.info("Connecting Handler to Queue")
         self.channel.connect()
 
@@ -51,9 +51,9 @@ class LogHandler(logging.Handler):
                 exchange=self.exchange,
                 queue=self.queue,
                 routing_key=self.routing_key,
-                declare_exchange=self.exchange_declare
+                declare_exchange=self.exchange_declare,
             )
-        
+
         self.exg_declared = self.exchange_declare
         self.channel_ready = self.channel.status()
 
@@ -61,7 +61,7 @@ class LogHandler(logging.Handler):
         # Remove logger to avoid shutdown message.
         logger.removeHandler(handler)
 
-    def emit(self, record):
+    def emit(self, record: LogRecord) -> None:
         self.acquire()
         try:
             if not self.channel_ready or not self.channel.status():
@@ -76,5 +76,17 @@ class LogHandler(logging.Handler):
         finally:
             self.release()
 
-    def __del__(self):
+    # def handle(self, record):
+    #     rv = self.filter(record)
+    #     if isinstance(rv, logging.LogRecord):
+    #         record = rv
+    #     if rv:
+    #         self.acquire()
+    #         try:
+    #             self.emit(record)
+    #         finally:
+    #             self.release()
+    #     return rv
+
+    def __del__(self) -> None:
         self.close()

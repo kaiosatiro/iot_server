@@ -6,21 +6,21 @@ from asgi_correlation_id import CorrelationIdMiddleware
 from asgi_correlation_id.middleware import is_valid_uuid4
 from fastapi import FastAPI, Request
 
-from src.route.router import router
 from src.config import settings
 from src.errors import unhandled_exception_handler
-from src.logger.setup import setup_logging
-from src.message_handler import MessageHandler
+from src.logger.setup import setup_logging_config
+from src.route.router import router
 
-setup_logging()
+# from src.message_handler import MessageHandler
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+    setup_logging_config()
     logger = logging.getLogger("lifespan")
     logger.info("StartUP")
-    message_handler = MessageHandler()
-    yield {"message_handler": message_handler}
+    # message_handler = MessageHandler()
+    yield  # {"message_handler": message_handler}
     logger.info("ShutDown")
 
 

@@ -11,7 +11,6 @@ class TestMessageHandler:
         message_handler.process_message(1, {"message": "Hello!"})
 
         message_handler._channel.publish_message.assert_called_once_with(
-            {"device_id": 1, "request_id": ""},
-            {"message": "Hello!"},
+            {"device_id": 1, "request_id": "", "message": "Hello!"},
             content_type="application/json"
-        )
+            )

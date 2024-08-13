@@ -14,3 +14,5 @@ docker compose up -d
 # Test the services
 docker compose exec -T logging bash tests-start.sh "$@"
 docker compose exec -T userapi bash tests-start.sh "$@"
+docker compose exec -T receiver bash tests-start.sh "$@"
+

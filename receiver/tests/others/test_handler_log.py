@@ -1,50 +1,11 @@
 # The tests in the FIRST class need to run with a RabbitMQ server running.
 # On the other hand, the tests in the SECOND class are Mocked.
 import logging
-from logging import LogRecord
 from unittest.mock import MagicMock
 
 import pytest
 
 from src.logger.handler import LogHandler
-from src.publishers.abs import ABSQueueChannel
-from src.publishers.channels import LogChannel
-from src.logger.handler import LogHandler
-
-
-class TestLogHandler:
-    @pytest.fixture(autouse=True)
-    def setup(self):
-        self.handler = LogHandler(
-            channel=LogChannel(),
-            level=0,
-            formatter=None,
-            exchange='logs',
-            queue='logs',
-            routing_key=None,
-            content_type='text/plain',
-            declare_exchange=True
-            )
-
-    def test_handler_channel(self):
-        assert isinstance(self.handler.channel, ABSQueueChannel)
-        assert self.handler.channel.status()
-    
-    def test_emission(self):
-        try:
-            self.handler.emit(LogRecord(
-                name='test',
-                level=0,
-                pathname='test.py',
-                lineno=1,
-                msg='test',
-                args=None,
-                exc_info=None
-            ))
-        except Exception as e:
-            assert None, "Emission failed"
-        finally:
-            assert True, "Emission successful"
 
 
 class TestLogHandlerB:

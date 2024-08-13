@@ -4,7 +4,8 @@ echo $ENVIRONMENT
 echo $RABBITMQ_DNS
 
 # Let the DB start
-# python src/backend_pre_start.py
+
+python src/pre_start.py
 
 # Start application
 if [ "$ENVIRONMENT" = "dev" ]; then

@@ -12,3 +12,7 @@ class TokenPayload(BaseModel):
 
 class DefaultResponseMessage(BaseModel):
     message: str
+
+
+class MessageTest(BaseModel):
+    message: str

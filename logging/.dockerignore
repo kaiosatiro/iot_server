@@ -1,10 +1,10 @@
-__pycache__
-tests/__pycache__/
+.env
 .venv
-src/logs/*.txt
-src/logs/*.log
+src/logs/*
+src/__pycache__/
+tests/__pycache__/
 .pytest_cache
-.dockerignore
-.gitignore
-.ruff_cache
 tests/load_test.py
+.ruff_cache
+**/del.py
+**/__pycache__

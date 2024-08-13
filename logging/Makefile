@@ -1,4 +1,4 @@
-.PHONY: install run run-dev tests lint # install-pre-commit
+.PHONY: install run tests lint # install-pre-commit
 
 install:
 	@echo "Installing dependencies..."
@@ -19,11 +19,7 @@ lint:
 
 run:
 	@echo "Running server..."
-	poetry run fastapi run src/main.py --port 8000
-
-run-local:
-	@echo "Running server..."
-	poetry run fastapi dev src/main.py --port 8100
+	poetry run python src/main.py
 
 # update: install install-pre-commit;
 

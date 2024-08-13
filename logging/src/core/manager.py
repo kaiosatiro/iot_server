@@ -11,7 +11,7 @@ from pika import (  # type: ignore
 from pika.channel import Channel  # type: ignore
 
 from src.config import settings
-from src.publishers.abs import ABSQueueConnectionManager
+from src.core.abs import ABSQueueConnectionManager
 
 
 class PublishingManager(ABSQueueConnectionManager, Thread):

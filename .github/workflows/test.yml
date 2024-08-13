@@ -64,11 +64,15 @@ jobs:
       - name: Tests - UserAPI service
         run: |
           docker compose exec -T userapi bash tests-start.sh
+        
+      - name: Tests - Receiver service
+        run: |
+          docker compose exec -T receiver bash tests-start.sh
       
       # Cleanup
-      - name: Cleanup
-        run: |
-          make compose-down-dev
+      # - name: Cleanup
+      #   run: |
+      #     make compose-down-dev
 
   # # https://github.com/marketplace/actions/alls-green#why
   # alls-green:  # This job does nothing and is only used for the branch protection

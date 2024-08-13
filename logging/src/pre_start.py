@@ -14,6 +14,7 @@ logger = logging.getLogger("PRE Start")
 max_tries = 60 * 5  # 5 minutes
 wait_seconds = 1
 
+# TODO: ADD checker for the logs dir
 
 @retry(
     stop=stop_after_attempt(max_tries),

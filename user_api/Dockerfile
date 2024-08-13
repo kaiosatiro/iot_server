@@ -13,7 +13,7 @@ RUN pip install --no-cache-dir poetry
 COPY ./pyproject.toml ./poetry.lock* /app/
 
 ARG ENVIRONMENT
-RUN bash -c "if [ $ENVIRONMENT == 'production' ] ; then poetry install --no-root --only main; else poetry install --no-root ; fi"
+RUN bash -c "if [ $ENVIRONMENT == 'production' ] || [ $ENVIRONMENT == 'staging' ]; then poetry install --no-root --only main; else poetry install --no-root ; fi"
 
 ENV PYTHONPATH=/app
 

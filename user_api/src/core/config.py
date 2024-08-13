@@ -40,8 +40,8 @@ class Settings(BaseSettings):
     FIRST_SUPERUSERNAME: str
     FIRST_SUPERUSER_PASSWORD: str
 
-    RABBITMQ_DNS: str = "rabbitmq"
-    # RABBITMQ_PORT: int = 5672
+    RABBITMQ_DNS: str = "localhost"
+    RABBITMQ_PORT: int = 5672
     # RABBITMQ_USER: str
     # RABBITMQ_PASSWORD: str
 
