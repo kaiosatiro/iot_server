@@ -8,6 +8,8 @@ from pika import (  # type: ignore
 from tenacity import after_log, before_log, retry, stop_after_attempt, wait_fixed
 
 from src.config import settings
+from src.logger.setup import setup_logging_config
+
 
 logger = logging.getLogger("PRE Start")
 
@@ -27,25 +29,13 @@ def connect() -> None:
 
         connection = BlockingConnection(
             ConnectionParameters(
-                host=settings.RABBITMQ_DNS,
-                port=settings.RABBITMQ_PORT,
-                credentials=PlainCredentials("guest", "guest"),
+                host=settings.RABBITMQ_DNS, port=settings.RABBITMQ_PORT,
+                credentials=PlainCredentials('guest', 'guest')
             )
         )
-        channel = connection.channel()
-
-        channel.exchange_declare(exchange="logs", exchange_type="topic", durable=True)
-        queue = channel.queue_declare(queue="logs", durable=True)
-        channel.queue_bind(
-            exchange="logs", queue=queue.method.queue, routing_key="log.*"
-        )
-
-        logger.info("Connected to RabbitMQ")
-
-        channel.basic_publish(
-            exchange="logs", routing_key="log.info", body="PRE started!"
-        )
+        assert connection.is_open
         connection.close()
+
     except Exception as e:
         logger.error(e)
         raise e
@@ -54,8 +44,9 @@ def connect() -> None:
 def main() -> None:
     logger.info("Initializing service | Testing QUEUE connection")
     connect()
-    logger.info("Service finished initializing")
+    setup_logging_config()
 
 
 if __name__ == "__main__":
     main()
+    logger.info("Service finished initializing")

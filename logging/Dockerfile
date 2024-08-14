@@ -21,7 +21,7 @@ COPY ./prestart.sh /app/
 
 COPY . /app/
 
-RUN mkdir -p /app/src/logs
+RUN mkdir -p /app/logs
 
 RUN chmod +x /app/prestart.sh
 

@@ -5,11 +5,11 @@ from os import _exit as os_exit
 import logging.config
 import logging.handlers
 
-from src.puller import puller
 from src.handler import get_handler
 from src.data import get_db_manager
 from src.logger.setup import setup_logging
 from src.config import settings
+
 
 if __name__ == '__main__':
     setup_logging()

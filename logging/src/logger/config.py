@@ -1,12 +1,16 @@
 from src.config import settings
 
+import os
+print(os.getcwd())
+print(settings.LOG_INFO_LOCAL_PATH)
+print(settings.LOG_INFO_FILE)
 
 LOG_CONFIG = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
         "simple": {
-            "format": "[ %(levelname)s | %(module)s | L%(lineno)d ] %(asctime)s : %(message)s",
+            "format": "[ %(levelname)s | %(module)s | %(name)s | L%(lineno)d ] %(asctime)s : %(message)s",
             "datefmt": "%Y-%m-%dT%H:%M:%S%"
         }
     },

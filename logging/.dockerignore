@@ -8,3 +8,4 @@ tests/load_test.py
 .ruff_cache
 **/del.py
 **/__pycache__
+**/logs/*

@@ -9,25 +9,12 @@ from src.core.config import settings
 from src.core.db import engine
 from src.logger.setup import setup_logging
 
+
 logger = logging.getLogger("Pre Start")
 
 max_tries = 60 * 5  # 5 minutes
 wait_seconds = 1
 
-
-@retry(
-    stop=stop_after_attempt(max_tries),
-    wait=wait_fixed(wait_seconds),
-    before=before_log(logger, logging.INFO),
-    after=after_log(logger, logging.WARN),
-)
-def init(db_engine: Engine) -> None:
-    try:
-        with Session(db_engine) as session:
-            session.exec(select(1))
-    except Exception as e:
-        logger.error(e)
-        raise e
 
 @retry(
     stop=stop_after_attempt(max_tries),
@@ -45,18 +32,24 @@ def connect() -> None:
                 credentials=PlainCredentials('guest', 'guest')
             )
         )
-        channel = connection.channel()
-
-        channel.exchange_declare(exchange='logs', exchange_type='topic', durable=True)
-        queue = channel.queue_declare(queue='logs', durable=True)
-        channel.queue_bind(exchange='logs', queue=queue.method.queue, routing_key='log.*')
-
-        logger.info("Connected to RabbitMQ")
-
-        channel.basic_publish(
-            exchange='logs', routing_key='log.info', body='PRE started!'
-        )
+        assert connection.is_open
         connection.close()
+
+    except Exception as e:
+        logger.error(e)
+        raise e
+
+
+@retry(
+    stop=stop_after_attempt(max_tries),
+    wait=wait_fixed(wait_seconds),
+    before=before_log(logger, logging.INFO),
+    after=after_log(logger, logging.WARN),
+)
+def init(db_engine: Engine) -> None:
+    try:
+        with Session(db_engine) as session:
+            session.exec(select(1))
     except Exception as e:
         logger.error(e)
         raise e

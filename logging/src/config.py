@@ -1,7 +1,8 @@
 from typing import Literal
 from pathlib import Path
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import computed_field, model_validator
+from pydantic import computed_field
 
 
 class Settings(BaseSettings):
@@ -10,7 +11,7 @@ class Settings(BaseSettings):
     )
     ENVIRONMENT: Literal["dev", "staging", "production"] = "dev"
     LOG_LEVEL: str = "INFO"
-    LOG_INFO_LOCAL_PATH: str = "/src/logs/"  # 'path' may conflict
+    LOG_INFO_LOCAL_PATH: str = "/logs/"  # 'path' may conflict
     PYTHONPATH: str
 
     @computed_field  # type: ignore
@@ -19,14 +20,14 @@ class Settings(BaseSettings):
         path = Path(self.LOG_INFO_LOCAL_PATH).joinpath("logging_service_logs.log")
         return str(path).strip(r'\/')
     
-    RABBITMQ_DNS: str = "localhost"
+    RABBITMQ_DNS: str = "localhost"    
     RABBITMQ_PORT: int = 5672
-    # RABBITMQ_USER: str = "guest"
-    # RABBITMQ_PASSWORD: str = "guest"
-
-    MESSAGES_EXCHANGE: str = "messages"
-    MESSAGES_QUEUE: str = "messages"
-    MESSAGES_ROUTING_KEY: str = "messages.receiver"
+    RABBITMQ_USER: str = "guest"
+    RABBITMQ_PASSWORD: str = "guest"
+    
+    LOG_EXCHANGE: str = "logs"
+    LOG_QUEUE: str = "logs"
+    LOG_ROUTING_KEY: str = "log.*"
 
 
 settings = Settings()

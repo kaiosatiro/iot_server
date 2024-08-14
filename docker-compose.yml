@@ -50,6 +50,11 @@ services:
       - internal_network
     environment:
       - LOG_INFO_LOCAL_PATH=${LOG_INFO_LOCAL_PATH}
+      - LOG_EXCHANGE=${LOG_EXCHANGE}
+      - LOG_EXCHANGE_TYPE=${LOG_EXCHANGE_TYPE}
+      - LOG_QUEUE=${LOG_QUEUE}
+      - LOG_ROUTING_KEY=${LOG_ROUTING_KEY}
+
     depends_on:
       rabbitmq:
         condition: service_healthy
