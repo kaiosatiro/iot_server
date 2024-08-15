@@ -52,6 +52,7 @@ jobs:
           echo PROJECT_NAME=$PROJECT_NAME >> .env  
           echo USERS_OPEN_REGISTRATION=$USERS_OPEN_REGISTRATION >> .env 
           echo EMAILS_FROM_EMAIL=$EMAILS_FROM_EMAIL >> .env
+          echo RABBITMQ_DNS=$RABBITMQ_DNS >> .env
 
       - name: Build and run
         run: |
