@@ -9,3 +9,4 @@ tests/load_test.py
 **/del.py
 **/__pycache__
 **/logs/*
+.mypy_cache

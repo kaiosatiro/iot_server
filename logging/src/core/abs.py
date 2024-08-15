@@ -1,7 +1,7 @@
 from __future__ import annotations
+
 from abc import ABC, ABCMeta, abstractmethod
 from threading import Lock
-from typing import Any
 
 
 class SingletonConnection(type):
@@ -42,15 +42,15 @@ class SingletonMetaHandler(ABCMeta):
 
 class HandlerABC(ABC):
     @abstractmethod
-    def handle_message(self, msg: str | bytes, properties: Any) -> None: ...
+    def handle_message(self, msg: str, *args, **kwargs) -> None: ...  # type: ignore
 
 
 class DB(ABC):
     @abstractmethod
-    def save(self, data, *args, **kwargs): ...
+    def save(self, data: str, *args, **kwargs) -> None: ...  # type: ignore
 
     @abstractmethod
-    def set_origin(self, origin): ...
+    def set_origin(self, origin: str) -> None: ...
 
 
 class DataManager(ABC):

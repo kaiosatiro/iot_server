@@ -40,7 +40,7 @@ app = FastAPI(
     exception_handlers={Exception: unhandled_exception_handler},
     servers=[
         {"url": "/listener/v1"},
-    ]
+    ],
 )
 
 app.include_router(api_router)

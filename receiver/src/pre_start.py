@@ -29,8 +29,9 @@ def connect() -> None:
 
         connection = BlockingConnection(
             ConnectionParameters(
-                host=settings.RABBITMQ_DNS, port=settings.RABBITMQ_PORT,
-                credentials=PlainCredentials('guest', 'guest')
+                host=settings.RABBITMQ_DNS,
+                port=settings.RABBITMQ_PORT,
+                credentials=PlainCredentials("guest", "guest"),
             )
         )
         assert connection.is_open

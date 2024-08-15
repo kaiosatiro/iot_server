@@ -2,10 +2,9 @@
 # It is responsible for handling the log messages pulled from the queue.
 from logging import getLogger
 
-from src.core.abs import HandlerABC, SingletonMetaHandler
-from src.core.data import DataManager, DB, get_data_manager
 from src.config import settings
-
+from src.core.abs import DB, DataManager, HandlerABC, SingletonMetaHandler
+from src.core.data import get_data_manager
 
 logger = getLogger(__name__)
 
@@ -37,8 +36,8 @@ class HandlerManager(HandlerABC, metaclass=SingletonMetaHandler):
             ),
         }
 
-    def handle_message(self, msg: str | bytes, app_id: str, *args, **kwargs) -> None:
-        logger.debug(f"Handling message: {msg}")
+    def handle_message(self, msg: str, app_id: str) -> None:
+        # logger.debug("Handling message: %s", msg)
         match app_id:
             case settings.HANDLER_ID:
                 self.handlers[app_id].handle_message(msg)
@@ -47,7 +46,7 @@ class HandlerManager(HandlerABC, metaclass=SingletonMetaHandler):
             case settings.USERAPI_ID:
                 self.handlers[app_id].handle_message(msg)
             case _:
-                logger.warning(f"Unknown app_id: {app_id}")
+                logger.warning("Unknown app_id: %s", app_id)
 
 
 def get_handlers_manager() -> HandlerABC:
@@ -55,13 +54,8 @@ def get_handlers_manager() -> HandlerABC:
 
 
 class Handler(HandlerABC):
-    def __init__(
-        self,
-        origin: str,
-        db_local: DB,
-        db_remote: DB | None = None
-    ) -> None:
-        logger.info(f"Initializing handler for {origin}")
+    def __init__(self, origin: str, db_local: DB, db_remote: DB | None = None) -> None:
+        logger.info("Initializing handler for %s", origin)
 
         self.origin = origin
         self.db_local = db_local
@@ -69,6 +63,6 @@ class Handler(HandlerABC):
 
         self.db_local.set_origin(self.origin)
 
-    def handle_message(self, msg) -> None:
-        logger.debug(f"Handling message: {msg}")
+    def handle_message(self, msg: str) -> None:
+        logger.debug("Handling message: %s", msg)
         self.db_local.save(msg)

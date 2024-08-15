@@ -6,7 +6,6 @@ from datetime import datetime
 from src.config import settings
 from src.core.abs import SingletonTimeService
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -34,7 +33,7 @@ class TimeService(metaclass=SingletonTimeService):
     def get_current_date(self) -> str:
         return self.current_date
 
-    def stop(self):
+    def stop(self) -> None:
         self._stop_event.set()
         self._thread.join()
 

@@ -1,18 +1,16 @@
 # Description: Main entry point for the logging service
-from sys import exit as sysexit
-from os import _exit as os_exit
-
 import logging.config
 import logging.handlers
+from os import _exit as os_exit
+from sys import exit as sysexit
 
-from src.logger.setup import setup_logging
 from src.consumer import Consumer
 from src.core.time_service import get_time_service
-
+from src.logger.setup import setup_logging
 
 setup_logging()
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     logger = logging.getLogger(__name__)
     logger.info("Starting the logging service")
 

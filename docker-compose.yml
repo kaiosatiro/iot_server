@@ -70,7 +70,7 @@ services:
   
   userapi:
     build: 
-      context: ./user_apiz
+      context: ./user_api
       args:
         ENVIRONMENT: ${ENVIRONMENT}
     networks:

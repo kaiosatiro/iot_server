@@ -11,12 +11,12 @@ from tenacity import after_log, before_log, retry, stop_after_attempt, wait_fixe
 from src.config import settings
 from src.logger.setup import setup_logging
 
-
 logger = logging.getLogger("Pre Start")
 
 
 max_tries = 60 * 5  # 5 minutes
 wait_seconds = 1
+
 
 @retry(
     stop=stop_after_attempt(max_tries),
@@ -30,8 +30,9 @@ def connect() -> None:
 
         connection = BlockingConnection(
             ConnectionParameters(
-                host=settings.RABBITMQ_DNS, port=settings.RABBITMQ_PORT,
-                credentials=PlainCredentials('guest', 'guest')
+                host=settings.RABBITMQ_DNS,
+                port=settings.RABBITMQ_PORT,
+                credentials=PlainCredentials("guest", "guest"),
             )
         )
         assert connection.is_open
@@ -42,8 +43,7 @@ def connect() -> None:
         raise e
 
 
-def check_log_folder() -> None:
-    print(settings.LOG_INFO_LOCAL_PATH)
+def check_log_folder() -> bool:
     return os.path.exists(settings.LOG_INFO_LOCAL_PATH)
 
 
@@ -57,7 +57,7 @@ def main() -> None:
     else:
         logger.error("Log folder does not exist")
         raise Exception("Log folder does not exist")
-    
+
 
 if __name__ == "__main__":
     main()
