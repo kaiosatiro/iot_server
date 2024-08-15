@@ -45,16 +45,22 @@ services:
       retries: 15
 
   logging:
-    build: ./logging
+    build: 
+      context: ./logging
+      args:
+        ENVIRONMENT: ${ENVIRONMENT}
+        LOG_INFO_LOCAL_PATH: ${LOG_INFO_LOCAL_PATH}
     networks:
       - internal_network
     environment:
+      - ENVIRONMENT=${ENVIRONMENT}
+      - RABBITMQ_DNS=${RABBITMQ_DNS}
       - LOG_INFO_LOCAL_PATH=${LOG_INFO_LOCAL_PATH}
       - LOG_EXCHANGE=${LOG_EXCHANGE}
       - LOG_EXCHANGE_TYPE=${LOG_EXCHANGE_TYPE}
       - LOG_QUEUE=${LOG_QUEUE}
       - LOG_ROUTING_KEY=${LOG_ROUTING_KEY}
-
+    
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -63,7 +69,10 @@ services:
       - ./logs/:${LOG_INFO_LOCAL_PATH}
   
   userapi:
-    build: ./user_api
+    build: 
+      context: ./user_apiz
+      args:
+        ENVIRONMENT: ${ENVIRONMENT}
     networks:
       - default
       - internal_network
@@ -106,7 +115,10 @@ services:
         condition: service_started
     
   receiver:
-    build: ./receiver
+    build: 
+      context: ./receiver
+      args:
+        ENVIRONMENT: ${ENVIRONMENT}
     networks:
       - default
       - internal_network

@@ -5,25 +5,23 @@ from os import _exit as os_exit
 import logging.config
 import logging.handlers
 
-from src.handler import get_handler
-from src.data import get_db_manager
 from src.logger.setup import setup_logging
-from src.config import settings
+from src.consumer import Consumer
+from src.core.time_service import get_time_service
 
+
+setup_logging()
 
 if __name__ == '__main__':
-    setup_logging()
     logger = logging.getLogger(__name__)
-    # logging.basicConfig()
     logger.info("Starting the logging service")
 
-    db = get_db_manager()
-    handler_mng = get_handler(db)
     try:
-        logger.debug("Initializing puller")
-        puller(handler_mng)
+        _ = get_time_service()
+        consumer = Consumer()
+        consumer.run()
     except KeyboardInterrupt:
-        logger.info("Shutting down the logging service")
+        logger.warning("Shutting down the logging service")
         try:
             sysexit(0)
         except SystemExit:

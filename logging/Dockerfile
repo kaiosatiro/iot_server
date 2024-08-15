@@ -6,6 +6,9 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     POETRY_VIRTUALENVS_CREATE=false \
     POETRY_VERSION=1.8.3
 
+ARG LOG_INFO_LOCAL_PATH
+RUN mkdir -p $LOG_INFO_LOCAL_PATH  # Need to create the log directory before setting the workdir
+
 WORKDIR /app/
 
 RUN pip install --no-cache-dir poetry
@@ -20,8 +23,6 @@ ENV PYTHONPATH=/app
 COPY ./prestart.sh /app/
 
 COPY . /app/
-
-RUN mkdir -p /app/logs
 
 RUN chmod +x /app/prestart.sh
 

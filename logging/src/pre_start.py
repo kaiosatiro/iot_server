@@ -1,4 +1,5 @@
 import logging
+import os
 
 from pika import (  # type: ignore
     BlockingConnection,
@@ -11,12 +12,11 @@ from src.config import settings
 from src.logger.setup import setup_logging
 
 
-setup_logging()
 logger = logging.getLogger("Pre Start")
+
 
 max_tries = 60 * 5  # 5 minutes
 wait_seconds = 1
-
 
 @retry(
     stop=stop_after_attempt(max_tries),
@@ -42,11 +42,22 @@ def connect() -> None:
         raise e
 
 
-def main() -> None:
-    logger.info("Initializing service | Testing QUEUE connection")
-    connect()
+def check_log_folder() -> None:
+    print(settings.LOG_INFO_LOCAL_PATH)
+    return os.path.exists(settings.LOG_INFO_LOCAL_PATH)
 
+
+def main() -> None:
+    logger.info("Initializing service | Checking log folder")
+    if check_log_folder():
+        setup_logging()
+        logger.info("Initializing service | Testing QUEUE connection")
+        connect()
+        logger.info("Service finished initializing")
+    else:
+        logger.error("Log folder does not exist")
+        raise Exception("Log folder does not exist")
+    
 
 if __name__ == "__main__":
     main()
-    logger.info("Service finished initializing")

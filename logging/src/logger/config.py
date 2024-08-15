@@ -1,9 +1,5 @@
 from src.config import settings
 
-import os
-print(os.getcwd())
-print(settings.LOG_INFO_LOCAL_PATH)
-print(settings.LOG_INFO_FILE)
 
 LOG_CONFIG = {
     "version": 1,

@@ -1,4 +1,5 @@
 import logging
+from typing import Callable
 
 from pika import (  # type: ignore
     BasicProperties,
@@ -12,23 +13,27 @@ from pika.connection import Connection  # type: ignore
 from pika.spec import Basic
 
 from src.config import settings
-from src.core.abs import SingletonMetaConnection
+from src.core.abs import SingletonConnection, HandlerABC
 from src.logger.setup import setup_logging
 
 
 setup_logging()
 
 
-class ConnectionManager(metaclass=SingletonMetaConnection):
+class ConnectionManager(metaclass=SingletonConnection):
     EXCHANGE = settings.LOG_EXCHANGE
     EXCHANGE_TYPE = ExchangeType.topic
     QUEUE = settings.LOG_QUEUE
     ROUTING_KEY = settings.LOG_ROUTING_KEY
 
-    def __init__(self) -> None:
+    def __init__(self, handler: HandlerABC | None = None) -> None:
         self._connection: SelectConnection | None = None
         self._channel: Channel | None = None
         self._consumer_tag: str | None = None
+
+        # ---
+        self._handler = handler
+        # ---
 
         self._consuming:bool = False
         self._closing:bool = False
@@ -58,6 +63,7 @@ class ConnectionManager(metaclass=SingletonMetaConnection):
             host=settings.RABBITMQ_DNS,
             port=settings.RABBITMQ_PORT,
             credentials=PlainCredentials(settings.RABBITMQ_USER, settings.RABBITMQ_PASSWORD),
+            heartbeat=3600,
         )
         
         self._connection = SelectConnection(
@@ -172,7 +178,7 @@ class ConnectionManager(metaclass=SingletonMetaConnection):
     def on_consumer_cancelled(self, _unused_frame: str) -> None:
         self.logger.info('Consumer was cancelled remotely')
         self._channel.close()
-    
+
     def on_message(
             self,
             _unused_channel: Channel,
@@ -180,9 +186,13 @@ class ConnectionManager(metaclass=SingletonMetaConnection):
             properties: BasicProperties,
             body: str | bytes
     ) -> None:
-        # self.logger.debug('Received message # %s from %s: %s',
-        #                  method.delivery_tag, properties.app_id, body)
-        self._channel.basic_ack(delivery_tag=method.delivery_tag)
+        self.logger.debug('Received message # %s from %s: %s',
+                         method.delivery_tag, properties.app_id, body)
+        try:
+            self._handler.handle_message(body, properties.app_id)
+            self._channel.basic_ack(delivery_tag=method.delivery_tag)
+        except Exception as e:
+            self.logger.error('Error handling message: %s', e)
     
     # ----------------------------------------
     def stop(self) -> None:
@@ -213,7 +223,7 @@ class ConnectionManager(metaclass=SingletonMetaConnection):
     def run(self) -> None:
         self.connect()
         self._connection.ioloop.start()
-
+            
 
 def get_connection_manager() -> ConnectionManager:
     return ConnectionManager()
