@@ -85,15 +85,15 @@ jobs:
       # Test services
       - name: Tests - Logging service
         run: |
-          docker compose exec -T logging bash tests-start.sh
+          docker compose exec -T logging bash tests-start.sh "$@"
 
       - name: Tests - UserAPI service
         run: |
-          docker compose exec -T userapi bash tests-start.sh
+          docker compose exec -T userapi bash tests-start.sh "$@"
         
       - name: Tests - Receiver service
         run: |
-          docker compose exec -T receiver bash tests-start.sh
+          docker compose exec -T receiver bash tests-start.sh "$@"
       
       # Cleanup
       # - name: Cleanup
