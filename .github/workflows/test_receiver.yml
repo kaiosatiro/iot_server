@@ -1,4 +1,4 @@
-name: Test
+name: Test Receiver
 on: [workflow_call]
 
 jobs:
