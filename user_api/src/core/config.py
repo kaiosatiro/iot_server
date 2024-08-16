@@ -14,11 +14,11 @@ class Settings(BaseSettings):
     ENVIRONMENT: Literal["dev", "staging", "production"] = "dev"
     LOG_LEVEL: str = "INFO"
 
-    PROJECT_NAME: str = ""
+    PROJECT_NAME: str = "..."
     DOMAIN: str = "localhost"
 
     API_V1_STR: str = "/userapi/v1"
-    VERSION: str = ""
+    VERSION: str = "0.1.0"
 
     USERS_OPEN_REGISTRATION: bool = False
 

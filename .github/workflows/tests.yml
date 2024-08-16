@@ -7,12 +7,10 @@ jobs:
     uses: ./.github/workflows/test_logging.yml
   
   tests-userapi:
-    needs: tests-logging
     name: Tests User API Service
     uses: ./.github/workflows/test_userapi.yml
   
   tests-receiver:
-    needs: tests-userapi
     name: Tests Receiver Service
     uses: ./.github/workflows/test_receiver.yml
     

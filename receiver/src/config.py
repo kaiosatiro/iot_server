@@ -12,10 +12,10 @@ class Settings(BaseSettings):
     ENVIRONMENT: Literal["dev", "staging", "production"] = "dev"
     LOG_LEVEL: str = "INFO"
 
-    PROJECT_NAME: str = ""
+    PROJECT_NAME: str = "..."
     DOMAIN: str = "localhost"
     RECEIVER_API_V1_STR: str = "/listener/v1"
-    RECEIVER_VERSION: str = ""
+    RECEIVER_VERSION: str = "0.1.0"
 
     SECRET_KEY: str = secrets.token_urlsafe(32)
 
