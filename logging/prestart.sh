@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+set -e
+set -x
+
 echo $PWD
 echo $ENVIRONMENT
 echo $LOG_LEVEL

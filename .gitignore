@@ -8,3 +8,4 @@ userapi/.coverage
 userapi/htmlcov/
 **/del.py
 **/.mypy_cache/
+logs/*
