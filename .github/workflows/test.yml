@@ -80,7 +80,8 @@ jobs:
 
       - name: Build and run
         run: |
-          make compose-dev-d
+          docker compose build
+          docker compose up -d
       # Test services
       - name: Tests - Logging service
         run: |
