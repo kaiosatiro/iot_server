@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 echo $PWD
 echo $ENVIRONMENT
+echo $LOG_LEVEL
 echo $RABBITMQ_DNS
 echo $LOG_INFO_LOCAL_PATH
 

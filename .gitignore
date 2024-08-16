@@ -7,3 +7,4 @@ doc/schema.sql
 userapi/.coverage
 userapi/htmlcov/
 **/del.py
+**/.mypy_cache/

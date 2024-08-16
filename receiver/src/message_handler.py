@@ -5,15 +5,18 @@ import pika  # type: ignore
 from asgi_correlation_id import correlation_id
 from fastapi import Depends
 
-from src.publishers.abs import ABSQueueChannel
 from src.publishers.channels import MessageChannel, get_message_channel
 
 logger = logging.getLogger("MessageHandler")
 
 
 class MessageHandler:
-    def __init__(self, channel: ABSQueueChannel = get_message_channel()):
-        self._channel: MessageChannel = channel
+    def __init__(self) -> None:
+        self._channel: MessageChannel = get_message_channel()
+
+        # self.connect()
+        # if self._connection.status() and self._declare_exchange:
+        #     self.setup()
 
     def _create_headers(self, device_id: int) -> dict[Any, Any]:
         return {
@@ -28,6 +31,12 @@ class MessageHandler:
             body.update(headers)
             self._channel.publish_message(body, content_type="application/json")
         except pika.exceptions.ConnectionWrongStateError as e:
+            logger.error("Error publishing message: %s", e)
+        except pika.exceptions.ChannelWrongStateError as e:
+            logger.error("Error publishing message: %s", e)
+        except pika.exceptions.StreamLostError as e:
+            logger.error("Error publishing message: %s", e)
+        except AttributeError as e:
             logger.error("Error publishing message: %s", e)
         except Exception as e:
             logger.error("Error processing message: %s", e)

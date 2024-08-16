@@ -5,8 +5,44 @@ volumes:
 networks:
   internal_network:
 
-services:
+x-environment: &default-environment
+  ENVIRONMENT:
+  ### Logs:
+  LOG_LEVEL:
+  LOG_EXCHANGE:
+  LOG_QUEUE:
+  RECEIVER_ID:
+  HANDLER_ID:
+  USERAPI_ID:
+  ### Queue:
+  RABBITMQ_DNS:
+  RABBITMQ_PORT:
+  RABBITMQ_USER:
+  RABBITMQ_PASSWORD:
 
+x-common-environment-userapi-receiver: &userapi_receiver
+    PROJECT_NAME:
+    DOMAIN:
+    SECRET_KEY:
+
+x-common-environment-userapi_handler: &userapi_handler
+    ### Superuser
+    FIRST_SUPERUSER_EMAIL:
+    FIRST_SUPERUSERNAME:
+    FIRST_SUPERUSER_PASSWORD:
+    ### DB
+    POSTGRES_SERVER: db
+    POSTGRES_PORT:
+    POSTGRES_USER:
+    POSTGRES_PASSWORD:
+    POSTGRES_DB:
+
+x-common-environment-receiver-handler: &receiver_handler
+    MESSAGES_EXCHANGE:
+    MESSAGES_QUEUE:
+
+
+services:
   db:
     image: postgres:12
     restart: always
@@ -17,9 +53,9 @@ services:
       - .env
     environment:
       - PGDATA=/var/lib/postgresql/data/pgdata
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_PASSWORD
+      - POSTGRES_USER
+      - POSTGRES_DB
   
   adminer:
     image: adminer
@@ -48,19 +84,13 @@ services:
     build: 
       context: ./logging
       args:
-        ENVIRONMENT: ${ENVIRONMENT}
-        LOG_INFO_LOCAL_PATH: ${LOG_INFO_LOCAL_PATH}
+        ENVIRONMENT:
+        LOG_INFO_LOCAL_PATH:
     networks:
       - internal_network
-    environment:
-      - ENVIRONMENT=${ENVIRONMENT}
-      - RABBITMQ_DNS=${RABBITMQ_DNS}
-      - LOG_INFO_LOCAL_PATH=${LOG_INFO_LOCAL_PATH}
-      - LOG_EXCHANGE=${LOG_EXCHANGE}
-      - LOG_EXCHANGE_TYPE=${LOG_EXCHANGE_TYPE}
-      - LOG_QUEUE=${LOG_QUEUE}
-      - LOG_ROUTING_KEY=${LOG_ROUTING_KEY}
-    
+    environment: 
+      << : [*default-environment]
+      LOG_INFO_LOCAL_PATH: ${LOG_INFO_LOCAL_PATH}
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -72,41 +102,26 @@ services:
     build: 
       context: ./user_api
       args:
-        ENVIRONMENT: ${ENVIRONMENT}
+        ENVIRONMENT:
     networks:
       - default
       - internal_network
     ports:
       - "8000:8000"
     environment:
-      - PROJECT_NAME=${PROJECT_NAME}
-      - ENVIRONMENT=${ENVIRONMENT}
-      - DOMAIN=${DOMAIN}
-      - API_V1_STR=${API_V1_STR}
-      - VERSION=${VERSION}
-      - USERS_OPEN_REGISTRATION=${USERS_OPEN_REGISTRATION}
-      #Database
-      - POSTGRES_SERVER=db
-      - POSTGRES_PORT=${POSTGRES_PORT}
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
-      #Superuser
-      - FIRST_SUPERUSERNAME=${FIRST_SUPERUSERNAME} # change to secret
-      - FIRST_SUPERUSER_EMAIL=${FIRST_SUPERUSER_EMAIL} # change to secret
-      - FIRST_SUPERUSER_PASSWORD=${FIRST_SUPERUSER_PASSWORD} # change to secret
-      #RabbitMQ
-      - RABBITMQ_DNS=${RABBITMQ_DNS}
-      #Emails
-      - SMTP_TLS=${SMTP_TLS}
-      - SMTP_SSL=${SMTP_SSL}
-      - SMTP_PORT=${SMTP_PORT}
-      - SMTP_HOST=${SMTP_HOST}
-      - SMTP_USER=${SMTP_USER}
-      - SMTP_PASSWORD=${SMTP_PASSWORD}
-      - EMAILS_FROM_EMAIL=${EMAILS_FROM_EMAIL}
-      - EMAILS_FROM_NAME=${EMAILS_FROM_NAME}
-
+      <<: [*default-environment, *userapi_handler, *userapi_receiver]
+      API_V1_STR:
+      VERSION:
+      USERS_OPEN_REGISTRATION:
+      #Emails:
+      SMTP_TLS:
+      SMTP_SSL:
+      SMTP_PORT:
+      SMTP_HOST:
+      SMTP_USER:
+      SMTP_PASSWORD:
+      EMAILS_FROM_EMAIL:
+      EMAILS_FROM_NAME:
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -118,25 +133,16 @@ services:
     build: 
       context: ./receiver
       args:
-        ENVIRONMENT: ${ENVIRONMENT}
+        ENVIRONMENT:
     networks:
       - default
       - internal_network
     ports:
       - "8100:8000"
     environment:
-      - PROJECT_NAME=${PROJECT_NAME}
-      - ENVIRONMENT=${ENVIRONMENT}
-      - DOMAIN=${DOMAIN}
-      - RECEIVER_API_V1_STR=${RECEIVER_API_V1_STR}
-      - RECEIVER_VERSION=${RECEIVER_VERSION}
-      #RabbitMQ
-      - RABBITMQ_DNS=${RABBITMQ_DNS}
-      - MESSAGES_EXCHANGE=${MESSAGES_EXCHANGE}
-      - MESSAGES_QUEUE=${MESSAGES_QUEUE}
-      - MESSAGES_ROUTING_KEY=${MESSAGES_ROUTING_KEY}
-      - MESSAGES_DECLARE_EXCHANGE=${MESSAGES_DECLARE_EXCHANGE}
-
+      <<: [*default-environment, *userapi_receiver, *receiver_handler]
+      RECEIVER_API_V1_STR:
+      RECEIVER_VERSION:
     depends_on:
       rabbitmq:
         condition: service_healthy

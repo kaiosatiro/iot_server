@@ -12,7 +12,7 @@ LOG_CONFIG = {
     },
     "formatters": {
         "simple": {
-            "format": "USER-API [%(levelname)s] [%(name)s | L%(lineno)d] %(asctime)s [%(correlation_id)s]: %(message)s",
+            "format": f"{settings.USERAPI_ID} [%(levelname)s] [%(name)s | L%(lineno)d] %(asctime)s [%(correlation_id)s]: %(message)s",
             "datefmt": "%H:%M:%S",
         }
     },
@@ -28,11 +28,11 @@ LOG_CONFIG = {
             "class": "python_logging_rabbitmq.RabbitMQHandler",
             "level": settings.LOG_LEVEL,
             "host": settings.RABBITMQ_DNS,
-            "port": "5672",
+            "port": settings.RABBITMQ_PORT,
             # "filters": ["correlation_id"],
             "formatter": "simple",
-            "exchange": "logs",
-            "routing_key_formatter": lambda key: "log.userapi",
+            "exchange": settings.LOG_EXCHANGE,
+            "routing_key_formatter": lambda key: settings.LOG_ROUTING_KEY,
             "declare_exchange": True,
             # "record_fields":['app', 'levelname', 'module', 'asctime', 'msg'],
             # "fields":{'app': 'USERAPI'},

@@ -34,6 +34,11 @@ class HandlerManager(HandlerABC, metaclass=SingletonMetaHandler):
                 db_local=self.db_manager.get_local(),
                 db_remote=self.db_manager.get_remote(),
             ),
+            "UNKNOWN": Handler(
+                origin="UNKNOWN",
+                db_local=self.db_manager.get_local(),
+                db_remote=self.db_manager.get_remote(),
+            ),
         }
 
     def handle_message(self, msg: str, app_id: str) -> None:
@@ -47,6 +52,7 @@ class HandlerManager(HandlerABC, metaclass=SingletonMetaHandler):
                 self.handlers[app_id].handle_message(msg)
             case _:
                 logger.warning("Unknown app_id: %s", app_id)
+                self.handlers["UNKNOWN"].handle_message(msg)
 
 
 def get_handlers_manager() -> HandlerABC:

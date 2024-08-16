@@ -8,6 +8,7 @@ class TestLogPublisher:
     @pytest.fixture(autouse=True)
     def channelfix(self) -> LogChannel:
         self.channel = get_log_channel()
+        self.channel.connect()
 
     def test_configure_channel(self) -> None:
         self.channel.configure('logs', '', 'log.receiver', True)

@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 echo $PWD
 echo $ENVIRONMENT
+echo $LOG_LEVEL
 echo $RABBITMQ_DNS
 
 # Let the DB start
 
-python src/pre_start.py
+python src/pre_start.py || exit 1
 
 # Start application
 if [ "$ENVIRONMENT" = "dev" ]; then

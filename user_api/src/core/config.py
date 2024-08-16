@@ -13,11 +13,13 @@ class Settings(BaseSettings):
     )
     ENVIRONMENT: Literal["dev", "staging", "production"] = "dev"
     LOG_LEVEL: str = "INFO"
-    VERSION: str = "0.1.0"
 
-    PROJECT_NAME: str = "iot-api"
+    PROJECT_NAME: str = ""
     DOMAIN: str = "localhost"
+
     API_V1_STR: str = "/userapi/v1"
+    VERSION: str = ""
+
     USERS_OPEN_REGISTRATION: bool = False
 
     SECRET_KEY: str = secrets.token_urlsafe(32)
@@ -39,17 +41,14 @@ class Settings(BaseSettings):
     )
     FIRST_SUPERUSERNAME: str
     FIRST_SUPERUSER_PASSWORD: str
+    FIRST_SUPERUSER_EMAIL: str
 
-    RABBITMQ_DNS: str = "localhost"
-    RABBITMQ_PORT: int = 5672
-    # RABBITMQ_USER: str
-    # RABBITMQ_PASSWORD: str
-
+    # Postgres Config
     POSTGRES_SERVER: str
     POSTGRES_PORT: int = 5432
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
-    POSTGRES_DB: str = "app"
+    POSTGRES_DB: str
 
     @computed_field  # type: ignore
     @property
@@ -62,6 +61,22 @@ class Settings(BaseSettings):
             port=self.POSTGRES_PORT,
             path=self.POSTGRES_DB,
         )
+
+    # RabbitMQ Config
+    RABBITMQ_DNS: str = "localhost"
+    RABBITMQ_PORT: int = 5672
+    RABBITMQ_USER: str = "guest"
+    RABBITMQ_PASSWORD: str = "guest"
+
+    # Logs channel config
+    LOG_EXCHANGE: str
+    LOG_QUEUE: str
+    USERAPI_ID: str
+
+    @computed_field  # type: ignore
+    @property
+    def LOG_ROUTING_KEY(self) -> str:
+        return f"{self.LOG_EXCHANGE}.{self.USERAPI_ID}"
 
     # Email Config
     SMTP_TLS: bool = True

@@ -4,5 +4,6 @@ src/logs/*
 **/__pycache__/
 .pytest_cache
 tests/load_test.py
-.ruff_cache
+**/.ruff_cache
 **/del.py
+**/mypy_cache

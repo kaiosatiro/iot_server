@@ -4,22 +4,21 @@ from time import sleep
 from typing import Any
 
 import pika  # type: ignore
+from pika.channel import Channel  # type: ignore
 
 import src.publishers.manager as manager
 from src.config import settings
-from src.publishers.abs import ABSQueueChannel, ABSQueueConnectionManager
+from src.publishers.abs import ABSQueueChannel  # ABSQueueConnectionManager
 
 
 class LogChannel(ABSQueueChannel):
     def __init__(self) -> None:
-        self._connection: ABSQueueConnectionManager
-        self._channel: ABSQueueChannel
+        self._connection: manager.PublishingManager
+        self._channel: Channel
         self._exchange: str
         self._queue = ""
         self._routing_key = ""
         self._declare_exchange = False
-
-        self.connect()
 
     def connect(self) -> None:
         self._connection = manager.get_queue_access()
@@ -98,7 +97,7 @@ def get_log_channel() -> LogChannel:
 class MessageChannel(ABSQueueChannel):
     def __init__(self) -> None:
         self._connection: manager.PublishingManager
-        self._channel: ABSQueueChannel
+        self._channel: Channel
         self._exchange = settings.MESSAGES_EXCHANGE
         self._queue = settings.MESSAGES_QUEUE
         self._routing_key = settings.MESSAGES_ROUTING_KEY

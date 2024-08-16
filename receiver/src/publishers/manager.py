@@ -11,10 +11,9 @@ from pika import (  # type: ignore
 from pika.channel import Channel  # type: ignore
 
 from src.config import settings
-from src.publishers.abs import ABSQueueConnectionManager
 
 
-class PublishingManager(ABSQueueConnectionManager, Thread):
+class PublishingManager(Thread):
     def __init__(self, testmode: bool = False, *args, **kwargs):  # type: ignore
         super().__init__(*args, **kwargs)
         self.daemon = True

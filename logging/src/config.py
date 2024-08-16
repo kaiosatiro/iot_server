@@ -26,13 +26,17 @@ class Settings(BaseSettings):
     RABBITMQ_USER: str = "guest"
     RABBITMQ_PASSWORD: str = "guest"
 
-    LOG_EXCHANGE: str = "logs"
-    LOG_QUEUE: str = "logs"
-    LOG_ROUTING_KEY: str = "log.*"
+    LOG_EXCHANGE: str
+    LOG_QUEUE: str
 
-    RECEIVER_ID: str = "receiver"
-    HANDLER_ID: str = "handler"
-    USERAPI_ID: str = "userapi"
+    @computed_field  # type: ignore
+    @property
+    def LOG_ROUTING_KEY(self) -> str:
+        return f"{self.LOG_EXCHANGE}.*"
+
+    RECEIVER_ID: str
+    HANDLER_ID: str
+    USERAPI_ID: str
 
 
 settings = Settings()

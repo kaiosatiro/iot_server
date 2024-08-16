@@ -7,18 +7,33 @@ jobs:
     environment: test
     env:
       ENVIRONMENT: ${{ vars.ENVIRONMENT }}
-      LOG_INFO_LOCAL_PATH: ${{ vars.LOG_INFO_LOCAL_PATH }}
       LOG_LEVEL: ${{ vars.LOG_LEVEL }}
+
+      LOG_EXCHANGE: ${{ vars.LOG_EXCHANGE }}
+      LOG_QUEUE: ${{ vars.LOG_QUEUE }}
+      RECEIVER_ID: ${{ vars.RECEIVER_ID }}
+      HANDLER_ID: ${{ vars.HANDLER_ID }}
+      USERAPI_ID: ${{ vars.USERAPI_ID }}
+
+      RABBITMQ_DNS: ${{ vars.RABBITMQ_DNS }}
+      RABBITMQ_PORT: ${{ vars.RABBITMQ_PORT }}
+      RABBITMQ_USER: ${{ vars.RABBITMQ_USER }}
+      RABBITMQ_PASSWORD: ${{ vars.RABBITMQ_PASSWORD }}
+
+      MESSAGES_EXCHANGE: ${{ vars.MESSAGES_EXCHANGE }}
+      MESSAGES_QUEUE: ${{ vars.MESSAGES_EXCHANGE }}
+
+      FIRST_SUPERUSERNAME: ${{ vars.FIRST_SUPERUSERNAME }}
+      FIRST_SUPERUSER_EMAIL: ${{ vars.FIRST_SUPERUSER_EMAIL }}
+      FIRST_SUPERUSER_PASSWORD: ${{ vars.FIRST_SUPERUSER_PASSWORD }}
       
       POSTGRES_PORT: ${{ vars.POSTGRES_PORT }}
       POSTGRES_USER: ${{ vars.POSTGRES_USER }}
       POSTGRES_PASSWORD: ${{ vars.POSTGRES_PASSWORD }}
       POSTGRES_DB: ${{ vars.POSTGRES_DB }}
 
-      FIRST_SUPERUSERNAME: ${{ vars.FIRST_SUPERUSERNAME }}
-      FIRST_SUPERUSER_EMAIL: ${{ vars.FIRST_SUPERUSER_EMAIL }}
-      FIRST_SUPERUSER_PASSWORD: ${{ vars.FIRST_SUPERUSER_PASSWORD }}
-      PROJECT_NAME: ${{ vars.PROJECT_NAME }}
+      LOG_INFO_LOCAL_PATH: ${{ vars.LOG_INFO_LOCAL_PATH }}
+
       USERS_OPEN_REGISTRATION: ${{ vars.USERS_OPEN_REGISTRATION }}
       EMAILS_FROM_EMAIL: ${{ vars.EMAILS_FROM_EMAIL }}
 
@@ -40,19 +55,28 @@ jobs:
         id: create-env
         run: |
           echo ENVIRONMENT=$ENVIRONMENT >> .env
-          echo LOG_INFO_LOCAL_PATH=$LOG_INFO_LOCAL_PATH >> .env
           echo LOG_LEVEL=$LOG_LEVEL >> .env
+          echo LOG_EXCHANGE=$LOG_EXCHANGE >> .env
+          echo LOG_QUEUE=$LOG_QUEUE >> .env
+          echo RECEIVER_ID=$RECEIVER_ID >> .env
+          echo HANDLER_ID=$HANDLER_ID >> .env
+          echo USERAPI_ID=$USERAPI_ID >> .env
+          echo RABBITMQ_DNS=$RABBITMQ_DNS >> .env
+          echo RABBITMQ_PORT=$RABBITMQ_PORT >> .env
+          echo RABBITMQ_USER=$RABBITMQ_USER >> .env
+          echo RABBITMQ_PASSWORD=$RABBITMQ_PASSWORD >> .env
+          echo MESSAGES_EXCHANGE=$MESSAGES_EXCHANGE >> .env
+          echo MESSAGES_QUEUE=$MESSAGES_QUEUE >> .env
+          echo FIRST_SUPERUSERNAME=$FIRST_SUPERUSERNAME >> .env
+          echo FIRST_SUPERUSER_EMAIL=$FIRST_SUPERUSER_EMAIL >> .env
+          echo FIRST_SUPERUSER_PASSWORD=$FIRST_SUPERUSER_PASSWORD >> .env
           echo POSTGRES_PORT=$POSTGRES_PORT >> .env
           echo POSTGRES_USER=$POSTGRES_USER >> .env
           echo POSTGRES_PASSWORD=$POSTGRES_PASSWORD >> .env
           echo POSTGRES_DB=$POSTGRES_DB >> .env
-          echo FIRST_SUPERUSERNAME=$FIRST_SUPERUSERNAME >> .env
-          echo FIRST_SUPERUSER_EMAIL=$FIRST_SUPERUSER_EMAIL >> .env
-          echo FIRST_SUPERUSER_PASSWORD=$FIRST_SUPERUSER_PASSWORD >> .env
-          echo PROJECT_NAME=$PROJECT_NAME >> .env  
-          echo USERS_OPEN_REGISTRATION=$USERS_OPEN_REGISTRATION >> .env 
+          echo LOG_INFO_LOCAL_PATH=$LOG_INFO_LOCAL_PATH >> .env
+          echo USERS_OPEN_REGISTRATION=$USERS_OPEN_REGISTRATION >> .env
           echo EMAILS_FROM_EMAIL=$EMAILS_FROM_EMAIL >> .env
-          echo RABBITMQ_DNS=$RABBITMQ_DNS >> .env
 
       - name: Build and run
         run: |

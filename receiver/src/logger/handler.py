@@ -71,7 +71,7 @@ class LogHandler(logging.Handler):
             self.channel.publish_message(message=formatted)
 
         except Exception:
-            self.channel = None
+            # self.channel = None
             self.handleError(record)
         finally:
             self.release()
