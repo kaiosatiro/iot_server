@@ -4,17 +4,17 @@ on: [pull_request, workflow_call]
 jobs:
   tests-logging:
     name: Tests Logging Service
-    uses: ./.github/workflows/tests/test_logging.yml
+    uses: ./.github/workflows/test_logging.yml
   
   tests-userapi:
     needs: tests-logging
     name: Tests User API Service
-    uses: ./.github/workflows/tests/test_userapi.yml
+    uses: ./.github/workflows/test_userapi.yml
   
   tests-receiver:
     needs: tests-userapi
     name: Tests Receiver Service
-    uses: ./.github/workflows/tests/test_receiver.yml
+    uses: ./.github/workflows/test_receiver.yml
     
 
   # # https://github.com/marketplace/actions/alls-green#why

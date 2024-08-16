@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
+  tests:
     name: Tests
     uses: ./.github/workflows/test.yml
     
