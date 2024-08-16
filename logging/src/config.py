@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     )
     ENVIRONMENT: Literal["dev", "staging", "production"] = "dev"
     LOG_LEVEL: str = "INFO"
-    LOG_INFO_LOCAL_PATH: str = "/temp/"  # 'path' may conflict
+    LOG_INFO_LOCAL_PATH: str
 
     @computed_field  # type: ignore
     @property
