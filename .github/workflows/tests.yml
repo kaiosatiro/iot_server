@@ -13,6 +13,10 @@ jobs:
   tests-receiver:
     name: Tests Receiver Service
     uses: ./.github/workflows/test_receiver.yml
+  
+  tests-handler:
+    name: Tests Handler Service
+    uses: ./.github/workflows/test_handler.yml
     
 
   # # https://github.com/marketplace/actions/alls-green#why

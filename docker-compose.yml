@@ -147,3 +147,18 @@ services:
       rabbitmq:
         condition: service_healthy
         restart: true
+  
+  handler:
+    build: 
+      context: ./handler
+      args:
+        ENVIRONMENT:
+    networks:
+      - default
+      - internal_network
+    environment:
+      <<: [*default-environment, *userapi_handler, *receiver_handler]
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+        restart: true

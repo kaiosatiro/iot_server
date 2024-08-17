@@ -37,6 +37,10 @@ lint:
 	flake8 user_api/src --count --exit-zero --max-complexity=10 --max-line-length=150 --statistics --exclude=.venv
 	flake8 user_api/src --count --select=E9,F63,F7,F82 --show-source --statistics --exclude=.venv
 
-	@echo "Running linter on UserAPI"
+	@echo "Running linter on Receiver"
 	flake8 receiver/src --count --exit-zero --max-complexity=10 --max-line-length=150 --statistics --exclude=.venv
 	flake8 receiver/src --count --select=E9,F63,F7,F82 --show-source --statistics --exclude=.venv
+
+	@echo "Running linter on Handler"
+	flake8 handler/src --count --exit-zero --max-complexity=10 --max-line-length=150 --statistics --exclude=.venv
+	flake8 handler/src --count --select=E9,F63,F7,F82 --show-source --statistics --exclude=.venv

@@ -6,3 +6,7 @@ tests/__pycache__/
 .pytest_cache
 tests/load_test.py
 .ruff_cache
+**/del.py
+**/__pycache__
+**/logs/*
+.mypy_cache
