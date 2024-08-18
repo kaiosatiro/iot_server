@@ -49,7 +49,7 @@ jobs:
       - name: Tests - Hanlder service
       # Need the user api for db migrations
         run: |
-          make compose-dev-d s="rabbitmq db userpi handler"
+          make compose-dev-d s="rabbitmq db userapi handler"
           docker compose exec -T handler bash tests-start.sh
 
       # Cleanup
