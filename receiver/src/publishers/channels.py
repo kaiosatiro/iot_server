@@ -76,7 +76,7 @@ class LogChannel(ABSQueueChannel):
     def publish_message(self, message: str, content_type: str = "text/plain") -> None:
         properties = pika.BasicProperties(
             app_id="receiver",
-            content_type=content_type,
+            content_type=content_type,  # TODO: ADD to self
             delivery_mode=2,
         )
         self._connection.publish(

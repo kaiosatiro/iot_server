@@ -13,25 +13,22 @@ from pika.exchange_type import ExchangeType  # type: ignore
 from pika.spec import Basic  # type: ignore
 
 from src.config import settings
-from src.core.abs import HandlerABC, SingletonConnection
-from src.logger.setup import setup_logging
-
-setup_logging()
+from src.core.abs import SingletonConnection, Handler
 
 
 class ConnectionManager(metaclass=SingletonConnection):
-    EXCHANGE = settings.LOG_EXCHANGE
+    EXCHANGE = settings.MESSAGES_EXCHANGE
     EXCHANGE_TYPE = ExchangeType.topic
-    QUEUE = settings.LOG_QUEUE
-    ROUTING_KEY = settings.LOG_ROUTING_KEY
+    QUEUE = settings.MESSAGES_QUEUE
+    ROUTING_KEY = settings.MESSAGES_ROUTING_KEY
 
-    def __init__(self, handler: HandlerABC | None = None) -> None:
+    def __init__(self, handler: Handler | None = None) -> None:
         self._connection: BaseConnection = None
         self._channel: Channel = None
         self._consumer_tag: str = ""
 
         # ---
-        self._handler: HandlerABC | None = handler
+        self._handler: Handler | None = handler
         # ---
 
         self._consuming: bool = False
@@ -119,14 +116,15 @@ class ConnectionManager(metaclass=SingletonConnection):
 
     # ----------------------------------------
     def setup_exchange(self) -> None:
-        self.logger.info("Declaring exchange '%s'", self.EXCHANGE)
+        if settings.MESSAGES_DECLARE_EXCHANGE:
+            self.logger.info("Declaring exchange '%s'", self.EXCHANGE)
 
-        self._channel.exchange_declare(
-            exchange=self.EXCHANGE,
-            exchange_type=self.EXCHANGE_TYPE,
-            durable=True,
-            callback=self.on_exchange_declareok,
-        )
+            self._channel.exchange_declare(
+                exchange=self.EXCHANGE,
+                exchange_type=self.EXCHANGE_TYPE,
+                durable=True,
+                callback=self.on_exchange_declareok,
+            )
 
     def on_exchange_declareok(self, _unused_frame: str) -> None:
         self.logger.info("Exchange declared")
@@ -189,16 +187,11 @@ class ConnectionManager(metaclass=SingletonConnection):
         _unused_channel: Channel,
         method: Basic.Deliver,
         properties: BasicProperties,
-        body: str,
+        body: str | bytes,
     ) -> None:
-        self.logger.debug(
-            "Received message # %s from %s: %s",
-            method.delivery_tag,
-            properties.app_id,
-            body,
-        )
+        self.logger.info("Received message")
         try:
-            self._handler.handle_message(body, properties.app_id)  # type: ignore
+            self._handler.handle_message(body)  # type: ignore
             self._channel.basic_ack(delivery_tag=method.delivery_tag)
         except AttributeError as e:
             self.logger.error("Handler not set: %s", e)

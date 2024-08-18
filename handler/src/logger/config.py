@@ -5,23 +5,23 @@ from src.logger.channel import LogChannel
 LOG_CONFIG = {
     "version": 1,
     "disable_existing_loggers": True,
-    # "filters": {
-    #     "correlation_id": {
-    #         "()": "asgi_correlation_id.CorrelationIdFilter",
-    #         "uuid_length": 8 if settings.ENVIRONMENT == "dev" else 32,
-    #         "default_value": "-",
-    #     },
-    # },
+    "filters": {
+        "correlation_id": {
+            "()": "src.logger.filter_cid.CorrelationIdFilter",
+            "corrid_length": 8 if settings.ENVIRONMENT == "dev" else 32,
+            "default_value": "-",
+        },
+    },
     "formatters": {
         "simple": {
-            "format": f"{settings.HANDLER_ID} [%(levelname)s] [%(name)s | L%(lineno)d] %(asctime)s : %(message)s",
+            "format": f"{settings.HANDLER_ID} [%(levelname)s] [%(name)s | L%(lineno)d] %(asctime)s [%(correlation_id)s]: %(message)s",
             "datefmt": "%H:%M:%S",
         }
     },
     "handlers": {
         "stderr": {
             "class": "logging.StreamHandler",
-            "level": "WARNING",
+            "level": "WARNING" if settings.ENVIRONMENT == "production" else "DEBUG",
             "formatter": "simple",
             "stream": "ext://sys.stderr",
         },
@@ -35,7 +35,7 @@ LOG_CONFIG = {
             "class": "logging.handlers.QueueHandler",
             "handlers": ["stderr", "queue"],
             "respect_handler_level": "true",
-            # "filters": ["correlation_id"],
+            "filters": ["correlation_id"],
         },
     },
     "loggers": {

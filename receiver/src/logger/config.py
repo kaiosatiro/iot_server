@@ -20,7 +20,7 @@ LOG_CONFIG = {
     "handlers": {
         "stderr": {
             "class": "logging.StreamHandler",
-            "level": "WARNING",
+            "level": "WARNING" if settings.ENVIRONMENT == "production" else "DEBUG",
             "formatter": "simple",
             "stream": "ext://sys.stderr",
         },

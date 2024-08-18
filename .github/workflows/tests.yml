@@ -15,7 +15,7 @@ jobs:
     uses: ./.github/workflows/test_receiver.yml
   
   tests-handler:
-    name: Tests Handler Service
+    name: Tests Handler Service  # Need to be made after the userapi wich is the responsible for migrations
     uses: ./.github/workflows/test_handler.yml
     
 

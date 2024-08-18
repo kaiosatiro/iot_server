@@ -21,7 +21,7 @@ class MessageHandler:
     def _create_headers(self, device_id: int) -> dict[Any, Any]:
         return {
             "device_id": device_id,
-            "request_id": correlation_id.get() or "",
+            "correlation_id": correlation_id.get() or "",  # TODO: Maybe a setting key
         }
 
     def process_message(self, device_id: int, body: dict[Any, Any]) -> None:

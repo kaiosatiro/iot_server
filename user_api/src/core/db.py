@@ -10,7 +10,9 @@ from src.models import (
     UserCreation,
 )
 
-engine = create_engine(str(settings.SQL_DATABASE_URI), poolclass=StaticPool)
+engine = create_engine(
+    str(settings.SQL_DATABASE_URI), poolclass=StaticPool
+)  # TODO: try others poolclasses
 
 
 def init_db(session: Session) -> None:

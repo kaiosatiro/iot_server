@@ -19,7 +19,7 @@ LOG_CONFIG = {
     "handlers": {
         "stderr": {
             "class": "logging.StreamHandler",
-            "level": "WARNING",
+            "level": "WARNING" if settings.ENVIRONMENT == "production" else "DEBUG",
             # "filters": ["correlation_id"],
             "formatter": "simple",
             "stream": "ext://sys.stderr",

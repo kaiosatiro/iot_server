@@ -47,8 +47,9 @@ jobs:
           echo LOG_INFO_LOCAL_PATH=$LOG_INFO_LOCAL_PATH >> .env
 
       - name: Tests - Hanlder service
+      # Need the user api for db migrations
         run: |
-          make compose-dev-d s="rabbitmq handler"
+          make compose-dev-d s="rabbitmq db userpi handler"
           docker compose exec -T handler bash tests-start.sh
 
       # Cleanup

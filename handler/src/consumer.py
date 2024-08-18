@@ -2,16 +2,17 @@ import logging
 
 from tenacity import after_log, before_log, retry, stop_after_attempt, wait_fixed
 
-from src.core.abs import HandlerABC
+from src.core.abs import Handler
 from src.core.connection import ConnectionManager
-from src.core.handlers import get_handlers_manager
+from src.core.message_handlers import get_handler
+
 
 logger = logging.getLogger(__name__)
 
 
 class Consumer:
     def __init__(self) -> None:
-        self._handler: HandlerABC = get_handlers_manager()
+        self._handler: Handler = get_handler()
         self._connection: ConnectionManager = ConnectionManager(handler=self._handler)
 
     def run(self) -> None:
@@ -21,6 +22,7 @@ class Consumer:
                 self._connection.run()
             except KeyboardInterrupt as e:
                 logger.warning("KeyboardInterrupt in consumer: %s", e)
+                self._handler.close()
                 self._connection.stop()
                 break
             except Exception as e:

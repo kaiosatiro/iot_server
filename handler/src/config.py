@@ -34,7 +34,7 @@ class Settings(BaseSettings):
     @computed_field  # type: ignore
     @property
     def MESSAGES_ROUTING_KEY(self) -> str:
-        return f"{self.MESSAGES_EXCHANGE}.{self.HANDLER_ID}"
+        return f"{self.MESSAGES_EXCHANGE}.*"
 
     # Postgres Config
     POSTGRES_SERVER: str

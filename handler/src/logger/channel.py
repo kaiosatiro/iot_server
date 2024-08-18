@@ -1,5 +1,5 @@
 import logging
-from threading import Thread
+from threading import Thread, Lock
 
 from pika.channel import Channel  # type: ignore
 from pika import (  # type: ignore
@@ -10,13 +10,22 @@ from pika import (  # type: ignore
 )
 
 from src.config import settings
-from src.logger.abs import SingletonMetaConnection
 
 
 logger = logging.getLogger(__name__)
 
 
-class LogChannel(Thread, metaclass=SingletonMetaConnection):
+class LogChannel(Thread):
+    _instances = {}  # type: ignore
+    _lock: Lock = Lock()
+
+    def __call__(cls, *args, **kwargs):  # type: ignore
+        with cls._lock:
+            if cls not in cls._instances:
+                instance = super().__call__(*args, **kwargs)
+                cls._instances[cls] = instance
+        return cls._instances[cls]
+
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.daemon = True
@@ -36,12 +45,18 @@ class LogChannel(Thread, metaclass=SingletonMetaConnection):
         self._queue = settings.LOG_QUEUE
         self._routing_key = settings.LOG_ROUTING_KEY
 
+        self._credentials = PlainCredentials(self._username, self._password)
+        self._parameters = ConnectionParameters(
+            self._host, self._port, credentials=self._credentials, heartbeat=3600
+        )
         self._message_properties = BasicProperties(
             app_id=settings.HANDLER_ID,
             content_type="text/bytes",
             delivery_mode=2,
         )
 
+    # --------------------------------- #
+    def connect(self) -> None:
         # Set logger if something went wrong connecting to the channel.
         self.logger = logging.getLogger(self.__class__.__name__)
         self.log_handler = logging.StreamHandler()
@@ -50,49 +65,40 @@ class LogChannel(Thread, metaclass=SingletonMetaConnection):
         self.logger.setLevel(logging.WARNING)
 
         try:
-            self.logger.info("Connecting Logger to Queue")
-            self.connect()
+            logger.info("Connecting to Queue")
+            self._connection = BlockingConnection(self._parameters)
+
+            self.logger.info("Opening Channel")
+            self._channel = self._connection.channel()
+
+            self.logger.info(f"Connecting to {self._exchange} exchange")
+            self._channel.exchange_declare(
+                exchange=self._exchange,
+                exchange_type="topic",
+                durable=True,
+            )
+
+            self.logger.info(f"Connecting to {self._queue} queue")
+            self._channel.queue_declare(
+                queue=self._queue,
+                durable=True,
+            )
+
+            self.logger.info(
+                f"Binding {self._queue} to {self._exchange} with {self._routing_key}"
+            )
+            self._channel.queue_bind(
+                exchange=self._exchange,
+                queue=self._queue,
+                routing_key=self._routing_key,
+            )
         except Exception as e:
             self.logger.error(f"Error connecting to Queue: {e}")
             self.stop()
+            self._connection = None
         finally:
             self.logger.removeHandler(self.log_handler)
             del self.log_handler
-
-    # --------------------------------- #
-    def connect(self) -> None:
-        self.logger.info("Connecting to Queue")
-
-        credentials = PlainCredentials(self._username, self._password)
-        parameters = ConnectionParameters(
-            self._host, self._port, credentials=credentials, heartbeat=3600
-        )
-        self._connection = BlockingConnection(parameters)
-
-        self.logger.info("Opening Channel")
-        self._channel = self._connection.channel()
-
-        self.logger.info(f"Connecting to {self._exchange} exchange")
-        self._channel.exchange_declare(
-            exchange=self._exchange,
-            exchange_type="topic",
-            durable=True,
-        )
-
-        self.logger.info(f"Connecting to {self._queue} queue")
-        self._channel.queue_declare(
-            queue=self._queue,
-            durable=True,
-        )
-
-        self.logger.info(
-            f"Binding {self._queue} to {self._exchange} with {self._routing_key}"
-        )
-        self._channel.queue_bind(
-            exchange=self._exchange,
-            queue=self._queue,
-            routing_key=self._routing_key,
-        )
 
     # --------------------------------- #
     def status(self) -> bool:

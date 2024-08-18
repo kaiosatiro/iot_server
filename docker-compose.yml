@@ -162,3 +162,5 @@ services:
       rabbitmq:
         condition: service_healthy
         restart: true
+      db:
+        condition: service_started
