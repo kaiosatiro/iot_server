@@ -6,7 +6,7 @@ echo $PWD
 echo $ENVIRONMENT
 echo $LOG_LEVEL
 echo $RABBITMQ_DNS
-# echo $DB
+echo $DB
 
 # Let the DB start
 python src/pre_start.py

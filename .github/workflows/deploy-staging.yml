@@ -3,21 +3,21 @@ name: Deploy
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
 
 concurrency:
   group: master
   cancel-in-progress: true
 
 jobs:
+  quality-assurance:
+    name: Quality Assurance
+    uses: ./.github/workflows/qa.yml
+
   tests:
     name: Tests
     uses: ./.github/workflows/tests.yml
     
-  quality-assurance:
-    name: Quality Assurance
-    uses: ./.github/workflows/qa.yml
+
 
   #Deploy to staging
   # deploy:

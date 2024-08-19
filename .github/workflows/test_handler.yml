@@ -23,6 +23,14 @@ jobs:
       POSTGRES_PASSWORD: ${{ vars.POSTGRES_PASSWORD }}
       POSTGRES_DB: ${{ vars.POSTGRES_DB }}
 
+      # Need the user api for db migrations
+      USERAPI_ID: ${{ vars.USERAPI_ID }}
+      FIRST_SUPERUSERNAME: ${{ vars.FIRST_SUPERUSERNAME }}
+      FIRST_SUPERUSER_EMAIL: ${{ vars.FIRST_SUPERUSER_EMAIL }}
+      FIRST_SUPERUSER_PASSWORD: ${{ vars.FIRST_SUPERUSER_PASSWORD }}
+      USERS_OPEN_REGISTRATION: ${{ vars.USERS_OPEN_REGISTRATION }}
+      EMAILS_FROM_EMAIL: ${{ vars.EMAILS_FROM_EMAIL }}
+
       LOG_INFO_LOCAL_PATH: ${{ vars.LOG_INFO_LOCAL_PATH }} # Need to add this so compose wont fail to bind volume
 
     steps:
@@ -36,7 +44,7 @@ jobs:
           echo LOG_LEVEL=$LOG_LEVEL >> .env
           echo LOG_EXCHANGE=$LOG_EXCHANGE >> .env
           echo LOG_QUEUE=$LOG_QUEUE >> .env
-          echo RECEIVER_ID=$RECEIVER_ID >> .env
+          echo HANDLER_ID=$HANDLER_ID >> .env
           echo RABBITMQ_DNS=$RABBITMQ_DNS >> .env
           echo MESSAGES_EXCHANGE=$MESSAGES_EXCHANGE >> .env
           echo MESSAGES_QUEUE=$MESSAGES_QUEUE >> .env
@@ -44,9 +52,14 @@ jobs:
           echo POSTGRES_USER=$POSTGRES_USER >> .env
           echo POSTGRES_PASSWORD=$POSTGRES_PASSWORD >> .env
           echo POSTGRES_DB=$POSTGRES_DB >> .env
+          echo FIRST_SUPERUSERNAME=$FIRST_SUPERUSERNAME >> .env
+          echo FIRST_SUPERUSER_EMAIL=$FIRST_SUPERUSER_EMAIL >> .env
+          echo FIRST_SUPERUSER_PASSWORD=$FIRST_SUPERUSER_PASSWORD >> .env
+          echo USERS_OPEN_REGISTRATION=$USERS_OPEN_REGISTRATION >> .env
+          echo EMAILS_FROM_EMAIL=$EMAILS_FROM_EMAIL >> .env
           echo LOG_INFO_LOCAL_PATH=$LOG_INFO_LOCAL_PATH >> .env
 
-      - name: Tests - Hanlder service
+      - name: Tests - Handler services
       # Need the user api for db migrations
         run: |
           make compose-dev-d s="rabbitmq db userapi handler"
