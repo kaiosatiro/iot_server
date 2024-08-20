@@ -11,7 +11,11 @@ from src.config import settings
 from src.logger.setup import setup_logging_config
 
 
-logger = logging.getLogger("PRE Start")
+handler = logging.StreamHandler()
+logger = logging.getLogger("Pre Start")
+logger.addHandler(handler)
+logger.propagate = False
+logger.setLevel(logging.INFO)
 
 max_tries = 60 * 5  # 5 minutes
 wait_seconds = 1

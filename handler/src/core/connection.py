@@ -187,9 +187,9 @@ class ConnectionManager(metaclass=SingletonConnection):
         _unused_channel: Channel,
         method: Basic.Deliver,
         properties: BasicProperties,
-        body: str | bytes,
+        body: bytes,
     ) -> None:
-        self.logger.info("Received message")
+        self.logger.debug("Received message")
         try:
             self._handler.handle_message(body)  # type: ignore
             self._channel.basic_ack(delivery_tag=method.delivery_tag)

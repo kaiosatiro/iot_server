@@ -24,12 +24,15 @@ class LogHandler(logging.Handler):
     def setup_channel(self) -> None:
         # Set logger if something went wrong connecting to the channel.
         handler = logging.StreamHandler()
-        handler.setFormatter(self.formatter)
+        formatter = logging.Formatter(
+            "[%(levelname)s] [%(name)s | L%(lineno)d] %(asctime)s : %(message)s",
+        )
+        handler.setFormatter(formatter)
 
         logger = logging.getLogger("setup_log_channel")
         logger.addHandler(handler)
         logger.propagate = False
-        logger.setLevel(logging.WARNING)
+        logger.setLevel(logging.INFO)
 
         logger.info("Connecting Handler to Queue")
 

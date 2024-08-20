@@ -24,7 +24,7 @@ def get_data_manager() -> DataManager:
 
 class LocalData(DB):
     def __init__(self) -> None:
-        self.origin: str = "UNKNOWN"
+        self.origin: str = ""
         self.path: str = settings.LOG_INFO_LOCAL_PATH
         self.datetime_service: object = get_time_service()
 

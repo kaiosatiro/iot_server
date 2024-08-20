@@ -58,33 +58,37 @@ class LogChannel(Thread):
     # --------------------------------- #
     def connect(self) -> None:
         # Set logger if something went wrong connecting to the channel.
-        self.logger = logging.getLogger(self.__class__.__name__)
-        self.log_handler = logging.StreamHandler()
-        self.logger.addHandler(self.log_handler)
-        self.logger.propagate = False
-        self.logger.setLevel(logging.WARNING)
+        handler = logging.StreamHandler()
+        formatter = logging.Formatter(
+            "[%(levelname)s] [%(name)s | L%(lineno)d] %(asctime)s : %(message)s",
+        )
+        handler.setFormatter(formatter)
+        logger = logging.getLogger(self.__class__.__name__)
+        logger.addHandler(handler)
+        logger.propagate = False
+        logger.setLevel(logging.INFO)
 
         try:
             logger.info("Connecting to Queue")
             self._connection = BlockingConnection(self._parameters)
 
-            self.logger.info("Opening Channel")
+            logger.info("Opening Channel")
             self._channel = self._connection.channel()
 
-            self.logger.info(f"Connecting to {self._exchange} exchange")
+            logger.info(f"Connecting to {self._exchange} exchange")
             self._channel.exchange_declare(
                 exchange=self._exchange,
                 exchange_type="topic",
                 durable=True,
             )
 
-            self.logger.info(f"Connecting to {self._queue} queue")
+            logger.info(f"Connecting to {self._queue} queue")
             self._channel.queue_declare(
                 queue=self._queue,
                 durable=True,
             )
 
-            self.logger.info(
+            logger.info(
                 f"Binding {self._queue} to {self._exchange} with {self._routing_key}"
             )
             self._channel.queue_bind(
@@ -93,12 +97,11 @@ class LogChannel(Thread):
                 routing_key=self._routing_key,
             )
         except Exception as e:
-            self.logger.error(f"Error connecting to Queue: {e}")
+            logger.error(f"Error connecting to Queue: {e}")
             self.stop()
             self._connection = None
         finally:
-            self.logger.removeHandler(self.log_handler)
-            del self.log_handler
+            logger.removeHandler(handler)
 
     # --------------------------------- #
     def status(self) -> bool:

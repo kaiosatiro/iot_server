@@ -16,7 +16,7 @@ class SingletonConnection(type):
 
 class Handler(ABC):
     @abstractmethod
-    def handle_message(self, body: str | bytes, *args, **kwargs) -> None: ...  # type: ignore
+    def handle_message(self, msg: str | bytes, *args, **kwargs) -> None: ...  # type: ignore
 
     @abstractmethod
     def close(self) -> None: ...  # type: ignore

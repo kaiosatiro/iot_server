@@ -42,7 +42,7 @@ class SingletonMetaHandler(ABCMeta):
 
 class HandlerABC(ABC):
     @abstractmethod
-    def handle_message(self, msg: str, *args, **kwargs) -> None: ...  # type: ignore
+    def handle_message(self, msg: str | bytes, *args, **kwargs) -> None: ...  # type: ignore
 
 
 class DB(ABC):

@@ -32,7 +32,7 @@ class Consumer:
 
     def _maybe_reconnect(self) -> None:
         if self._connection.should_reconnect:
-            logger.info("Reconnecting to RabbitMQ")
+            logger.warning("Reconnecting to RabbitMQ")
             self._connection.stop()
 
             max_tries = 60 * 5  # 5 minutes
@@ -47,5 +47,5 @@ class Consumer:
             def reconnect_wrapper() -> None:
                 self._connection.run()
 
-            logger.info("Reconnecting to RabbitMQ in %d seconds...", wait_seconds)
+            logger.warning("Reconnecting to RabbitMQ in %d seconds...", wait_seconds)
             reconnect_wrapper()

@@ -1,3 +1,5 @@
+import logging
+
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import Session
 
@@ -28,10 +30,13 @@ class DB:
     def __init__(self) -> None:
         self.session: Session = Session(engine)
         self.active_devices: set = set()  # A 'cache' of active devices
+        self.logger = logging.getLogger(self.__class__.__name__)
 
         self._get_devices()
+        self.logger.info("Database instance initialized")
 
     def _get_devices(self) -> None:
+        self.logger.info("Getting active devices")
         query = self.session.query(Device)
         self.active_devices = {device.id for device in query}
 
@@ -51,6 +56,7 @@ class DB:
         self.session.commit()
 
     def close(self) -> None:
+        self.logger.info("Closing database instance")
         self.session.close()
 
 

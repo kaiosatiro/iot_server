@@ -13,7 +13,7 @@ setup_logging_config()
 
 if __name__ == "__main__":
     logger = logging.getLogger(__name__)
-    logger.info("Starting the logging service")
+    logger.info("Starting the Handler service")
 
     try:
         consumer = Consumer()

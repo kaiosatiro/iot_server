@@ -41,7 +41,7 @@ class HandlerManager(HandlerABC, metaclass=SingletonMetaHandler):
             ),
         }
 
-    def handle_message(self, msg: str, app_id: str) -> None:
+    def handle_message(self, msg: str | bytes, app_id: str) -> None:
         # logger.debug("Handling message: %s", msg)
         match app_id:
             case settings.HANDLER_ID:
@@ -69,6 +69,7 @@ class Handler(HandlerABC):
 
         self.db_local.set_origin(self.origin)
 
-    def handle_message(self, msg: str) -> None:
+    def handle_message(self, msg: str | bytes) -> None:
         logger.debug("Handling message: %s", msg)
-        self.db_local.save(msg)
+        body = msg.decode("utf-8") if isinstance(msg, bytes) else msg
+        self.db_local.save(body)

@@ -170,7 +170,7 @@ class MessageChannel(ABSQueueChannel):
             self._channel.basic_publish(
                 exchange=self._exchange,
                 routing_key=self._routing_key,
-                body=body,
+                body=body.encode(),
                 properties=properties,
                 mandatory=True,
             )
