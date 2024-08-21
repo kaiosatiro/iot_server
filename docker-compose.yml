@@ -90,7 +90,9 @@ services:
       - internal_network
     environment: 
       << : [*default-environment]
-      LOG_INFO_LOCAL_PATH: ${LOG_INFO_LOCAL_PATH}
+      LOG_INFO_LOCAL_PATH:
+      LOG_FILE_MAX_SIZE:
+      LOG_FILE_BACKUP_COUNT:
     depends_on:
       rabbitmq:
         condition: service_healthy

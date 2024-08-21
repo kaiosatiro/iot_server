@@ -16,16 +16,16 @@ services:
       - "5672:5672" 
       - "15672:15672"
   
-  logging:
-    build: ./logging
-    environment:
-      - ENVIRONMENT=dev
-      - LOG_LEVEL=DEBUG
+  # logging:
+  #   build: ./logging
+  #   environment:
+  #     - ENVIRONMENT=dev
+  #     - LOG_LEVEL=DEBUG
   
   userapi:
     environment:
-      - ENVIRONMENT=dev
-      - LOG_LEVEL=DEBUG
+      # - ENVIRONMENT=dev
+      # - LOG_LEVEL=DEBUG
     volumes:
       - type: bind
         source: ./user_api
@@ -33,16 +33,16 @@ services:
   
   receiver:
     build: ./receiver
-    environment:
-      - ENVIRONMENT=dev
-      - LOG_LEVEL=DEBUG
+    # environment:
+      # - ENVIRONMENT=dev
+      # - LOG_LEVEL=DEBUG
     volumes:
       - type: bind
         source: ./receiver
         target: /app
   
-  handler:
-    build: ./handler
-    environment:
-      - ENVIRONMENT=dev
-      - LOG_LEVEL=DEBUG
+  # handler:
+  #   build: ./handler
+  #   environment:
+  #     - ENVIRONMENT=dev
+  #     - LOG_LEVEL=DEBUG

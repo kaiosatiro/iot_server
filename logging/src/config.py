@@ -12,11 +12,14 @@ class Settings(BaseSettings):
     ENVIRONMENT: Literal["dev", "staging", "production"] = "dev"
     LOG_LEVEL: str = "INFO"
     LOG_INFO_LOCAL_PATH: str
+    LOG_FILE_MAX_SIZE: int = 10240
+    LOG_FILE_BACKUP_COUNT: int = 5
 
     @computed_field  # type: ignore
     @property
     def LOG_INFO_FILE(self) -> str:
         path = Path(self.LOG_INFO_LOCAL_PATH).joinpath("logging_service_logs.log")
+        # For testing outside the container it needs a relative path on .env
         return str(path)
 
     TIME_SERVICE_UPDATE_INTERVAL: int = 60

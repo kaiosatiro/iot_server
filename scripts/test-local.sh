@@ -17,3 +17,4 @@ docker compose exec -T userapi bash tests-start.sh "$@"
 docker compose exec -T receiver bash tests-start.sh "$@"
 docker compose exec -T handler bash tests-start.sh "$@"
 
+docker compose down -v --remove-orphans

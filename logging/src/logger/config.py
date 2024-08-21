@@ -1,4 +1,8 @@
+import os
+
 from src.config import settings
+
+print(os.getcwd())
 
 LOG_CONFIG = {
     "version": 1,

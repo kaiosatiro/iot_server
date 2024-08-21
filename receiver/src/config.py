@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     RABBITMQ_USER: str = "guest"
     RABBITMQ_PASSWORD: str = "guest"
 
-    RECEIVER_ID: str = "receiver"
+    RECEIVER_ID: str
 
     MESSAGES_EXCHANGE: str
     MESSAGES_QUEUE: str

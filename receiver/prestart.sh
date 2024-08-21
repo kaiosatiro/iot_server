@@ -6,6 +6,7 @@ echo $PWD
 echo $ENVIRONMENT
 echo $LOG_LEVEL
 echo $RABBITMQ_DNS
+echo $RECEIVER_ID
 
 # Let the DB start
 

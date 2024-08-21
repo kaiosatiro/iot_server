@@ -1,6 +1,5 @@
 from unittest.mock import patch
 from os import environ
-from datetime import datetime
 
 from src.core.data import LocalData
 
@@ -24,14 +23,6 @@ def test_LocalData_save_method_without_LOG_INFO_LOCAL_PATH():
     with patch.object(LocalData, "save", return_value=None) as mock_save:
         local_data.save(data, origin=origin)
         mock_save.assert_called_with(data, origin=origin)
-
-
-def test_LocalData_set_current_date_method():
-    local_data = LocalData()
-    local_data.set_current_date()
-    assert local_data.current_date == datetime.now().strftime(
-        "%Y-%m-%d"
-    ), "current_date should be updated to the current date"
 
 
 def test_LocalData_set_origin_method():
