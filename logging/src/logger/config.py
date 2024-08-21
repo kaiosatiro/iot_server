@@ -1,8 +1,4 @@
-import os
-
 from src.config import settings
-
-print(os.getcwd())
 
 LOG_CONFIG = {
     "version": 1,
@@ -28,9 +24,16 @@ LOG_CONFIG = {
             "maxBytes": 10000,
             "backupCount": 5,
         },
+        # On settings, pydantic will check if REMOTE_LOG_ADDRESS and REMOTE_LOG_PORT are set
+        settings.REMOTE_LOG_HANDLER_NAME: {
+            "level": settings.REMOTE_LOG_LEVEL,
+            "class": "logging.handlers.SysLogHandler",
+            "formatter": "simple",
+            "address": (settings.REMOTE_LOG_ADDRESS, settings.REMOTE_LOG_PORT),
+        },
         "queue_handler": {
             "class": "logging.handlers.QueueHandler",
-            "handlers": ["stderr", "file"],
+            "handlers": ["stderr", "file", settings.REMOTE_LOG_HANDLER_NAME],
             "respect_handler_level": "true",
         },
     },

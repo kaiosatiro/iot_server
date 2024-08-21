@@ -15,8 +15,10 @@ class Manager(DataManager):
     def get_local(self) -> DB:
         return LocalData()
 
-    def get_remote(self) -> DB:
-        return RemoteData()
+    def get_remote(self) -> DB | None:
+        if settings.ENABLE_REMOTE_LOG:
+            return RemoteData()
+        return None
 
 
 def get_data_manager() -> DataManager:
@@ -55,7 +57,8 @@ class LocalData(DB):
         ) as e:  # try catch here we may lose msg because it will be acknoledged??
             logger.error("Error saving data: %s", e)
         finally:
-            self.stream.flush()
+            if self.stream:
+                self.stream.flush()
 
     def should_rollover(self, data: str) -> bool:
         if self.stream is None:
@@ -93,9 +96,42 @@ class LocalData(DB):
 
 
 class RemoteData(DB):
+    # TODO: Need to handle the level using the Queue priority in each service
+    #   this class is just a workaround. Parsing strings may consume too much
+    def __init__(self) -> None:
+        self.origin: str = ""
+        self.originlen: int = 0
+        self.lvl_index: int = 0
+        self.handler: logging.Handler | None = logging.getHandlerByName(
+            settings.REMOTE_LOG_HANDLER_NAME
+        )
+        if self.handler:
+            self.logger = logging.getLogger(self.origin)
+            self.logger.addHandler(self.handler)
+
     def save(self, data: str) -> None:
         logger.debug("Saving data remotely: %s", data)
-        pass
+        level = self._parse_level(data)
+        match level:
+            case "DEBUG":
+                self.logger.debug(data)
+            case "INFO":
+                self.logger.info(data)
+            case "WARNING":
+                self.logger.warning(data)
+            case "ERROR":
+                self.logger.error(data)
+            case "CRITICAL":
+                self.logger.critical(data)
+            case _:
+                self.logger.info(data)
+
+    def _parse_level(self, s: str) -> str:
+        lvl_i_end = s.find("]", self.lvl_index)
+        return s[self.lvl_index:lvl_i_end]
 
     def set_origin(self, origin: str) -> None:
-        pass
+        logger.info("Setting origin: %s", origin)
+        self.origin = origin
+        self.originlen = len(origin)
+        self.lvl_index = self.originlen + 2

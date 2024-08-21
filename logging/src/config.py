@@ -1,7 +1,7 @@
 from pathlib import Path
-from typing import Literal
+from typing import Literal, Self
 
-from pydantic import computed_field
+from pydantic import computed_field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -14,6 +14,23 @@ class Settings(BaseSettings):
     LOG_INFO_LOCAL_PATH: str
     LOG_FILE_MAX_SIZE: int = 10240
     LOG_FILE_BACKUP_COUNT: int = 5
+
+    REMOTE_LOG_HANDLER_NAME: str = "remoteSysLog"
+    REMOTE_LOG_LEVEL: str = "WARNING"
+    REMOTE_LOG_ADDRESS: str | None = None
+    REMOTE_LOG_PORT: int | None = None
+
+    @computed_field  # type: ignore
+    @property
+    def ENABLE_REMOTE_LOG(self) -> bool:
+        return self.REMOTE_LOG_ADDRESS is not None and self.REMOTE_LOG_PORT is not None
+
+    @model_validator(mode="after")
+    def _set_default_REMOTE_LOG_config(self) -> Self:
+        if self.REMOTE_LOG_ADDRESS is None and self.REMOTE_LOG_PORT is None:
+            self.REMOTE_LOG_ADDRESS = "localhost"
+            self.REMOTE_LOG_PORT = 514
+        return self
 
     @computed_field  # type: ignore
     @property

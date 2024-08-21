@@ -73,3 +73,5 @@ class Handler(HandlerABC):
         logger.debug("Handling message: %s", msg)
         body = msg.decode("utf-8") if isinstance(msg, bytes) else msg
         self.db_local.save(body)
+        if self.db_remote:
+            self.db_remote.save(body)

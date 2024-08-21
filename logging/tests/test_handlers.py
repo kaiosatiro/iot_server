@@ -24,5 +24,3 @@ class TestHandler:
         ) as mock_handle_message:
             manager.handle_message(msg, app_id)
             mock_handle_message.assert_called_with(msg)
-
-
