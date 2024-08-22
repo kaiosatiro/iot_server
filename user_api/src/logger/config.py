@@ -31,7 +31,7 @@ LOG_CONFIG = {
             "port": settings.RABBITMQ_PORT,
             # "filters": ["correlation_id"],
             "formatter": "simple",
-            "exchange": settings.LOG_EXCHANGE,
+            "exchange": settings.LOGGING_EXCHANGE,
             "routing_key_formatter": lambda key: settings.LOG_ROUTING_KEY,
             "declare_exchange": True,
             # "record_fields":['app', 'levelname', 'module', 'asctime', 'msg'],

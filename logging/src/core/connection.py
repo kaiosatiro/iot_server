@@ -20,7 +20,7 @@ setup_logging()
 
 
 class ConnectionManager(metaclass=SingletonConnection):
-    EXCHANGE = settings.LOG_EXCHANGE
+    EXCHANGE = settings.LOGGING_EXCHANGE
     EXCHANGE_TYPE = ExchangeType.topic
     QUEUE = settings.LOG_QUEUE
     ROUTING_KEY = settings.LOG_ROUTING_KEY

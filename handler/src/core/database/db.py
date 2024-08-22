@@ -40,6 +40,12 @@ class DB:
         query = self.session.query(Device)
         self.active_devices = {device.id for device in query}
 
+    def add_device_to_cache(self, device_id: int) -> None:
+        self.active_devices.add(device_id)
+
+    def remove_device_from_cache(self, device_id: int) -> None:
+        self.active_devices.remove(device_id)
+
     def verify_device_id(self, device_id: int) -> bool:
         if device_id in self.active_devices:
             return True

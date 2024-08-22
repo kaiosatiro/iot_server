@@ -10,7 +10,6 @@ from tenacity import after_log, before_log, retry, stop_after_attempt, wait_fixe
 from src.config import settings
 from src.logger.setup import setup_logging_config
 
-
 handler = logging.StreamHandler()
 logger = logging.getLogger("Pre Start")
 logger.addHandler(handler)

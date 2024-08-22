@@ -128,7 +128,7 @@ class RemoteData(DB):
 
     def _parse_level(self, s: str) -> str:
         lvl_i_end = s.find("]", self.lvl_index)
-        return s[self.lvl_index:lvl_i_end]
+        return s[self.lvl_index:lvl_i_end]  # noqa: BLK100
 
     def set_origin(self, origin: str) -> None:
         logger.info("Setting origin: %s", origin)

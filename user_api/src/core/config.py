@@ -69,14 +69,14 @@ class Settings(BaseSettings):
     RABBITMQ_PASSWORD: str = "guest"
 
     # Logs channel config
-    LOG_EXCHANGE: str
+    LOGGING_EXCHANGE: str
     LOG_QUEUE: str
     USERAPI_ID: str
 
     @computed_field  # type: ignore
     @property
     def LOG_ROUTING_KEY(self) -> str:
-        return f"{self.LOG_EXCHANGE}.{self.USERAPI_ID}"
+        return f"{self.LOGGING_EXCHANGE}.{self.USERAPI_ID}"
 
     # Email Config
     SMTP_TLS: bool = True

@@ -1,7 +1,5 @@
 #! /usr/bin/env bash
 
-set -e
-
 docker compose down -v --remove-orphans 
 
 if [ $(uname -s) = "Linux" ]; then

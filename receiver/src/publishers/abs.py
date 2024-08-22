@@ -62,7 +62,7 @@ class ABSQueueChannel(ABC, Channel, metaclass=SingletonMetaChannel):  # type: ig
     def setup(self) -> None: ...
 
     @abstractmethod
-    def publish_message(self, message) -> None: ...  # type: ignore
+    def publish_message(self, message, *args, **kwargs) -> None: ...  # type: ignore
 
     @abstractmethod
     def stop(self) -> None: ...

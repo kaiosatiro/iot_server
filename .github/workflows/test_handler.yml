@@ -9,14 +9,15 @@ jobs:
       ENVIRONMENT: ${{ vars.ENVIRONMENT }}
       LOG_LEVEL: ${{ vars.LOG_LEVEL }}
 
-      LOG_EXCHANGE: ${{ vars.LOG_EXCHANGE }}
+      LOGGING_EXCHANGE: ${{ vars.LOGGING_EXCHANGE }}
       LOG_QUEUE: ${{ vars.LOG_QUEUE }}
       HANDLER_ID: ${{ vars.HANDLER_ID }}
 
       RABBITMQ_DNS: ${{ vars.RABBITMQ_DNS }}
 
-      MESSAGES_EXCHANGE: ${{ vars.MESSAGES_EXCHANGE }}
-      MESSAGES_QUEUE: ${{ vars.MESSAGES_EXCHANGE }}
+      HANDLER_EXCHANGE: ${{ vars.HANDLER_EXCHANGE }}
+      MESSAGES_QUEUE: ${{ vars.HANDLER_EXCHANGE }}
+      RPC_QUEUE: ${{ vars.RPC_QUEUE }}
 
       POSTGRES_PORT: ${{ vars.POSTGRES_PORT }}
       POSTGRES_USER: ${{ vars.POSTGRES_USER }}
@@ -42,11 +43,11 @@ jobs:
         run: |
           echo ENVIRONMENT=$ENVIRONMENT >> .env
           echo LOG_LEVEL=$LOG_LEVEL >> .env
-          echo LOG_EXCHANGE=$LOG_EXCHANGE >> .env
+          echo LOGGING_EXCHANGE=$LOGGING_EXCHANGE >> .env
           echo LOG_QUEUE=$LOG_QUEUE >> .env
           echo HANDLER_ID=$HANDLER_ID >> .env
           echo RABBITMQ_DNS=$RABBITMQ_DNS >> .env
-          echo MESSAGES_EXCHANGE=$MESSAGES_EXCHANGE >> .env
+          echo HANDLER_EXCHANGE=$HANDLER_EXCHANGE >> .env
           echo MESSAGES_QUEUE=$MESSAGES_QUEUE >> .env
           echo POSTGRES_PORT=$POSTGRES_PORT >> .env
           echo POSTGRES_USER=$POSTGRES_USER >> .env

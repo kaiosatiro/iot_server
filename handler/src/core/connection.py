@@ -1,4 +1,5 @@
 import logging
+import functools
 
 from pika import (  # type: ignore
     BasicProperties,
@@ -11,16 +12,19 @@ from pika.channel import Channel  # type: ignore
 from pika.connection import Connection  # type: ignore
 from pika.exchange_type import ExchangeType  # type: ignore
 from pika.spec import Basic  # type: ignore
+from pika.frame import Method  # type: ignore
 
 from src.config import settings
 from src.core.abs import SingletonConnection, Handler
 
 
 class ConnectionManager(metaclass=SingletonConnection):
-    EXCHANGE = settings.MESSAGES_EXCHANGE
+    EXCHANGE = settings.HANDLER_EXCHANGE
     EXCHANGE_TYPE = ExchangeType.topic
     QUEUE = settings.MESSAGES_QUEUE
     ROUTING_KEY = settings.MESSAGES_ROUTING_KEY
+    RPC_QUEUE = settings.RPC_QUEUE
+    RPC_ROUTING_KEY = settings.RPC_ROUTING_KEY
 
     def __init__(self, handler: Handler | None = None) -> None:
         self._connection: BaseConnection = None
@@ -129,56 +133,89 @@ class ConnectionManager(metaclass=SingletonConnection):
     def on_exchange_declareok(self, _unused_frame: str) -> None:
         self.logger.info("Exchange declared")
 
-        self.setup_queue()
+        self.setup_queues()
 
     # ----------------------------------------
-    def setup_queue(self) -> None:
+    def setup_queues(self) -> None:
         self.logger.info("Declaring queue '%s'", self.QUEUE)
-
+        message_cb = functools.partial(
+            self.on_queue_declareok,
+            sets={
+                "exchange": self.EXCHANGE,
+                "queue": self.QUEUE,
+                "routing_key": self.ROUTING_KEY,
+            },
+        )
         self._channel.queue_declare(
             queue=self.QUEUE,
             durable=True,
-            callback=self.on_queue_declareok,
+            callback=message_cb,
         )
 
-    def on_queue_declareok(self, _unused_frame: str) -> None:
+        # Note to self. RPC queue for the handler load the new device id on its cache
+        #   I prefer to declare a queue instead of using the routing key, so the on_message function
+        #   doesn't need to be block. Futher it will be cached with redis I think
+        self.logger.info("Declaring queue '%s'", self.RPC_ROUTING_KEY)
+        rpc_cb = functools.partial(
+            self.on_queue_declareok,
+            sets={
+                "exchange": self.EXCHANGE,
+                "queue": self.RPC_QUEUE,
+                "routing_key": self.RPC_ROUTING_KEY,
+            },
+        )
+        self._channel.queue_declare(
+            queue=self.RPC_QUEUE,
+            durable=True,
+            callback=rpc_cb,
+        )
+
+    def on_queue_declareok(self, frame: Method, sets: dict) -> None:
         self.logger.info(
-            "Queue declared, binding to exchange. Routing key: '%s'", self.ROUTING_KEY
+            "Queue '%s' declared, binding to exchange. Routing key: '%s'",
+            frame.method.queue,
+            self.ROUTING_KEY,
         )
 
+        cb = functools.partial(self.on_bindok, sets=sets)
         self._channel.queue_bind(
-            exchange=self.EXCHANGE,
-            queue=self.QUEUE,
-            routing_key=self.ROUTING_KEY,
-            callback=self.on_bindok,
+            exchange=sets["exchange"],
+            queue=sets["queue"],
+            routing_key=sets["routing_key"],  # are the same
+            callback=cb,
         )
 
-    def on_bindok(self, _unused_frame: str) -> None:
+    def on_bindok(self, _unused_frame: Method, sets: dict) -> None:
         self.logger.info("Queue bound")
 
-        self._channel.basic_qos(
-            prefetch_count=self._prefetch_count, callback=self.on_basic_qos_ok
-        )
+        cb = functools.partial(self.on_basic_qos_ok, sets=sets)
+        self._channel.basic_qos(prefetch_count=self._prefetch_count, callback=cb)
 
-    def on_basic_qos_ok(self, _unused_frame: str) -> None:
-        self.logger.info("QoS set")
+    def on_basic_qos_ok(self, frame: Method, sets: dict) -> None:
+        self.logger.info("QoS set: '%s'", sets["queue"])
 
-        self.start_consuming()
+        self.start_consuming(queue=sets["queue"])
 
     # ----------------------------------------
-    def start_consuming(self) -> None:
+    def start_consuming(self, queue: str) -> None:
         self.logger.info("Adding consumer cancellation callback")
         self._channel.add_on_cancel_callback(self.on_consumer_cancelled)
 
-        self.logger.info("Starting consumer")
+        if queue == self.QUEUE:
+            cb = self.on_message
+        elif queue == self.RPC_QUEUE:
+            cb = self.on_rpc_request
+
+        self.logger.info("Starting consumer. Queue: '%s'", queue)
         self._consumer_tag = self._channel.basic_consume(
-            queue=self.QUEUE,
-            on_message_callback=self.on_message,
+            queue=queue,
+            on_message_callback=cb,
         )
+
         self.was_consuming = True
         self._consuming = True
 
-    def on_consumer_cancelled(self, _unused_frame: str) -> None:
+    def on_consumer_cancelled(self, _unused_frame: Method) -> None:
         self.logger.info("Consumer was cancelled remotely")
         self._channel.close()
 
@@ -191,12 +228,38 @@ class ConnectionManager(metaclass=SingletonConnection):
     ) -> None:
         self.logger.debug("Received message")
         try:
-            self._handler.handle_message(body)  # type: ignore
+            self._handler.handle_message(body, properties.correlation_id)
             self._channel.basic_ack(delivery_tag=method.delivery_tag)
         except AttributeError as e:
             self.logger.error("Handler not set: %s", e)
         except Exception as e:
             self.logger.error("Error handling message: %s", e)
+
+    def on_rpc_request(
+        self,
+        _unused_channel: Channel,
+        method: Basic.Deliver,
+        properties: BasicProperties,
+        body: bytes,
+    ) -> None:
+        self.logger.debug("Received RPC request")
+        try:
+            response = self._handler.handle_rpc_request(
+                corr_id=properties.correlation_id,
+                request=body,
+            )
+
+            self._channel.basic_publish(
+                exchange=self.EXCHANGE,
+                routing_key=properties.reply_to,  # ??
+                properties=BasicProperties(correlation_id=properties.correlation_id),
+                body=response,
+            )
+            self._channel.basic_ack(delivery_tag=method.delivery_tag)
+        except AttributeError as e:
+            self.logger.error("Handler not set: %s", e)
+        except Exception as e:
+            self.logger.error("Error handling RPC request: %s", e)
 
     # ----------------------------------------
     def stop(self) -> None:
@@ -218,7 +281,7 @@ class ConnectionManager(metaclass=SingletonConnection):
                 callback=self.on_cancelok,
             )
 
-    def on_cancelok(self, _unused_frame: str) -> None:
+    def on_cancelok(self, _unused_frame: Method) -> None:
         self.logger.info("RabbitMQ acknowledged the cancellation")
         self._consuming = False
         self._channel.close()

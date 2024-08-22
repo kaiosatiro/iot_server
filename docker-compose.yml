@@ -9,7 +9,7 @@ x-environment: &default-environment
   ENVIRONMENT:
   ### Logs:
   LOG_LEVEL:
-  LOG_EXCHANGE:
+  LOGGING_EXCHANGE:
   LOG_QUEUE:
   RECEIVER_ID:
   HANDLER_ID:
@@ -20,12 +20,19 @@ x-environment: &default-environment
   RABBITMQ_USER:
   RABBITMQ_PASSWORD:
 
+x-common-environment-receiver-handler: &receiver_handler
+    MESSAGES_QUEUE:
+
 x-common-environment-userapi-receiver: &userapi_receiver
     PROJECT_NAME:
     DOMAIN:
     SECRET_KEY:
 
+x-common-environment-userapi-receiver-handler: &userapi_receiver_handler
+    HANDLER_EXCHANGE:
+
 x-common-environment-userapi_handler: &userapi_handler
+    RPC_QUEUE:
     ### Superuser
     FIRST_SUPERUSER_EMAIL:
     FIRST_SUPERUSERNAME:
@@ -36,10 +43,6 @@ x-common-environment-userapi_handler: &userapi_handler
     POSTGRES_USER:
     POSTGRES_PASSWORD:
     POSTGRES_DB:
-
-x-common-environment-receiver-handler: &receiver_handler
-    MESSAGES_EXCHANGE:
-    MESSAGES_QUEUE:
 
 
 services:
@@ -111,7 +114,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      <<: [*default-environment, *userapi_handler, *userapi_receiver]
+      <<: [*default-environment, *userapi_handler, *userapi_receiver, *userapi_receiver_handler]
       API_V1_STR:
       VERSION:
       USERS_OPEN_REGISTRATION:
@@ -142,7 +145,7 @@ services:
     ports:
       - "8100:8000"
     environment:
-      <<: [*default-environment, *userapi_receiver, *receiver_handler]
+      <<: [*default-environment, *userapi_receiver, *receiver_handler, *userapi_receiver_handler]
       RECEIVER_API_V1_STR:
       RECEIVER_VERSION:
     depends_on:
@@ -159,7 +162,7 @@ services:
       - default
       - internal_network
     environment:
-      <<: [*default-environment, *userapi_handler, *receiver_handler]
+      <<: [*default-environment, *userapi_handler, *receiver_handler, *userapi_receiver_handler]
     depends_on:
       rabbitmq:
         condition: service_healthy

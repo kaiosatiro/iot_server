@@ -58,3 +58,16 @@ class TestDB:
         }
         db.save_message(message, device_id)
         assert session.query(Message).count() == 1, "Message should be saved"
+
+    def test_add_device_to_cache(self, session: Session) -> None:
+        db = DB()
+        device_id = 123
+        db.add_device_to_cache(device_id)
+        assert device_id in db.active_devices, "Device should be added to cache"
+
+    def test_remove_device_from_cache(self, session: Session) -> None:
+        db = DB()
+        device_id = 123
+        db.active_devices.add(device_id)
+        db.remove_device_from_cache(device_id)
+        assert device_id not in db.active_devices, "Device should be removed from cache"

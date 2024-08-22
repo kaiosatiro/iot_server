@@ -26,22 +26,22 @@ class Settings(BaseSettings):
 
     RECEIVER_ID: str
 
-    MESSAGES_EXCHANGE: str
+    HANDLER_EXCHANGE: str
     MESSAGES_QUEUE: str
     MESSAGES_DECLARE_EXCHANGE: bool = True
 
     @computed_field  # type: ignore
     @property
     def MESSAGES_ROUTING_KEY(self) -> str:
-        return f"{self.MESSAGES_EXCHANGE}.{self.RECEIVER_ID}"
+        return f"{self.HANDLER_EXCHANGE}.{self.RECEIVER_ID}"
 
-    LOG_EXCHANGE: str
+    LOGGING_EXCHANGE: str
     LOG_QUEUE: str
 
     @computed_field  # type: ignore
     @property
     def LOG_ROUTING_KEY(self) -> str:
-        return f"{self.LOG_EXCHANGE}.{self.RECEIVER_ID}"
+        return f"{self.LOGGING_EXCHANGE}.{self.RECEIVER_ID}"
 
     ALGORITHM: str = "HS256"
 

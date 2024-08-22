@@ -12,29 +12,54 @@ class Message_Handler(Handler):
 
         self.logger.info("Message Handler initialized")
 
-    def handle_message(self, msg: str | bytes) -> None:
+    def handle_message(self, msg: str | bytes, corr_id: str) -> None:
         try:
             body = dict(
                 json.loads(msg.decode("utf-8") if isinstance(msg, bytes) else msg)
             )
             device_id = int(body["device_id"])
-            correlation_id = body["correlation_id"]
+
             self.logger.info(
                 "Handling message from device: %s",
                 device_id,
-                extra={"corrid": correlation_id},
+                extra={"corrid": corr_id},
             )
 
             if self.db.verify_device_id(device_id):
+                body.pop("device_id")
                 self.db.save_message(body, device_id)
-                self.logger.info("Message saved", extra={"corrid": correlation_id})
+                self.logger.info("Message saved", extra={"corrid": corr_id})
             else:
-                self.logger.warning(
-                    "Device ID not found", extra={"corrid": correlation_id}
-                )
+                self.logger.warning("Device ID not found", extra={"corrid": corr_id})
 
         except Exception as e:
             self.logger.error("Error handling message: %s", e)
+
+    def handle_rpc_request(self, corr_id: str, request: bytes) -> str:
+        self.logger.info("Handling RPC request from: %s", corr_id)
+        self.logger.debug("Request body: %s", request)
+        try:
+            body = dict(json.loads(request.decode("utf-8")))
+            if body["method"] == "add":
+                device_id = int(body["device_id"])
+                self.db.add_device_to_cache(device_id)
+                self.logger.info(
+                    "Device added to cache: %s", device_id, extra={"corrid": corr_id}
+                )
+
+            elif body["method"] == "remove":
+                device_id = int(body["device_id"])
+                self.db.remove_device_from_cache(device_id)
+                self.logger.info(
+                    "Device removed from cache: %s",
+                    device_id,
+                    extra={"corrid": corr_id},
+                )
+
+        except Exception as e:
+            self.logger.error("Error handling RPC request: %s", e)
+        finally:
+            return "ok"
 
     def close(self) -> None:
         self.db.close()

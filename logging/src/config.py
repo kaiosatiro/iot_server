@@ -46,13 +46,13 @@ class Settings(BaseSettings):
     RABBITMQ_USER: str = "guest"
     RABBITMQ_PASSWORD: str = "guest"
 
-    LOG_EXCHANGE: str
+    LOGGING_EXCHANGE: str
     LOG_QUEUE: str
 
     @computed_field  # type: ignore
     @property
     def LOG_ROUTING_KEY(self) -> str:
-        return f"{self.LOG_EXCHANGE}.*"
+        return f"{self.LOGGING_EXCHANGE}.*"
 
     RECEIVER_ID: str
     HANDLER_ID: str

@@ -17,24 +17,31 @@ class Settings(BaseSettings):
     RABBITMQ_USER: str = "guest"
     RABBITMQ_PASSWORD: str = "guest"
 
-    LOG_EXCHANGE: str
+    LOGGING_EXCHANGE: str
     LOG_QUEUE: str
 
     HANDLER_ID: str
 
-    MESSAGES_EXCHANGE: str
+    HANDLER_EXCHANGE: str
     MESSAGES_QUEUE: str
     MESSAGES_DECLARE_EXCHANGE: bool = True
+
+    RPC_QUEUE: str
 
     @computed_field  # type: ignore
     @property
     def LOG_ROUTING_KEY(self) -> str:
-        return f"{self.LOG_EXCHANGE}.{self.HANDLER_ID}"
+        return f"{self.LOGGING_EXCHANGE}.{self.HANDLER_ID}"
 
     @computed_field  # type: ignore
     @property
     def MESSAGES_ROUTING_KEY(self) -> str:
-        return f"{self.MESSAGES_EXCHANGE}.*"
+        return f"{self.HANDLER_EXCHANGE}.*"
+
+    @computed_field  # type: ignore
+    @property
+    def RPC_ROUTING_KEY(self) -> str:
+        return f"{self.HANDLER_EXCHANGE}.rpc"
 
     # Postgres Config
     POSTGRES_SERVER: str

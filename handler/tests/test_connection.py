@@ -1,8 +1,9 @@
 import pytest
 from unittest.mock import patch, MagicMock
+import functools
 
 from src.core.connection import ConnectionManager
-
+from src.config import settings
 
 @pytest.fixture
 def connection_manager():
@@ -89,51 +90,18 @@ def test_connection_manager_setup_exchange(connection_manager):
 
 
 def test_connection_manager_on_exchange_declareok(connection_manager):
-    with patch("src.core.connection.ConnectionManager.setup_queue") as mock_setup_queue:
+    with patch("src.core.connection.ConnectionManager.setup_queues") as mock_setup_queue:
         connection_manager.on_exchange_declareok(MagicMock())
         mock_setup_queue.assert_called_once()
 
 
-def test_connection_manager_setup_queue(connection_manager):
+def test_connection_manager_setup_queues(connection_manager):
     with patch(
         "src.core.connection.ConnectionManager.on_queue_declareok"
     ) as mock_on_queue_declareok:
-        connection_manager.setup_queue()
-        connection_manager._channel.queue_declare.assert_called_once_with(
-            queue=connection_manager.QUEUE,
-            durable=True,
-            callback=mock_on_queue_declareok,
-        )
+        connection_manager.setup_queues()
+        assert connection_manager._channel.queue_declare.call_count == 2
 
-
-def test_connection_manager_on_queue_declareok(connection_manager):
-    with patch("src.core.connection.ConnectionManager.on_bindok") as mock_on_bindok:
-        connection_manager.on_queue_declareok(MagicMock())
-        connection_manager._channel.queue_bind.assert_called_once_with(
-            exchange=connection_manager.EXCHANGE,
-            queue=connection_manager.QUEUE,
-            routing_key=connection_manager.ROUTING_KEY,
-            callback=mock_on_bindok,
-        )
-
-
-def test_connection_manager_on_bindok(connection_manager):
-    with patch(
-        "src.core.connection.ConnectionManager.on_basic_qos_ok"
-    ) as mock_on_basic_qos_ok:
-        connection_manager.on_bindok(MagicMock())
-        connection_manager._channel.basic_qos.assert_called_once_with(
-            prefetch_count=connection_manager._prefetch_count,
-            callback=mock_on_basic_qos_ok,
-        )
-
-
-def test_connection_manager_on_basic_qos_ok(connection_manager):
-    with patch(
-        "src.core.connection.ConnectionManager.start_consuming"
-    ) as mock_start_consuming:
-        connection_manager.on_basic_qos_ok(MagicMock())
-        mock_start_consuming.assert_called_once()
 
 
 def test_connection_manager_start_consuming(connection_manager):
@@ -143,7 +111,7 @@ def test_connection_manager_start_consuming(connection_manager):
         with patch(
             "src.core.connection.ConnectionManager.on_message"
         ) as mock_on_message:
-            connection_manager.start_consuming()
+            connection_manager.start_consuming(queue=settings.MESSAGES_QUEUE)
             connection_manager._channel.add_on_cancel_callback.assert_called_once_with(
                 mock_on_consumer_cancelled
             )

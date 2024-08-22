@@ -18,7 +18,7 @@ class TestMessagePublisher:
     def test_publish_message(self):
         message_channel = MessageChannel()
         message_channel._connection.publish = MagicMock()
-        message_channel.publish_message("Hello!")
+        message_channel.publish_message("Hello!", correlation_id="f9g80asd7fg", content_type="text/plain")
         message_channel._connection.publish.assert_called_once_with(
             message_channel._channel.basic_publish(
                 exchange=message_channel._exchange,

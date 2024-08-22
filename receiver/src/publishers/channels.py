@@ -98,7 +98,7 @@ class MessageChannel(ABSQueueChannel):
     def __init__(self) -> None:
         self._connection: manager.PublishingManager
         self._channel: Channel
-        self._exchange = settings.MESSAGES_EXCHANGE
+        self._exchange = settings.HANDLER_EXCHANGE
         self._queue = settings.MESSAGES_QUEUE
         self._routing_key = settings.MESSAGES_ROUTING_KEY
         self._declare_exchange = settings.MESSAGES_DECLARE_EXCHANGE
@@ -155,17 +155,23 @@ class MessageChannel(ABSQueueChannel):
         )
 
     def publish_message(
-        self, message: dict[Any, Any], content_type: str = "text/plain"
+        self,
+        message: dict[Any, Any],
+        correlation_id: str,
+        content_type: str,
     ) -> None:
         properties = pika.BasicProperties(
             app_id=settings.RECEIVER_ID,
             content_type=content_type,
             delivery_mode=2,
+            correlation_id=correlation_id,
         )
+
         body = json.dumps(message)
         self.logger.info(
             f"Publishing message to exchange {self._exchange} with routing key {self._routing_key}"
         )
+
         self._connection.publish(
             self._channel.basic_publish(
                 exchange=self._exchange,

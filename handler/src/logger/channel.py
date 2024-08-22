@@ -41,7 +41,7 @@ class LogChannel(Thread):
 
         self._connection: BlockingConnection = None
         self._channel: Channel = None
-        self._exchange = settings.LOG_EXCHANGE
+        self._exchange = settings.LOGGING_EXCHANGE
         self._queue = settings.LOG_QUEUE
         self._routing_key = settings.LOG_ROUTING_KEY
 

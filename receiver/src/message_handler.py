@@ -1,7 +1,6 @@
 import logging
 from typing import Annotated, Any
 
-import pika  # type: ignore
 from asgi_correlation_id import correlation_id
 from fastapi import Depends
 
@@ -21,7 +20,6 @@ class MessageHandler:
     def _create_headers(self, device_id: int) -> dict[Any, Any]:
         return {
             "device_id": device_id,
-            "correlation_id": correlation_id.get() or "",  # TODO: Maybe a setting key
         }
 
     def process_message(self, device_id: int, body: dict[Any, Any]) -> None:
@@ -29,13 +27,11 @@ class MessageHandler:
         try:
             headers = self._create_headers(device_id)
             body.update(headers)
-            self._channel.publish_message(body, content_type="application/json")
-        except pika.exceptions.ConnectionWrongStateError as e:
-            logger.error("Error publishing message: %s", e)
-        except pika.exceptions.ChannelWrongStateError as e:
-            logger.error("Error publishing message: %s", e)
-        except pika.exceptions.StreamLostError as e:
-            logger.error("Error publishing message: %s", e)
+            self._channel.publish_message(
+                body,
+                correlation_id=correlation_id.get() or "",
+                content_type="application/json",
+            )
         except AttributeError as e:
             logger.error("Error publishing message: %s", e)
         except Exception as e:
