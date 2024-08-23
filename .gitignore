@@ -1,4 +1,5 @@
 .del
+del
 .env
 logs/*
 .pytest_cache/

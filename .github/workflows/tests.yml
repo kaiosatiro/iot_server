@@ -76,21 +76,25 @@ jobs:
         run: |
           make compose-dev-d s="logging"
           docker compose exec -T logging bash tests-start.sh
+          docker compose stop logging
       
       - name: Tests - UserAPI service
         run: |
           make compose-dev-d s="userapi"
           docker compose exec -T userapi bash tests-start.sh
+          docker compose stop userapi
       
       - name: Tests - Receiver service
         run: |
           make compose-dev-d s="receiver"
           docker compose exec -T receiver bash tests-start.sh
+          docker compose stop receiver
       
       - name: Tests - Handler services # Need the user api for db migrations
         run: |
           make compose-dev-d s="handler"
           docker compose exec -T handler bash tests-start.sh
+          docker compose stop handler
       
       # Cleanup
       - name: Cleanup
