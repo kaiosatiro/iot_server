@@ -1,10 +1,9 @@
 import secrets
-from typing import Literal
+from typing import Literal, Self
 
 from pydantic import PostgresDsn, computed_field, model_validator
 from pydantic_core import MultiHostUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from typing_extensions import Self
 
 
 class Settings(BaseSettings):
@@ -73,10 +72,19 @@ class Settings(BaseSettings):
     LOG_QUEUE: str
     USERAPI_ID: str
 
+    # Rpc channel config
+    RPC_QUEUE: str
+    RPC_TIMEOUT: int = 3
+
     @computed_field  # type: ignore
     @property
     def LOG_ROUTING_KEY(self) -> str:
         return f"{self.LOGGING_EXCHANGE}.{self.USERAPI_ID}"
+
+    @computed_field  # type: ignore
+    @property
+    def RPC_ROUTING_KEY(self) -> str:
+        return self.RPC_QUEUE
 
     # Email Config
     SMTP_TLS: bool = True

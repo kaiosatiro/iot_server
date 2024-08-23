@@ -38,11 +38,6 @@ class Settings(BaseSettings):
     def MESSAGES_ROUTING_KEY(self) -> str:
         return f"{self.HANDLER_EXCHANGE}.*"
 
-    @computed_field  # type: ignore
-    @property
-    def RPC_ROUTING_KEY(self) -> str:
-        return f"{self.HANDLER_EXCHANGE}.rpc"
-
     # Postgres Config
     POSTGRES_SERVER: str
     POSTGRES_PORT: int = 5432

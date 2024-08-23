@@ -24,7 +24,6 @@ class ConnectionManager(metaclass=SingletonConnection):
     QUEUE = settings.MESSAGES_QUEUE
     ROUTING_KEY = settings.MESSAGES_ROUTING_KEY
     RPC_QUEUE = settings.RPC_QUEUE
-    RPC_ROUTING_KEY = settings.RPC_ROUTING_KEY
 
     def __init__(self, handler: Handler | None = None) -> None:
         self._connection: BaseConnection = None
@@ -153,20 +152,15 @@ class ConnectionManager(metaclass=SingletonConnection):
         )
 
         # Note to self. RPC queue for the handler load the new device id on its cache
-        #   I prefer to declare a queue instead of using the routing key, so the on_message function
-        #   doesn't need to be block. Futher it will be cached with redis I think
-        self.logger.info("Declaring queue '%s'", self.RPC_ROUTING_KEY)
+        #   I prefer to declare a queue instead of using just the routing key, so the on_message function
+        #   doesn't need to be used. Futher it will be cached with redis I think
+        self.logger.info("Declaring queue '%s'", self.RPC_QUEUE)
+
         rpc_cb = functools.partial(
-            self.on_queue_declareok,
-            sets={
-                "exchange": self.EXCHANGE,
-                "queue": self.RPC_QUEUE,
-                "routing_key": self.RPC_ROUTING_KEY,
-            },
-        )
+            self.start_consuming, queue=self.RPC_QUEUE
+        )  # No exchange declared
         self._channel.queue_declare(
             queue=self.RPC_QUEUE,
-            durable=True,
             callback=rpc_cb,
         )
 
@@ -197,7 +191,7 @@ class ConnectionManager(metaclass=SingletonConnection):
         self.start_consuming(queue=sets["queue"])
 
     # ----------------------------------------
-    def start_consuming(self, queue: str) -> None:
+    def start_consuming(self, _unused_frame: Method = None, queue: str = None) -> None:
         self.logger.info("Adding consumer cancellation callback")
         self._channel.add_on_cancel_callback(self.on_consumer_cancelled)
 
@@ -244,16 +238,18 @@ class ConnectionManager(metaclass=SingletonConnection):
     ) -> None:
         self.logger.debug("Received RPC request")
         try:
-            response = self._handler.handle_rpc_request(
+            response: str = self._handler.handle_rpc_request(
                 corr_id=properties.correlation_id,
                 request=body,
             )
 
             self._channel.basic_publish(
-                exchange=self.EXCHANGE,
-                routing_key=properties.reply_to,  # ??
-                properties=BasicProperties(correlation_id=properties.correlation_id),
-                body=response,
+                exchange="",
+                routing_key=properties.reply_to,
+                properties=BasicProperties(
+                    correlation_id=properties.correlation_id, content_type="text/bytes"
+                ),
+                body=response.encode(),
             )
             self._channel.basic_ack(delivery_tag=method.delivery_tag)
         except AttributeError as e:

@@ -1,6 +1,5 @@
 import logging
-
-from tenacity import after_log, before_log, retry, stop_after_attempt, wait_fixed
+from time import sleep
 
 from src.core.abs import Handler
 from src.core.connection import ConnectionManager
@@ -14,6 +13,7 @@ class Consumer:
     def __init__(self) -> None:
         self._handler: Handler = get_handler()
         self._connection: ConnectionManager = ConnectionManager(handler=self._handler)
+        self._reconnect_delay = 0
 
     def run(self) -> None:
         while True:
@@ -30,22 +30,19 @@ class Consumer:
                 self._connection.stop()
             self._maybe_reconnect()
 
-    def _maybe_reconnect(self) -> None:
+    def _maybe_reconnect(self):
         if self._connection.should_reconnect:
-            logger.warning("Reconnecting to RabbitMQ")
             self._connection.stop()
+            reconnect_delay = self._get_reconnect_delay()
+            logger.info("Reconnecting after %d seconds", reconnect_delay)
+            sleep(reconnect_delay)
+            self._connection = ConnectionManager(handler=self._handler)
 
-            max_tries = 60 * 5  # 5 minutes
-            wait_seconds = 5
-
-            @retry(
-                stop=stop_after_attempt(max_tries),
-                wait=wait_fixed(wait_seconds),
-                before=before_log(logger, logging.INFO),
-                after=after_log(logger, logging.WARN),
-            )
-            def reconnect_wrapper() -> None:
-                self._connection.run()
-
-            logger.warning("Reconnecting to RabbitMQ in %d seconds...", wait_seconds)
-            reconnect_wrapper()
+    def _get_reconnect_delay(self):
+        if self._connection.was_consuming:
+            self._reconnect_delay = 0
+        else:
+            self._reconnect_delay += 1
+        if self._reconnect_delay > 30:
+            self._reconnect_delay = 30
+        return self._reconnect_delay

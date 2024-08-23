@@ -1,8 +1,9 @@
 from src.core.config import settings
+from src.queue.channels import LogChannel
 
 LOG_CONFIG = {
     "version": 1,
-    "disable_existing_loggers": False,
+    "disable_existing_loggers": True,
     "filters": {
         "correlation_id": {
             "()": "asgi_correlation_id.CorrelationIdFilter",
@@ -20,22 +21,32 @@ LOG_CONFIG = {
         "stderr": {
             "class": "logging.StreamHandler",
             "level": "WARNING" if settings.ENVIRONMENT == "production" else "DEBUG",
-            # "filters": ["correlation_id"],
             "formatter": "simple",
             "stream": "ext://sys.stderr",
         },
+        # "queue": {
+        #     "class": "python_logging_rabbitmq.RabbitMQHandler",
+        #     "level": settings.LOG_LEVEL,
+        #     "host": settings.RABBITMQ_DNS,
+        #     "port": settings.RABBITMQ_PORT,
+        #     # "filters": ["correlation_id"],
+        #     "formatter": "simple",
+        #     "exchange": settings.LOGGING_EXCHANGE,
+        #     "routing_key_formatter": lambda key: settings.LOG_ROUTING_KEY,
+        #     "declare_exchange": True,
+        #     # "record_fields":['app', 'levelname', 'module', 'asctime', 'msg'],
+        #     # "fields":{'app': 'USERAPI'},
+        # },
         "queue": {
-            "class": "python_logging_rabbitmq.RabbitMQHandler",
+            "class": "src.logger.handler.LogHandler",
+            "channel": LogChannel(),
             "level": settings.LOG_LEVEL,
-            "host": settings.RABBITMQ_DNS,
-            "port": settings.RABBITMQ_PORT,
-            # "filters": ["correlation_id"],
             "formatter": "simple",
             "exchange": settings.LOGGING_EXCHANGE,
-            "routing_key_formatter": lambda key: settings.LOG_ROUTING_KEY,
+            "queue": settings.LOG_QUEUE,
+            "routing_key": settings.LOG_ROUTING_KEY,
+            "content_type": "text/bytes",
             "declare_exchange": True,
-            # "record_fields":['app', 'levelname', 'module', 'asctime', 'msg'],
-            # "fields":{'app': 'USERAPI'},
         },
         "queue_handler": {
             "class": "logging.handlers.QueueHandler",

@@ -1,11 +1,12 @@
 import logging
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, BackgroundTasks, HTTPException
 from pydantic import ValidationError
 from sqlmodel import func, select
 
 from src import crud
 from src.api import dependencies as deps
+from src.api.rpc import rpcCall
 from src.models import (
     DefaultResponseMessage,
     Device,
@@ -142,6 +143,8 @@ async def create_device(
     session: deps.SessionDep,
     device_in: DeviceCreation,
     current_user: deps.CurrentUser,
+    background_tasks: BackgroundTasks,
+    rpcCall: rpcCall,
 ) -> Device | HTTPException:
     """
     Create a new Device, **"name"** and **"site_id"** are required.
@@ -167,6 +170,10 @@ async def create_device(
     except ValidationError as e:
         logger.error(e)
         raise HTTPException(status_code=422, detail="Bad body format")
+
+    background_tasks.add_task(
+        rpcCall.add_device_handler_cache, device.id
+    )  # add to Handler service cache
 
     logger.info("Device %s created", device.id)
     return device
@@ -230,7 +237,12 @@ async def update_device(
     response_model=DefaultResponseMessage,
 )
 async def delete_device(
-    *, session: deps.SessionDep, device_id: int, current_user: deps.CurrentUser
+    *,
+    session: deps.SessionDep,
+    device_id: int,
+    current_user: deps.CurrentUser,
+    background_tasks: BackgroundTasks,
+    rpcCall: rpcCall,
 ) -> DefaultResponseMessage | HTTPException:
     """
     Delete a Device by its ID and **consequently** all its messages.
@@ -253,6 +265,10 @@ async def delete_device(
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
     crud.delete_device(db=session, device=device)
+
+    background_tasks.add_task(
+        rpcCall.remove_device_handler_cache, device_id
+    )  # remove from Handler service cache
 
     logger.info("Device %s deleted", device_id)
     return DefaultResponseMessage(message="Device deleted")

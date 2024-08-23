@@ -33,11 +33,13 @@ class Message_Handler(Handler):
                 self.logger.warning("Device ID not found", extra={"corrid": corr_id})
 
         except Exception as e:
-            self.logger.error("Error handling message: %s", e)
+            self.logger.error(
+                "Error handling message: %s", e, extra={"corrid": corr_id}
+            )
 
     def handle_rpc_request(self, corr_id: str, request: bytes) -> str:
-        self.logger.info("Handling RPC request from: %s", corr_id)
-        self.logger.debug("Request body: %s", request)
+        self.logger.info("Handling RPC request", extra={"corrid": corr_id})
+        self.logger.debug("Request body: %s", request, extra={"corrid": corr_id})
         try:
             body = dict(json.loads(request.decode("utf-8")))
             if body["method"] == "add":
@@ -57,7 +59,9 @@ class Message_Handler(Handler):
                 )
 
         except Exception as e:
-            self.logger.error("Error handling RPC request: %s", e)
+            self.logger.error(
+                "Error handling RPC request: %s", e, extra={"corrid": corr_id}
+            )
         finally:
             return "ok"
 

@@ -33,7 +33,7 @@ def send_email(
     email_to: str,
     subject: str = "",
     html_content: str = "",
-    email_object: EmailData = None,
+    email_object: EmailData | None = None,
 ) -> None:
     logger.info("Sending email function")
     if not settings.emails_enabled and settings.ENVIRONMENT != "dev":

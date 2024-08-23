@@ -12,7 +12,6 @@ from src.core.config import settings
 from src.errors import unhandled_exception_handler
 from src.logger.setup import setup_logging
 
-
 setup_logging()
 
 

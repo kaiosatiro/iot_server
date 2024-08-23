@@ -17,6 +17,17 @@ jobs:
   tests-handler:
     name: Tests Handler Service  # Need to be made after the userapi wich is the responsible for migrations
     uses: ./.github/workflows/test_handler.yml
+  
+  delete-previous-deployment:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: strumwolf/delete-deployment-environment@v2
+        with:
+          token: ${{ secrets.CLEAN_DEPLOYMENTS_TOKEN }}
+          environment: Test
+          ref: main
+          onlyRemoveDeployments: true
+            
     
 
   # # https://github.com/marketplace/actions/alls-green#why

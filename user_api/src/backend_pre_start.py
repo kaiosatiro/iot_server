@@ -1,14 +1,17 @@
 import logging
 
+from pika import (  # type: ignore
+    BlockingConnection,
+    ConnectionParameters,
+    PlainCredentials,
+)
 from sqlalchemy import Engine
 from sqlmodel import Session, select
 from tenacity import after_log, before_log, retry, stop_after_attempt, wait_fixed
-from pika import BlockingConnection, ConnectionParameters, PlainCredentials
 
 from src.core.config import settings
 from src.core.db import engine
 from src.logger.setup import setup_logging
-
 
 logger = logging.getLogger("Pre Start")
 
