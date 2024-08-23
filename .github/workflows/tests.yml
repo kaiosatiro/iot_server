@@ -20,11 +20,11 @@ jobs:
   
   delete-previous-deployment:
     runs-on: ubuntu-latest
+    environment: Test
     steps:
       - uses: strumwolf/delete-deployment-environment@v2
         with:
           token: ${{ secrets.CLEAN_DEPLOYMENTS_TOKEN }}
-          environment: Test
           ref: main
           onlyRemoveDeployments: true
             
