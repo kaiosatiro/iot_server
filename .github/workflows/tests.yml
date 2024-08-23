@@ -98,7 +98,7 @@ jobs:
           make compose-down-dev
       
   delete-previous-deployment:
-    needs: [tests-logging, tests-userapi, tests-receiver, tests-handler]
+    needs: tests
     runs-on: ubuntu-latest
     environment: Test
     steps:
