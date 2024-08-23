@@ -16,7 +16,7 @@ jobs:
       RABBITMQ_DNS: ${{ vars.RABBITMQ_DNS }}
 
       HANDLER_EXCHANGE: ${{ vars.HANDLER_EXCHANGE }}
-      MESSAGES_QUEUE: ${{ vars.HANDLER_EXCHANGE }}
+      MESSAGES_QUEUE: ${{ vars.MESSAGES_QUEUE }}
 
       LOG_INFO_LOCAL_PATH: ${{ vars.LOG_INFO_LOCAL_PATH }} # Need to add this so compose wont fail to bind volume
 

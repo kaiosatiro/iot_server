@@ -1,7 +1,7 @@
 import logging
 from logging import Formatter, LogRecord
 
-from src.queue.channels import LogChannel
+from src.queues.channels import LogChannel
 
 
 class LogHandler(logging.Handler):

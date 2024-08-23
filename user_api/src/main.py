@@ -10,9 +10,9 @@ import src.doc as doc
 from src.api.main import api_router
 from src.core.config import settings
 from src.errors import unhandled_exception_handler
-from src.logger.setup import setup_logging
+from src.logger.setup import setup_logging_config
 
-setup_logging()
+setup_logging_config()
 
 
 @asynccontextmanager

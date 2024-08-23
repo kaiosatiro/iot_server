@@ -5,7 +5,7 @@ from atexit import register as atexitregister
 from src.logger.config import LOG_CONFIG
 
 
-def setup_logging() -> None:
+def setup_logging_config() -> None:
     logging.config.dictConfig(LOG_CONFIG)
     logging.logThreads = False
     logging.logProcesses = False

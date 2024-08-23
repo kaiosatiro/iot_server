@@ -1,7 +1,7 @@
 # This tests need to run with a RabbitMQ server running
 import pytest
 
-from src.queue.channels import LogChannel, get_log_channel
+from src.queues.channels import LogChannel, get_log_channel
 
 
 class TestLogPublisher:

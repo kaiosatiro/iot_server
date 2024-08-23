@@ -11,9 +11,13 @@ from tenacity import after_log, before_log, retry, stop_after_attempt, wait_fixe
 
 from src.core.config import settings
 from src.core.db import engine
-from src.logger.setup import setup_logging
+from src.logger.setup import setup_logging_config
 
+handler = logging.StreamHandler()
 logger = logging.getLogger("Pre Start")
+logger.addHandler(handler)
+logger.propagate = False
+logger.setLevel(logging.INFO)
 
 max_tries = 60 * 5  # 5 minutes
 wait_seconds = 1
@@ -62,7 +66,7 @@ def init(db_engine: Engine) -> None:
 def main() -> None:
     logger.info("Initializing service | Testing QUEUE connection")
     connect()
-    setup_logging()
+    setup_logging_config()
     logger.info("Initializing service | Testing DB connection")
     init(engine)
 

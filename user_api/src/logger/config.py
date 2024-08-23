@@ -1,5 +1,5 @@
 from src.core.config import settings
-from src.queue.channels import LogChannel
+from src.queues.channels import LogChannel
 
 LOG_CONFIG = {
     "version": 1,
@@ -24,19 +24,6 @@ LOG_CONFIG = {
             "formatter": "simple",
             "stream": "ext://sys.stderr",
         },
-        # "queue": {
-        #     "class": "python_logging_rabbitmq.RabbitMQHandler",
-        #     "level": settings.LOG_LEVEL,
-        #     "host": settings.RABBITMQ_DNS,
-        #     "port": settings.RABBITMQ_PORT,
-        #     # "filters": ["correlation_id"],
-        #     "formatter": "simple",
-        #     "exchange": settings.LOGGING_EXCHANGE,
-        #     "routing_key_formatter": lambda key: settings.LOG_ROUTING_KEY,
-        #     "declare_exchange": True,
-        #     # "record_fields":['app', 'levelname', 'module', 'asctime', 'msg'],
-        #     # "fields":{'app': 'USERAPI'},
-        # },
         "queue": {
             "class": "src.logger.handler.LogHandler",
             "channel": LogChannel(),

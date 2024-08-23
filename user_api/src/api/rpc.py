@@ -3,7 +3,7 @@ from typing import Annotated
 from asgi_correlation_id import correlation_id
 from fastapi import Depends
 
-from src.queue.channels import RpcChannel
+from src.queues.channels import RpcChannel
 
 
 class RpcHandler:

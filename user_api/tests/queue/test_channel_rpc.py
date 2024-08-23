@@ -1,10 +1,10 @@
 import unittest
 from unittest.mock import patch, MagicMock
-from src.queue.channels import RpcChannel
+from src.queues.channels import RpcChannel
 
 
 class TestRpcChannel(unittest.TestCase):
-    @patch('src.queue.manager.get_queue_access')
+    @patch('src.queues.manager.get_queue_access')
     @patch('src.core.config.settings')
     def setUp(self, mock_settings, mock_get_queue_access):
         self.mock_settings = mock_settings
