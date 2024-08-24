@@ -15,7 +15,7 @@ from src.config import settings
 logger = logging.getLogger(__name__)
 
 
-class LogChannel(Thread):
+class LogConnection(Thread):
     _instances = {}  # type: ignore
     _lock: Lock = Lock()
 
@@ -140,5 +140,5 @@ class LogChannel(Thread):
         self._connection.add_callback_threadsafe(lambda: self._publish(message))
 
 
-def get_channel() -> LogChannel:
-    return LogChannel()
+def get_channel() -> LogConnection:
+    return LogConnection()

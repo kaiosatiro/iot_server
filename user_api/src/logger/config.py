@@ -1,6 +1,7 @@
 from src.core.config import settings
 from src.queues.channels import LogChannel
 
+
 LOG_CONFIG = {
     "version": 1,
     "disable_existing_loggers": True,
@@ -29,11 +30,6 @@ LOG_CONFIG = {
             "channel": LogChannel(),
             "level": settings.LOG_LEVEL,
             "formatter": "simple",
-            "exchange": settings.LOGGING_EXCHANGE,
-            "queue": settings.LOG_QUEUE,
-            "routing_key": settings.LOG_ROUTING_KEY,
-            "content_type": "text/bytes",
-            "declare_exchange": True,
         },
         "queue_handler": {
             "class": "logging.handlers.QueueHandler",

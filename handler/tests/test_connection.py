@@ -1,9 +1,9 @@
 import pytest
 from unittest.mock import patch, MagicMock
-import functools
 
-from src.core.connection import ConnectionManager
+from src.queues.consumer_connection import ConnectionManager
 from src.config import settings
+
 
 @pytest.fixture
 def connection_manager():
@@ -12,7 +12,9 @@ def connection_manager():
 
 @pytest.mark.skip
 def test_connection_manager_connect(connection_manager):
-    with patch("src.core.connection.SelectConnection") as mock_select_connection:
+    with patch(
+        "src.queues.consumer_connection.SelectConnection"
+    ) as mock_select_connection:
         connection_manager.connect()
         mock_select_connection.assert_called_once_with(
             connection_manager.parameters,
@@ -24,20 +26,24 @@ def test_connection_manager_connect(connection_manager):
 
 def test_connection_manager_on_connection_open(connection_manager):
     with patch(
-        "src.core.connection.ConnectionManager.open_channel"
+        "src.queues.consumer_connection.ConnectionManager.open_channel"
     ) as mock_open_channel:
         connection_manager.on_connection_open(MagicMock())
         mock_open_channel.assert_called_once()
 
 
 def test_connection_manager_on_connection_open_error(connection_manager):
-    with patch("src.core.connection.ConnectionManager.reconnect") as mock_reconnect:
+    with patch(
+        "src.queues.consumer_connection.ConnectionManager.reconnect"
+    ) as mock_reconnect:
         connection_manager.on_connection_open_error(MagicMock(), Exception())
         mock_reconnect.assert_called_once()
 
 
 def test_connection_manager_on_connection_closed(connection_manager):
-    with patch("src.core.connection.ConnectionManager.reconnect") as mock_reconnect:
+    with patch(
+        "src.queues.consumer_connection.ConnectionManager.reconnect"
+    ) as mock_reconnect:
         connection_manager.on_connection_closed(MagicMock(), Exception())
         mock_reconnect.assert_called_once()
 
@@ -52,7 +58,7 @@ def test_connection_manager_reconnect(connection_manager):
 @pytest.mark.skip
 def test_connection_manager_open_channel(connection_manager):
     with patch(
-        "src.core.connection.ConnectionManager.on_channel_open"
+        "src.queues.consumer_connection.ConnectionManager.on_channel_open"
     ) as mock_on_channel_open:
         connection_manager.open_channel()
         connection_manager._connection.channel.assert_called_once_with(
@@ -62,7 +68,7 @@ def test_connection_manager_open_channel(connection_manager):
 
 def test_connection_manager_on_channel_open(connection_manager):
     with patch(
-        "src.core.connection.ConnectionManager.setup_exchange"
+        "src.queues.consumer_connection.ConnectionManager.setup_exchange"
     ) as mock_setup_exchange:
         connection_manager.on_channel_open(MagicMock())
         mock_setup_exchange.assert_called_once()
@@ -70,7 +76,7 @@ def test_connection_manager_on_channel_open(connection_manager):
 
 def test_connection_manager_on_channel_closed(connection_manager):
     with patch(
-        "src.core.connection.ConnectionManager.close_connection"
+        "src.queues.consumer_connection.ConnectionManager.close_connection"
     ) as mock_close_connection:
         connection_manager.on_channel_closed(MagicMock(), Exception())
         mock_close_connection.assert_called_once()
@@ -78,7 +84,7 @@ def test_connection_manager_on_channel_closed(connection_manager):
 
 def test_connection_manager_setup_exchange(connection_manager):
     with patch(
-        "src.core.connection.ConnectionManager.on_exchange_declareok"
+        "src.queues.consumer_connection.ConnectionManager.on_exchange_declareok"
     ) as mock_on_exchange_declareok:
         connection_manager.setup_exchange()
         connection_manager._channel.exchange_declare.assert_called_once_with(
@@ -90,26 +96,27 @@ def test_connection_manager_setup_exchange(connection_manager):
 
 
 def test_connection_manager_on_exchange_declareok(connection_manager):
-    with patch("src.core.connection.ConnectionManager.setup_queues") as mock_setup_queue:
+    with patch(
+        "src.queues.consumer_connection.ConnectionManager.setup_queues"
+    ) as mock_setup_queue:
         connection_manager.on_exchange_declareok(MagicMock())
         mock_setup_queue.assert_called_once()
 
 
 def test_connection_manager_setup_queues(connection_manager):
     with patch(
-        "src.core.connection.ConnectionManager.on_queue_declareok"
+        "src.queues.consumer_connection.ConnectionManager.on_queue_declareok"
     ) as mock_on_queue_declareok:
         connection_manager.setup_queues()
         assert connection_manager._channel.queue_declare.call_count == 2
 
 
-
 def test_connection_manager_start_consuming(connection_manager):
     with patch(
-        "src.core.connection.ConnectionManager.on_consumer_cancelled"
+        "src.queues.consumer_connection.ConnectionManager.on_consumer_cancelled"
     ) as mock_on_consumer_cancelled:
         with patch(
-            "src.core.connection.ConnectionManager.on_message"
+            "src.queues.consumer_connection.ConnectionManager.on_message"
         ) as mock_on_message:
             connection_manager.start_consuming(queue=settings.MESSAGES_QUEUE)
             connection_manager._channel.add_on_cancel_callback.assert_called_once_with(
@@ -124,7 +131,7 @@ def test_connection_manager_start_consuming(connection_manager):
 @pytest.mark.skip
 def test_connection_manager_on_consumer_cancelled(connection_manager):
     with patch(
-        "src.core.connection.ConnectionManager.close_connection"
+        "src.queues.consumer_connection.ConnectionManager.close_connection"
     ) as mock_close_connection:
         connection_manager.on_consumer_cancelled(MagicMock())
         mock_close_connection.assert_called_once()
@@ -132,7 +139,9 @@ def test_connection_manager_on_consumer_cancelled(connection_manager):
 
 @pytest.mark.skip
 def test_connection_manager_on_message(connection_manager):
-    with patch("src.core.connection.ConnectionManager.logger") as mock_logger:
+    with patch(
+        "src.queues.consumer_connection.ConnectionManager.logger"
+    ) as mock_logger:
         connection_manager.on_message(
             MagicMock(), MagicMock(), MagicMock(), MagicMock()
         )
@@ -153,7 +162,9 @@ def test_connection_manager_stop(connection_manager):
 
 
 def test_connection_manager_stop_consuming(connection_manager):
-    with patch("src.core.connection.ConnectionManager.on_cancelok") as mock_on_cancelok:
+    with patch(
+        "src.queues.consumer_connection.ConnectionManager.on_cancelok"
+    ) as mock_on_cancelok:
         connection_manager.stop_consuming()
         connection_manager._channel.basic_cancel.assert_called_once_with(
             connection_manager._consumer_tag,

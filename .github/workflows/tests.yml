@@ -90,46 +90,14 @@ jobs:
           docker compose exec -T receiver bash tests-start.sh
           docker compose stop receiver
       
-      - name: Tests - Handler services # Need the user api for db migrations
+      - name: Tests - Handler services # Need to be after userapi for db migrations
         run: |
           make compose-dev-d s="handler"
           docker compose exec -T handler bash tests-start.sh
           docker compose stop handler
-      
-      # Cleanup
-      - name: Cleanup
-        run: |
-          make compose-down-dev
-      
-  delete-previous-deployment:
-    needs: tests
-    runs-on: ubuntu-latest
-    environment: Test
-    steps:
-      - uses: strumwolf/delete-deployment-environment@v2
-        with:
-          token: ${{ secrets.CLEAN_DEPLOYMENTS_TOKEN }}
-          ref: main
-          onlyRemoveDeployments: true
-            
-  # tests-logging:
-  #   name: Tests Logging Service
-  #   uses: ./.github/workflows/test_logging.yml
-  
-  # tests-userapi:
-  #   name: Tests User API Service
-  #   uses: ./.github/workflows/test_userapi.yml
-  
-  # tests-receiver:
-  #   name: Tests Receiver Service
-  #   uses: ./.github/workflows/test_receiver.yml
-  
-  # tests-handler:
-  #   name: Tests Handler Service  # Need to be made after the userapi wich is the responsible for migrations
-  #   uses: ./.github/workflows/test_handler.yml
   
   # delete-previous-deployment:
-  #   needs: [tests-logging, tests-userapi, tests-receiver, tests-handler]
+  #   needs: tests
   #   runs-on: ubuntu-latest
   #   environment: Test
   #   steps:

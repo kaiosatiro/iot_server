@@ -4,7 +4,7 @@ from typing import Annotated, Any
 from asgi_correlation_id import correlation_id
 from fastapi import Depends
 
-from src.publishers.channels import MessageChannel, get_message_channel
+from src.queues.channels import MessageChannel, get_message_channel
 
 logger = logging.getLogger("MessageHandler")
 
@@ -27,7 +27,7 @@ class MessageHandler:
         try:
             headers = self._create_headers(device_id)
             body.update(headers)
-            self._channel.publish_message(
+            self._channel.publish(
                 body,
                 correlation_id=correlation_id.get() or "",
                 content_type="application/json",

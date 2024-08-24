@@ -69,8 +69,3 @@ class ABSQueueChannel(ABC, Channel, metaclass=SingletonMetaChannel):  # type: ig
 
     @abstractmethod
     def status(self) -> bool: ...
-
-    @abstractmethod
-    def configure(
-        self, exchange: str, queue: str, routing_key: str, declare_exchange: bool
-    ) -> None: ...

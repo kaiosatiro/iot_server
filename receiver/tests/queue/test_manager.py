@@ -1,7 +1,7 @@
 # This tests need to run with a RabbitMQ server running
 import pytest
 
-from src.publishers.manager import PublishingManager
+from src.queues.manager import PublishingManager
 
 
 class TestPublisherManager:

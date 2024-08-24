@@ -14,9 +14,6 @@ from pika.spec import Basic  # type: ignore
 
 from src.config import settings
 from src.core.abs import HandlerABC, SingletonConnection
-from src.logger.setup import setup_logging
-
-setup_logging()
 
 
 class ConnectionManager(metaclass=SingletonConnection):

@@ -6,41 +6,24 @@ from typing import Any
 import pika  # type: ignore
 from pika.channel import Channel  # type: ignore
 
-import src.publishers.manager as manager
 from src.config import settings
-from src.publishers.abs import ABSQueueChannel  # ABSQueueConnectionManager
+from src.queues.abs import ABSQueueChannel  # ABSQueueConnectionManager
+from src.queues.manager import PublishingManager, get_queue_access
 
 
 class LogChannel(ABSQueueChannel):
     def __init__(self) -> None:
-        self._connection: manager.PublishingManager
+        self._connection: PublishingManager
         self._channel: Channel
-        self._exchange: str
-        self._queue = ""
-        self._routing_key = ""
-        self._declare_exchange = False
+        self._exchange: str = settings.LOGGING_EXCHANGE
+        self._queue: str = settings.LOG_QUEUE
+        self._routing_key: str = settings.LOG_ROUTING_KEY
 
     def connect(self) -> None:
-        self._connection = manager.get_queue_access()
+        self._connection = get_queue_access()
         sleep(1)
         self._channel = self._connection.open_channel(tag=self.__class__.__name__)
         sleep(1)
-
-    def configure(
-        self,
-        exchange: str,
-        queue: str | None = None,
-        routing_key: str | None = None,
-        declare_exchange: bool = False,
-    ) -> None:
-        # Configure the exchange, queue, and routing key, setup if _declare_exchange is True
-        self._exchange = exchange
-        self._queue = queue if queue else ""
-        self._routing_key = routing_key if routing_key else "log"
-        self._declare_exchange = declare_exchange
-
-        if self._declare_exchange and self.status():
-            self.setup()
 
     def status(self) -> bool:
         try:
@@ -73,7 +56,7 @@ class LogChannel(ABSQueueChannel):
             routing_key=self._routing_key,
         )
 
-    def publish_message(self, message: str, content_type: str = "text/plain") -> None:
+    def publish(self, message: str, content_type: str = "text/plain") -> None:
         properties = pika.BasicProperties(
             app_id=settings.RECEIVER_ID,
             content_type=content_type,  # TODO: ADD to self
@@ -96,7 +79,7 @@ def get_log_channel() -> LogChannel:
 
 class MessageChannel(ABSQueueChannel):
     def __init__(self) -> None:
-        self._connection: manager.PublishingManager
+        self._connection: PublishingManager
         self._channel: Channel
         self._exchange = settings.HANDLER_EXCHANGE
         self._queue = settings.MESSAGES_QUEUE
@@ -111,7 +94,7 @@ class MessageChannel(ABSQueueChannel):
 
     def connect(self) -> None:
         self.logger.info("Connecting to Queue")
-        self._connection = manager.get_queue_access()
+        self._connection = get_queue_access()
         sleep(1)
 
         self.logger.info("Opening Channel")
@@ -154,7 +137,7 @@ class MessageChannel(ABSQueueChannel):
             routing_key=self._routing_key,
         )
 
-    def publish_message(
+    def publish(
         self,
         message: dict[Any, Any],
         correlation_id: str,
@@ -182,22 +165,6 @@ class MessageChannel(ABSQueueChannel):
             )
         )
         self.logger.info("Message processed")
-
-    def configure(
-        self,
-        exchange: str,
-        queue: str | None = None,
-        routing_key: str | None = None,
-        declare_exchange: bool = False,
-    ) -> None:
-        # Configure the exchange, queue, and routing key, setup if _declare_exchange is True
-        self._exchange = exchange
-        self._queue = queue if queue else ""
-        self._routing_key = routing_key if routing_key else "log"
-        self._declare_exchange = declare_exchange
-
-        if self._declare_exchange and self.status():
-            self.setup()
 
 
 def get_message_channel() -> MessageChannel:

@@ -191,7 +191,9 @@ class ConnectionManager(metaclass=SingletonConnection):
         self.start_consuming(queue=sets["queue"])
 
     # ----------------------------------------
-    def start_consuming(self, _unused_frame: Method = None, queue: str = None) -> None:
+    def start_consuming(
+        self, _unused_frame: Method | None = None, queue: str | None = None
+    ) -> None:
         self.logger.info("Adding consumer cancellation callback")
         self._channel.add_on_cancel_callback(self.on_consumer_cancelled)
 

@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     LOG_FILE_BACKUP_COUNT: int = 5
 
     REMOTE_LOG_HANDLER_NAME: str = "remoteSysLog"
+
     REMOTE_LOG_LEVEL: str = "WARNING"
     REMOTE_LOG_ADDRESS: str | None = None
     REMOTE_LOG_PORT: int | None = None

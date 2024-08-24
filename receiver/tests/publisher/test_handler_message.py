@@ -1,6 +1,6 @@
 from unittest.mock import Mock
 
-from src.publishers.channels import MessageChannel
+from src.queues.channels import MessageChannel
 from src.message_handler import MessageHandler
 
 
@@ -10,7 +10,7 @@ class TestMessageHandler:
         message_handler._channel = Mock(spec=MessageChannel)
         message_handler.process_message(1, {"message": "Hello!"})
 
-        message_handler._channel.publish_message.assert_called_with(
+        message_handler._channel.publish.assert_called_with(
             {'message': 'Hello!', 'device_id': 1},
             correlation_id='',
             content_type='application/json'

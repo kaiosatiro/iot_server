@@ -1,5 +1,5 @@
 from src.config import settings
-from src.logger.channel import LogChannel
+from src.queues.log_connection import LogConnection
 
 
 LOG_CONFIG = {
@@ -8,7 +8,7 @@ LOG_CONFIG = {
     "filters": {
         "correlation_id": {
             "()": "src.logger.filter_cid.CorrelationIdFilter",
-            "corrid_length": 8 if settings.ENVIRONMENT == "dev" else 32,
+            "uuid_length": 8 if settings.ENVIRONMENT == "dev" else 32,
             "default_value": "-",
         },
     },
@@ -27,7 +27,7 @@ LOG_CONFIG = {
         },
         "queue": {
             "class": "src.logger.handler.LogHandler",
-            "channel": LogChannel(),
+            "channel": LogConnection(),
             "level": settings.LOG_LEVEL,
             "formatter": "simple",
         },

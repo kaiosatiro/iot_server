@@ -2,7 +2,7 @@ import logging
 from time import sleep
 
 from src.core.abs import Handler
-from src.core.connection import ConnectionManager
+from src.queues.consumer_connection import ConnectionManager
 from src.core.message_handlers import get_handler
 
 

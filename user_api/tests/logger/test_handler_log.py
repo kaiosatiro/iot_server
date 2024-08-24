@@ -16,11 +16,6 @@ class TestLogHandlerB:
             channel=self.channel,
             level=logging.NOTSET,
             formatter=None,
-            exchange='logs',
-            queue='logs',
-            routing_key=None,
-            content_type='text/plain',
-            declare_exchange=True
         )
 
     def test_emit_calls_setup_channel_if_channel_not_ready(self):

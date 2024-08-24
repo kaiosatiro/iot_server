@@ -21,7 +21,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install flake8
 
-      - name: Lint flake8
+      - name: Lint
         run: |
           # echo "Running linteron Logging"
           flake8 logging/src --count --max-complexity=10 --max-line-length=150 --statistics

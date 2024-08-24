@@ -1,13 +1,13 @@
 import logging
 from logging import Formatter, LogRecord
 
-from src.logger.channel import LogChannel
+from src.queues.log_connection import LogConnection
 
 
 class LogHandler(logging.Handler):
     def __init__(
         self,
-        channel: LogChannel,
+        channel: LogConnection,
         level: int = logging.NOTSET,
         formatter: Formatter | None = None,
     ):
@@ -38,7 +38,7 @@ class LogHandler(logging.Handler):
 
         self.channel.connect()
         self.channel_ready = self.channel.status()
-        self.channel.start()
+        self.channel.start()  # In this service, we call this method start() instead of setup()
 
         logger.info("Handler Channel Ready")
 

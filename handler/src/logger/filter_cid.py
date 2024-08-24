@@ -15,11 +15,11 @@ class CorrelationIdFilter(Filter):
     def __init__(
         self,
         name: str = "",
-        corrid_length: Optional[int] = None,
+        uuid_length: Optional[int] = None,
         default_value: Optional[str] = None,
     ):
         super().__init__(name=name)
-        self.corrid_length = corrid_length
+        self.corrid_length = uuid_length
         self.default_value = default_value
 
     def filter(self, record: "LogRecord") -> bool:

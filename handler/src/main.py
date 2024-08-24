@@ -1,4 +1,3 @@
-# Description: Main entry point for the logging service
 import logging.config
 import logging.handlers
 

@@ -2,14 +2,14 @@ import logging
 import pytest
 from unittest.mock import MagicMock
 
-from src.logger.channel import LogChannel
+from src.queues.log_connection import LogConnection
 from src.logger.handler import LogHandler
 
 
 class TestLogHandler:
     @pytest.fixture(autouse=True)
     def setup(self):
-        self.channel = MagicMock(spec=LogChannel)
+        self.channel = MagicMock(spec=LogConnection)
         self.handler = LogHandler(channel=self.channel)
 
     def test_setup_channel(self):
