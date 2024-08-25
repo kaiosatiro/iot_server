@@ -2,7 +2,13 @@
 
 compose-prod:
 	@echo "Starting production environment..."
-	docker compose -f docker-compose.yml up --build -d
+	docker compose -f docker-compose.yml up rabbitmq --build -d
+	docker compose -f docker-compose.yml up db --build -d
+	docker compose -f docker-compose.yml up adminer --build -d
+	docker compose -f docker-compose.yml up logging --build -d
+	docker compose -f docker-compose.yml up userapi --build -d
+	docker compose -f docker-compose.yml up receiver --build -d
+	docker compose -f docker-compose.yml up handler --build -d
 
 compose-dev-d:
 	@echo "Starting development/test environment..."

@@ -20,103 +20,136 @@ jobs:
 
 
   #Deploy to staging
-  # deploy:
-  #   needs: tests
-  #   runs-on: ubuntu-latest
-  #   environment: staging
-  #   steps:
-  #     - name: Test
-  #       run: echo "Testing..."
+  deploy:
+    needs: tests
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - name: Test
+        run: echo "Testing..."
 
-  #     - name: Configure SSH
-  #       env:
-  #         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-  #         SSH_HOST: ${{ secrets.SSH_HOST }}
-  #         SSH_USER: ${{ secrets.SSH_USER }}
-  #       run: |
-  #         mkdir -p ~/.ssh
-  #         echo "$SSH_PRIVATE_KEY" > ~/.ssh/github
-  #         chmod 600 ~/.ssh/github
-  #         echo "SSH_HOST: '$SSH_HOST'"
-  #         echo "SSH_USER: '$SSH_USER'"
-  #         cat >> ~/.ssh/config << END
-  #         Host Target
-  #           HostName $SSH_HOST
-  #           User $SSH_USER
-  #           IdentityFile ~/.ssh/github
-  #           LogLevel ERROR
-  #           StrictHostKeyChecking no
-  #         END
+      - name: Configure SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/github
+          chmod 600 ~/.ssh/github
+          echo "SSH_HOST: '$SSH_HOST'"
+          echo "SSH_USER: '$SSH_USER'"
+          cat >> ~/.ssh/config << END
+          Host Target
+            HostName $SSH_HOST
+            User $SSH_USER
+            IdentityFile ~/.ssh/github
+            LogLevel ERROR
+            StrictHostKeyChecking no
+          END
 
-  #     - name: Create env file
-  #       id: create-env
-  #       env:
-  #         SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      - name: Create env file
+        id: create-env
+        env:
+          # General
+          ENVIRONMENT: ${{ vars.ENVIRONMENT }}
+          ### Logs:
+          LOG_LEVEL: ${{ vars.LOG_LEVEL }}
+          LOGGING_EXCHANGE: ${{ vars.LOGGING_EXCHANGE }}
+          LOG_QUEUE: ${{ vars.LOG_QUEUE }}
+          RECEIVER_ID: ${{ vars.RECEIVER_ID }}
+          HANDLER_ID: ${{ vars.HANDLER_ID }}
+          USERAPI_ID: ${{ vars.USERAPI_ID }}
+          ### Queue:
+          RABBITMQ_DNS: ${{ vars.RABBITMQ_DNS }}
+          RABBITMQ_PORT: ${{ vars.RABBITMQ_PORT }}
+          RABBITMQ_USER: ${{ vars.RABBITMQ_USER }}
+          RABBITMQ_PASSWORD: ${{ secrets.RABBITMQ_PASSWORD }}
 
-  #         ENVIRONMENT: ${{ vars.ENVIRONMENT }}
-  #         LOG_INFO_LOCAL_PATH: ${{ vars.LOG_INFO_LOCAL_PATH }}
-  #         LOG_LEVEL: ${{ vars.LOG_LEVEL }}
+          #Logging
+          LOG_INFO_LOCAL_PATH: ${{ vars.LOG_INFO_LOCAL_PATH }}
+          LOG_FILE_MAX_SIZE: ${{ vars.LOG_FILE_MAX_SIZE }}
+          LOG_FILE_BACKUP_COUNT: ${{ vars.LOG_FILE_BACKUP_COUNT }}
+          # Receiver
+          RECEIVER_API_V1_STR: ${{ vars.RECEIVER_API_V1_STR }}
+          # Userapi
+          API_V1_STR: ${{ vars.API_V1_STR }}
+          USERS_OPEN_REGISTRATION: ${{ vars.USERS_OPEN_REGISTRATION }}
+          SMTP_PORT: ${{ vars.SMTP_PORT }}
+          SMTP_HOST: ${{ vars.SMTP_HOST }}
+          SMTP_USER: ${{ vars.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          EMAILS_FROM_EMAIL: ${{ vars.EMAILS_FROM_EMAIL }}
+          EMAILS_FROM_NAME: ${{ vars.EMAILS_FROM_NAME }}
 
-  #         PROJECT_NAME: ${{ vars.PROJECT_NAME }}
-  #         DOMAIN: ${{ vars.DOMAIN }}
-  #         API_V1_STR: ${{ vars.API_V1_STR }}
-  #         VERSION: ${{ vars.VERSION }}
-  #         USERS_OPEN_REGISTRATION: ${{ vars.USERS_OPEN_REGISTRATION }}
+          # Receiver | Handler
+          HANDLER_EXCHANGE: ${{ vars.HANDLER_EXCHANGE }}
+          MESSAGES_QUEUE: ${{ vars.MESSAGES_QUEUE }}
 
-  #         RABBITMQ_DNS: ${{ vars.RABBITMQ_DNS }}
-  #         POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
-  #         POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-  #         POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-  #         POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          # Userapi | Receiver
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          PROJECT_NAME: ${{ vars.PROJECT_NAME }}
+          DOMAIN: ${{ vars.DOMAIN }}
 
-  #         FIRST_SUPERUSERNAME: ${{ secrets.FIRST_SUPERUSERNAME }}
-  #         FIRST_SUPERUSER_EMAIL: ${{ secrets.FIRST_SUPERUSER_EMAIL }}
-  #         FIRST_SUPERUSER_PASSWORD: ${{ secrets.FIRST_SUPERUSER_PASSWORD }}
+          # Userapi | Handler
+          RPC_QUEUE: ${{ vars.RPC_QUEUE }}
+          ### Superuser
+          FIRST_SUPERUSER_EMAIL: ${{ vars.FIRST_SUPERUSER_EMAIL }}
+          FIRST_SUPERUSERNAME: ${{ vars.FIRST_SUPERUSERNAME }}
+          FIRST_SUPERUSER_PASSWORD: ${{ secrets.FIRST_SUPERUSER_PASSWORD }}
+          ### DB
+          POSTGRES_PORT: ${{ vars.POSTGRES_PORT }}
+          POSTGRES_USER: ${{ vars.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ vars.POSTGRES_DB }}
 
-  #         SMTP_PORT: ${{ vars.SMTP_PORT }}
-  #         SMTP_HOST: ${{ vars.SMTP_HOST }}
-  #         SMTP_USER: ${{ vars.SMTP_USER }}
-  #         SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
-  #         EMAILS_FROM_EMAIL: ${{ secrets.EMAILS_FROM_EMAIL }}
-  #         EMAILS_FROM_NAME: ${{ vars.EMAILS_FROM_NAME }}
+        run: |
+          echo ENVIRONMENT=$ENVIRONMENT >> .env
+          echo LOG_LEVEL=$LOG_LEVEL >> .env
+          echo LOGGING_EXCHANGE=$LOGGING_EXCHANGE >> .env
+          echo LOG_QUEUE=$LOG_QUEUE >> .env
+          echo RECEIVER_ID=$RECEIVER_ID >> .env
+          echo HANDLER_ID=$HANDLER_ID >> .env
+          echo USERAPI_ID=$USERAPI_ID >> .env
+          echo RABBITMQ_DNS=$RABBITMQ_DNS >> .env
+          echo RABBITMQ_PORT=$RABBITMQ_PORT >> .env
+          echo RABBITMQ_USER=$RABBITMQ_USER >> .env
+          echo RABBITMQ_PASSWORD=$RABBITMQ_PASSWORD >> .env
+          echo LOG_INFO_LOCAL_PATH=$LOG_INFO_LOCAL_PATH >> .env
+          echo LOG_FILE_MAX_SIZE=$LOG_FILE_MAX_SIZE >> .env
+          echo LOG_FILE_BACKUP_COUNT=$LOG_FILE_BACKUP_COUNT >> .env
+          echo RECEIVER_API_V1_STR=$RECEIVER_API_V1_STR >> .env
+          echo API_V1_STR=$API_V1_STR >> .env
+          echo USERS_OPEN_REGISTRATION=$USERS_OPEN_REGISTRATION >> .env
+          echo SMTP_PORT=$SMTP_PORT >> .env
+          echo SMTP_HOST=$SMTP_HOST >> .env
+          echo SMTP_USER=$SMTP_USER >> .env
+          echo SMTP_PASSWORD=$SMTP_PASSWORD >> .env
+          echo EMAILS_FROM_EMAIL=$EMAILS_FROM_EMAIL >> .env
+          echo EMAILS_FROM_NAME=$EMAILS_FROM_NAME >> .env
+          echo HANDLER_EXCHANGE=$HANDLER_EXCHANGE >> .env
+          echo MESSAGES_QUEUE=$MESSAGES_QUEUE >> .env
+          echo SECRET_KEY=$SECRET_KEY >> .env
+          echo PROJECT_NAME=$PROJECT_NAME >> .env
+          echo DOMAIN=$DOMAIN >> .env
+          echo RPC_QUEUE=$RPC_QUEUE >> .env
+          echo FIRST_SUPERUSER_EMAIL=$FIRST_SUPERUSER_EMAIL >> .env
+          echo FIRST_SUPERUSERNAME=$FIRST_SUPERUSERNAME >> .env
+          echo FIRST_SUPERUSER_PASSWORD=$FIRST_SUPERUSER_PASSWORD >> .env
+          echo POSTGRES_PORT=$POSTGRES_PORT >> .env
+          echo POSTGRES_USER=$POSTGRES_USER >> .env
+          echo POSTGRES_PASSWORD=$POSTGRES_PASSWORD >> .env
+          echo POSTGRES_DB=$POSTGRES_DB >> .env
 
-  #       run: |
-  #         echo SECRET_KEY=$SECRET_KEY >> .env
-  #         echo ENVIRONMENT=$ENVIRONMENT >> .env
-  #         echo LOG_INFO_LOCAL_PATH=$LOG_INFO_LOCAL_PATH >> .env
-  #         echo LOG_LEVEL=$LOG_LEVEL >> .env
-          
-  #         echo PROJECT_NAME=$PROJECT_NAME >> .env
-  #         echo API_V1_STR=$API_V1_STR >> .env
-  #         echo DOMAIN=$DOMAIN >> .env
-  #         echo VERSION=$VERSION >> .env
+      - name: Pull repository
+        run: |
+          ssh Target "cd iot_server && git pull origin main"
 
-  #         echo POSTGRES_PORT=$POSTGRES_PORT >> .env
-  #         echo POSTGRES_USER=$POSTGRES_USER >> .env
-  #         echo POSTGRES_PASSWORD=$POSTGRES_PASSWORD >> .env
-  #         echo POSTGRES_DB=$POSTGRES_DB >> .env
-  #         echo FIRST_SUPERUSERNAME=$FIRST_SUPERUSERNAME >> .env
-  #         echo FIRST_SUPERUSER_EMAIL=$FIRST_SUPERUSER_EMAIL >> .env
-  #         echo FIRST_SUPERUSER_PASSWORD=$FIRST_SUPERUSER_PASSWORD >> .env
+      - name: Send env file
+        run: |
+          scp .env Target:iot_server/.env
 
-  #         echo SMTP_TLS= >> .env
-  #         echo SMTP_SSL= >> .env
-  #         echo SMTP_PORT=$SMTP_PORT >> .env
-  #         echo SMTP_HOST=$SMTP_HOST >> .env
-  #         echo SMTP_USER=$SMTP_USER >> .env
-  #         echo SMTP_PASSWORD=$SMTP_PASSWORD >> .env
-  #         echo EMAILS_FROM_EMAIL=$EMAILS_FROM_EMAIL >> .env
-  #         echo EMAILS_FROM_NAME=$EMAILS_FROM_NAME >> .env
-
-  #     - name: Pull repository
-  #       run: |
-  #         ssh Target "cd iot_server && git pull origin main"
-
-  #     - name: Send env file
-  #       run: |
-  #         scp .env Target:iot_server/.env
-
-  #     - name: Deploy
-  #       if: steps.create-env.outcome == 'success'
-  #       run: |
-  #           ssh Target "cd iot_server && make compose-down && make compose-prod"
+      # - name: Deploy
+      #   if: steps.create-env.outcome == 'success'
+      #   run: |
+      #       ssh Target "cd iot_server && make compose-down && make compose-prod"

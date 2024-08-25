@@ -45,7 +45,7 @@ x-common-environment-userapi_handler: &userapi_handler
 
 services:
   db:
-    image: postgres:12
+    image: postgres:12 # Change to slim
     restart: always
     volumes:
       - app-db-data:/var/lib/postgresql/data/pgdata
