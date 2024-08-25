@@ -1,5 +1,5 @@
 # IoT Telemetry Application
-[![Tests](https://github.com/kaiosatiro/iot_server/actions/workflows/tests-staging.yml/badge.svg)](https://github.com/kaiosatiro/iot_server/actions/workflows/deploy-staging.yml)
+[![Deploy](https://github.com/kaiosatiro/iot_server/actions/workflows/deploy-staging.yml/badge.svg)](https://github.com/kaiosatiro/iot_server/actions/workflows/deploy-staging.yml)
 
 :construction: In progress ... :construction:
 

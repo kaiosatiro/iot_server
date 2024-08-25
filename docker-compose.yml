@@ -94,6 +94,9 @@ services:
       LOG_INFO_LOCAL_PATH:
       LOG_FILE_MAX_SIZE:
       LOG_FILE_BACKUP_COUNT:
+      REMOTE_LOG_LEVEL:
+      REMOTE_LOG_ADDRESS:
+      REMOTE_LOG_PORT:
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -114,7 +117,7 @@ services:
     environment:
       <<: [*default-environment, *userapi_handler, *userapi_receiver]
       API_V1_STR:
-      VERSION:
+      VERSION: "0.1.0"
       USERS_OPEN_REGISTRATION:
       #Emails:
       SMTP_TLS:
@@ -145,7 +148,7 @@ services:
     environment:
       <<: [*default-environment, *userapi_receiver, *receiver_handler]
       RECEIVER_API_V1_STR:
-      RECEIVER_VERSION:
+      RECEIVER_VERSION: "0.1.0"
     depends_on:
       rabbitmq:
         condition: service_healthy
