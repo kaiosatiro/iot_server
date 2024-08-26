@@ -59,7 +59,11 @@ async def root(request: Request) -> dict[str, str]:
     logger = logging.getLogger("Test Route")
     logger.info("Root")
     logger.info("Request ID: %s", request.headers["x-request-id"])
-    return {"TEST": "USERAPI", "request_id": request.headers["x-request-id"]}
+    return {
+        "TEST": "USERAPI",
+        "root_path": request.scope.get("root_path"),
+        "request_id": request.headers["x-request-id"]
+        }
 
 
 # Login:
