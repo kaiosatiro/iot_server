@@ -87,6 +87,7 @@ services:
       args:
         ENVIRONMENT:
         LOG_INFO_LOCAL_PATH:
+    restart: always
     networks:
       - internal_network
     environment: 
@@ -109,6 +110,7 @@ services:
       context: ./user_api
       args:
         ENVIRONMENT:
+    restart: always
     networks:
       - default
       - internal_network
@@ -116,7 +118,7 @@ services:
       - "8000:8000"
     environment:
       <<: [*default-environment, *userapi_handler, *userapi_receiver]
-      API_V1_STR:
+      USERAPI_API_V1_STR:
       VERSION: "0.1.0"
       USERS_OPEN_REGISTRATION:
       #Emails:
@@ -140,6 +142,7 @@ services:
       context: ./receiver
       args:
         ENVIRONMENT:
+    restart: always
     networks:
       - default
       - internal_network
@@ -159,6 +162,7 @@ services:
       context: ./handler
       args:
         ENVIRONMENT:
+    restart: always
     networks:
       - default
       - internal_network

@@ -2,6 +2,7 @@
 
 compose-prod:
 	@echo "Starting production environment..."
+	# Lazy initialization 
 	docker compose -f docker-compose.yml up rabbitmq --build -d
 	docker compose -f docker-compose.yml up db --build -d
 	docker compose -f docker-compose.yml up adminer --build -d

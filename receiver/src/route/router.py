@@ -12,6 +12,7 @@ from fastapi import (
 import src.route.dependencies as deps
 from src.message_handler import message_handler
 from src.models import DefaultResponseMessage
+from src.config import settings
 
 router = APIRouter()
 
@@ -33,7 +34,7 @@ async def listener(
     """
     Endpoint that receives devices messages. Send messages to this endpoint with a token.
     """
-    logger = logging.getLogger("POST listener/v1/")
+    logger = logging.getLogger(f"POST {settings.RECEIVER_API_V1_STR}")
     logger.info("Message Received in listener")
     # request.state.message_handler.process_message(device, payload)
     handler.process_message(device, payload)

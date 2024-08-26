@@ -76,7 +76,7 @@ jobs:
           # Receiver
           RECEIVER_API_V1_STR: ${{ vars.RECEIVER_API_V1_STR }}
           # Userapi
-          API_V1_STR: ${{ vars.API_V1_STR }}
+          USERAPI_API_V1_STR: ${{ vars.USERAPI_API_V1_STR }}
           USERS_OPEN_REGISTRATION: ${{ vars.USERS_OPEN_REGISTRATION }}
           SMTP_PORT: ${{ vars.SMTP_PORT }}
           SMTP_HOST: ${{ vars.SMTP_HOST }}
@@ -130,7 +130,7 @@ jobs:
           
           echo RECEIVER_API_V1_STR=$RECEIVER_API_V1_STR >> .env
 
-          echo API_V1_STR=$API_V1_STR >> .env
+          echo USERAPI_API_V1_STR=$USERAPI_API_V1_STR >> .env
           echo USERS_OPEN_REGISTRATION=$USERS_OPEN_REGISTRATION >> .env
           echo SMTP_PORT=$SMTP_PORT >> .env
           echo SMTP_HOST=$SMTP_HOST >> .env

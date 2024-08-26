@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "..."
     DOMAIN: str = "localhost"
 
-    API_V1_STR: str = "/userapi/v1"
+    USERAPI_API_V1_STR: str = "/userapi/v1"
     VERSION: str = "0.1.0"
 
     USERS_OPEN_REGISTRATION: bool = False

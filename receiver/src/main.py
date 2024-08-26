@@ -49,7 +49,7 @@ async def root(request: Request) -> dict[str, str]:
     logger = logging.getLogger("GET /test/")
     logger.info("Root")
     logger.info("Request ID: %s", request.headers["x-request-id"])
-    return {"TEST": "PACMAN", "correlation_id": request.headers["x-request-id"]}
+    return {"TEST": "RECEIVER", "correlation_id": request.headers["x-request-id"]}
 
 
 if __name__ == "__main__":

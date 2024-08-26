@@ -33,7 +33,7 @@ app = FastAPI(
     # terms_of_service=
     contact=doc.CONTACT,
     swagger_ui_parameters={"operationsSorter": "method"},
-    root_path=settings.API_V1_STR,
+    root_path=settings.USERAPI_API_V1_STR,
     root_path_in_servers=True,
     lifespan=lifespan,
     exception_handlers={Exception: unhandled_exception_handler},
@@ -59,7 +59,7 @@ async def root(request: Request) -> dict[str, str]:
     logger = logging.getLogger("Test Route")
     logger.info("Root")
     logger.info("Request ID: %s", request.headers["x-request-id"])
-    return {"TEST": "PACMAN", "request_id": request.headers["x-request-id"]}
+    return {"TEST": "USERAPI", "request_id": request.headers["x-request-id"]}
 
 
 # Login:
