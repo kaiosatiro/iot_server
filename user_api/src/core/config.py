@@ -16,12 +16,15 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "..."
     DOMAIN: str = "localhost"
 
-    USERAPI_API_V1_STR: str = "/userapi/v1"
+    USERAPI_API_V1_STR: str = ""
+    RECEIVER_API_V1_STR: str = ""  # for the documentation only
     VERSION: str = "0.1.0"
 
     USERS_OPEN_REGISTRATION: bool = False
 
-    SECRET_KEY: str = secrets.token_urlsafe(32)
+    SECRET_KEY: str = secrets.token_urlsafe(
+        32
+    )  # TODO: change it according to the environment
 
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # seven days
     EMAIL_RESET_TOKEN_EXPIRE_HOURS: int = 48  # 48 hours

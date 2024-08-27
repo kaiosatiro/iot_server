@@ -20,7 +20,9 @@ def get_db() -> Generator[Session, None, None]:
         yield session  # So it can close the session after the request is finished
 
 
-reusable_oauth2 = OAuth2PasswordBearer(tokenUrl="/access-token")
+reusable_oauth2 = OAuth2PasswordBearer(
+    tokenUrl=f"{settings.USERAPI_API_V1_STR}/access-token"
+)
 
 SessionDep = Annotated[Session, Depends(get_db)]  # And then MetaData do be injected
 TokenDep = Annotated[str, Depends(reusable_oauth2)]

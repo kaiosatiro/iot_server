@@ -1,3 +1,5 @@
+from src.core.config import settings
+
 TAGS_METADATA = [
     {
         "name": "Login",
@@ -25,9 +27,18 @@ TAGS_METADATA = [
     },
 ]
 
-DESCRIPTION = """
-IoT Server Aplication.
-User API. 🚀
+DESCRIPTION = f"""
+## IoT Server Aplication.
+
+API documentation for the **User API**, which is responsible for managing users, sites, and devices.\n
+**Swagger UI version at:** [{settings.USERAPI_API_V1_STR}/docs]({settings.USERAPI_API_V1_STR}/docs)\n
+**Redoc version at:** [{settings.USERAPI_API_V1_STR}/redoc]({settings.USERAPI_API_V1_STR}/redoc)\n
+
+#### Messages listener:
+The device messages are received in the **Device API** endpoint: **[{settings.RECEIVER_API_V1_STR}]({settings.RECEIVER_API_V1_STR})**\n
+**Devices API docs:** [{settings.RECEIVER_API_V1_STR}/docs]({settings.RECEIVER_API_V1_STR}/docs)\n
+
+#### **See the repository at [GitHub](https://github.com/kaiosatiro/iot_server)**
 """
 
 LICENSE_INFO = {

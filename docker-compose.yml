@@ -25,6 +25,7 @@ x-common-environment-receiver-handler: &receiver_handler
     MESSAGES_QUEUE:
 
 x-common-environment-userapi-receiver: &userapi_receiver
+    RECEIVER_API_V1_STR:  # for the documentation
     PROJECT_NAME:
     DOMAIN:
     SECRET_KEY:
@@ -150,7 +151,6 @@ services:
       - "8100:8000"
     environment:
       <<: [*default-environment, *userapi_receiver, *receiver_handler]
-      RECEIVER_API_V1_STR:
       RECEIVER_VERSION: "0.1.0"
     depends_on:
       rabbitmq:

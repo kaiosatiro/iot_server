@@ -74,9 +74,10 @@ jobs:
           REMOTE_LOG_ADDRESS: ${{ vars.REMOTE_LOG_ADDRESS }}
           REMOTE_LOG_PORT: ${{ vars.REMOTE_LOG_PORT }}
           # Receiver
-          RECEIVER_API_V1_STR: ${{ vars.RECEIVER_API_V1_STR }}
+          # ...
+          # Handler
+          # ...
           # Userapi
-          USERAPI_API_V1_STR: ${{ vars.USERAPI_API_V1_STR }}
           USERS_OPEN_REGISTRATION: ${{ vars.USERS_OPEN_REGISTRATION }}
           SMTP_PORT: ${{ vars.SMTP_PORT }}
           SMTP_HOST: ${{ vars.SMTP_HOST }}
@@ -90,6 +91,8 @@ jobs:
           MESSAGES_QUEUE: ${{ vars.MESSAGES_QUEUE }}
 
           # Userapi | Receiver
+          RECEIVER_API_V1_STR: ${{ vars.RECEIVER_API_V1_STR }}
+          USERAPI_API_V1_STR: ${{ vars.USERAPI_API_V1_STR }}
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
           PROJECT_NAME: ${{ vars.PROJECT_NAME }}
           DOMAIN: ${{ vars.DOMAIN }}
@@ -128,9 +131,6 @@ jobs:
           echo REMOTE_LOG_ADDRESS=$REMOTE_LOG_ADDRESS >> .env
           echo REMOTE_LOG_PORT=$REMOTE_LOG_PORT >> .env
           
-          echo RECEIVER_API_V1_STR=$RECEIVER_API_V1_STR >> .env
-
-          echo USERAPI_API_V1_STR=$USERAPI_API_V1_STR >> .env
           echo USERS_OPEN_REGISTRATION=$USERS_OPEN_REGISTRATION >> .env
           echo SMTP_PORT=$SMTP_PORT >> .env
           echo SMTP_HOST=$SMTP_HOST >> .env
@@ -139,6 +139,8 @@ jobs:
           echo EMAILS_FROM_EMAIL=$EMAILS_FROM_EMAIL >> .env
           echo EMAILS_FROM_NAME=$EMAILS_FROM_NAME >> .env
 
+          echo RECEIVER_API_V1_STR=$RECEIVER_API_V1_STR >> .env
+          echo USERAPI_API_V1_STR=$USERAPI_API_V1_STR >> .env
           echo HANDLER_EXCHANGE=$HANDLER_EXCHANGE >> .env
           echo MESSAGES_QUEUE=$MESSAGES_QUEUE >> .env
 

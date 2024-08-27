@@ -7,9 +7,9 @@ import pika  # type: ignore
 from pika.channel import Channel  # type: ignore
 from pika.spec import Basic, BasicProperties  # type: ignore
 
-from src.queues.manager import PublishingManager, get_queue_access
 from src.core.config import settings
 from src.queues.abs import ABSQueueChannel  # ABSQueueConnectionManager
+from src.queues.manager import PublishingManager, get_queue_access
 
 
 class LogChannel(ABSQueueChannel):

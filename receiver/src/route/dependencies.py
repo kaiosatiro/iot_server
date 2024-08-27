@@ -2,15 +2,37 @@ import logging
 from typing import Annotated, Any
 
 import jwt
-from fastapi import Depends, HTTPException
-from fastapi.security import OAuth2PasswordBearer
+from fastapi import Depends, HTTPException, Request
 from jwt.exceptions import InvalidTokenError
 from pydantic import ValidationError
 
 from src.config import settings
 from src.models import DefaultResponseMessage, TokenPayload
 
-reusable_oauth2 = OAuth2PasswordBearer(tokenUrl="/access-token")
+
+class OAuth2BearerToken:
+    async def __call__(self, request: Request) -> str | None:
+        authorization = request.headers.get("Authorization")
+        scheme, param = self._get_authorization_scheme_param(authorization)
+        if not authorization or scheme.lower() != "bearer":
+            raise HTTPException(
+                status_code=401,
+                detail="Not authenticated",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        return param
+
+    def _get_authorization_scheme_param(
+        self,
+        authorization_header_value: str | None,
+    ) -> tuple[str, str]:
+        if not authorization_header_value:
+            return "", ""
+        scheme, _, param = authorization_header_value.partition(" ")
+        return scheme, param
+
+
+reusable_oauth2 = OAuth2BearerToken()
 TokenDep = Annotated[str, Depends(reusable_oauth2)]
 
 
@@ -32,7 +54,10 @@ async def validate_token(token: TokenDep) -> int | None:
         )
         token_data = TokenPayload(**payload)
 
-    except (InvalidTokenError, ValidationError):
+    except (
+        InvalidTokenError,
+        ValidationError,
+    ):  # TO CHECK: What if the user uses not a device token?
         logger.error("Invalid token: %s", token)
         raise HTTPException(
             status_code=403,

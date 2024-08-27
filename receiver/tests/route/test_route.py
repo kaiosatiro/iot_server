@@ -43,4 +43,29 @@ class TestListnerEndPoint:
         response = client.post("/", headers={"Authorization": f"Bearer {token}"})
         assert response.status_code == 422
 
-        sleep(5)
+        sleep(3)
+    
+    def test_listener_with_token_not_bearer(self, token: str, client: TestClient):
+        response = client.post("/", headers={"Authorization": token})
+        assert response.status_code == 401
+
+        sleep(3)
+
+
+class TestTestToken:
+    @pytest.fixture(scope="class")
+    def token(self):
+        token = create_device_access_token(1)
+        return token
+
+    def test_test_token(self, client: TestClient, token: str) -> None:
+        response = client.post("/test-token", headers={"Authorization": f"Bearer {token}"})
+        assert response.status_code == 200
+
+    def test_test_token_invalid(self, client: TestClient) -> None:
+        response = client.post("/test-token", headers={"Authorization": "Bearer invalid_token"},)
+        assert response.status_code == 403
+    
+    def test_test_token_not_bearer(self, client: TestClient) -> None:
+        response = client.post("/test-token", headers={"Authorization ": "invalid_token"},)
+        assert response.status_code == 401

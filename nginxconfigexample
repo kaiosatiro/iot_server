@@ -1,12 +1,12 @@
 server {
-	listen 80 default_server;
-	server_name *<DOMAIN>;
-	return 301 https://$host$request_uri;
+	listen 80;
+	server_name <DOMAIN> www.<DOMAIN>;
+	return 301 https://$server_name$request_uri;
 }
 
 server {
 	listen 443 ssl default_server;
-	server_name <DOMAIN>;
+	server_name staging.<DOMAIN>;
 	
 	ssl_certificate /etc/letsencrypt/live/<DOMAIN>/fullchain.pem;
 	ssl_certificate_key /etc/letsencrypt/live/<DOMAIN>/privkey.pem;
@@ -18,12 +18,20 @@ server {
 	ssl_prefer_server_ciphers off;
 
 	client_max_body_size 20M;
-
+	
 	location / {
-		proxy_pass http://localhost:8000/;
+		return 301 /userapi/v1/docs;
+	}	
+
+	location /docs {
+		return 301 /userapi/v1/docs;
+	}
+		
+	location /userapi/v1 {
+		proxy_pass http://localhost:8000;
 
 		proxy_http_version 1.1;
-	    proxy_set_header Upgrade $http_upgrade;
+		proxy_set_header Upgrade $http_upgrade;
 		proxy_set_header Connection "upgrade";
 		proxy_redirect   off;
 		proxy_buffering  off;
@@ -34,6 +42,28 @@ server {
 		proxy_set_header X-Forwarded-Proto $scheme;
 		proxy_set_header X-Forwarded-Host $http_host;					 
 	}
+
+	location /listener/v1 {
+		proxy_pass http://localhost:8100;
+
+		proxy_http_version 1.1;
+		proxy_set_header Upgrade $http_upgrade;
+		proxy_set_header Connection "upgrade";
+		proxy_redirect   off;
+		proxy_buffering  off;
+		
+		proxy_set_header Host $host;
+		proxy_set_header X-Real-IP $remote_addr;
+		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+		proxy_set_header X-Forwarded-Proto $scheme;
+		proxy_set_header X-Forwarded-Host $http_host;					 
+	}
+}
+
+server {
+	listen 80;
+	server_name adminer.<DOMAIN>;
+	return 301 https://$host$request_uri;
 }
 
 server {
@@ -67,3 +97,5 @@ server {
 		proxy_set_header X-Forwarded-Host $http_host;					 
 	}
 }
+
+

@@ -1,7 +1,6 @@
 from src.core.config import settings
 from src.queues.channels import LogChannel
 
-
 LOG_CONFIG = {
     "version": 1,
     "disable_existing_loggers": True,

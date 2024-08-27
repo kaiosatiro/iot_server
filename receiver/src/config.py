@@ -14,10 +14,13 @@ class Settings(BaseSettings):
 
     PROJECT_NAME: str = "..."
     DOMAIN: str = "localhost"
-    RECEIVER_API_V1_STR: str = "/listener/v1"
+    RECEIVER_API_V1_STR: str = ""
+    USERAPI_API_V1_STR: str = ""  # for the documentation
     RECEIVER_VERSION: str = "0.1.0"
 
-    SECRET_KEY: str = secrets.token_urlsafe(32)
+    SECRET_KEY: str = secrets.token_urlsafe(
+        32
+    )  # TODO: change it according to the environment
 
     RABBITMQ_DNS: str = "localhost"
     RABBITMQ_PORT: int = 5672

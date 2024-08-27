@@ -6,6 +6,7 @@ from asgi_correlation_id import CorrelationIdMiddleware
 from asgi_correlation_id.middleware import is_valid_uuid4
 from fastapi import FastAPI, Request
 
+import src.doc as doc
 from src.config import settings
 from src.errors import unhandled_exception_handler
 from src.logger.setup import setup_logging_config
@@ -26,6 +27,13 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
+    openapi_tags=doc.TAGS_METADATA,
+    # summary=
+    description=doc.DESCRIPTION,
+    version=settings.RECEIVER_VERSION,
+    license_info=doc.LICENSE_INFO,
+    # terms_of_service=
+    contact=doc.CONTACT,
     root_path=settings.RECEIVER_API_V1_STR,
     root_path_in_servers=True,
     lifespan=lifespan,
@@ -44,16 +52,16 @@ app.add_middleware(
 
 
 # Test route ---------------------------------------------------------------
-@app.get("/test/", include_in_schema=False)
+@app.get("/test", include_in_schema=False)
 async def root(request: Request) -> dict[str, str]:
-    logger = logging.getLogger("GET /test/")
+    logger = logging.getLogger("GET /test")
     logger.info("Root")
     logger.info("Request ID: %s", request.headers["x-request-id"])
     return {
         "TEST": "RECEIVER",
-        "root_path": request.scope.get("root_path"),
-        "correlation_id": request.headers["x-request-id"]
-        }
+        "root_path": request.scope.get("root_path") or "",
+        "correlation_id": request.headers["x-request-id"],
+    }
 
 
 if __name__ == "__main__":

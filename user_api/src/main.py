@@ -37,9 +37,6 @@ app = FastAPI(
     root_path_in_servers=True,
     lifespan=lifespan,
     exception_handlers={Exception: unhandled_exception_handler},
-    servers=[
-        {"url": "/listener/v1"},
-    ],
 )
 
 app.include_router(api_router)
@@ -54,16 +51,16 @@ app.add_middleware(
 
 
 # Test route ---------------------------------------------------------------
-@app.get("/test/", include_in_schema=False)
+@app.get("/test", include_in_schema=False)
 async def root(request: Request) -> dict[str, str]:
     logger = logging.getLogger("Test Route")
     logger.info("Root")
     logger.info("Request ID: %s", request.headers["x-request-id"])
     return {
         "TEST": "USERAPI",
-        "root_path": request.scope.get("root_path"),
-        "request_id": request.headers["x-request-id"]
-        }
+        "root_path": request.scope.get("root_path") or "",
+        "request_id": request.headers["x-request-id"],
+    }
 
 
 # Login:
