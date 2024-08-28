@@ -42,7 +42,7 @@ class HandlerManager(HandlerABC, metaclass=SingletonMetaHandler):
         }
 
     def handle_message(self, msg: str | bytes, app_id: str) -> None:
-        # logger.debug("Handling message: %s", msg)
+        logger.debug("Handling message: %s", msg)
         match app_id:
             case settings.HANDLER_ID:
                 self.handlers[app_id].handle_message(msg)

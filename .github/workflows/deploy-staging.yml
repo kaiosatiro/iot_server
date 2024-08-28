@@ -171,3 +171,10 @@ jobs:
         if: steps.create-env.outcome == 'success'
         run: |
             ssh Target "cd iot_server && make compose-down && make compose-prod"
+      
+      - name: Clean up
+        run: |
+          rm .env
+          ssh Target "rm iot_server/.env"
+          ssh Target "docker image prune -f"
+          

@@ -156,10 +156,11 @@ class RpcChannel:
             "RPC request to %s %s", message["method"], message["device_id"]
         )
 
-        timeout = settings.RPC_TIMEOUT  # Set the timeout to 3 seconds
-        while self.response is None and timeout > settings.RPC_TIMEOUT:
+        timeout = settings.RPC_TIMEOUT
+        while self.response is None and timeout > 0:
             self._connection._connection.process_data_events(time_limit=1)
             timeout -= 1
+            # sleep(1)
 
         if self.response is None:
             self.logger.error("RPC request timeout")

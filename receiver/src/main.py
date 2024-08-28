@@ -34,6 +34,7 @@ app = FastAPI(
     license_info=doc.LICENSE_INFO,
     # terms_of_service=
     contact=doc.CONTACT,
+    swagger_ui_parameters={"supportedSubmitMethods": []},  # None Method
     root_path=settings.RECEIVER_API_V1_STR,
     root_path_in_servers=True,
     lifespan=lifespan,

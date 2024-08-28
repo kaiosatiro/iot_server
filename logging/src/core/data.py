@@ -108,6 +108,10 @@ class RemoteData(DB):
         if self.handler:
             self.logger = logging.getLogger(self.origin)
             self.logger.addHandler(self.handler)
+            # Note to self: Since I'm reusing the SysLogHandler class to remote log. I need to remove
+            #  the 'file' handler from the logger I'll be using in this class so it won't
+            #  save the logs locally in the wrong file.
+            self.logger.removeHandler(logging.getHandlerByName("queue_handler"))
 
     def save(self, data: str) -> None:
         logger.debug("Saving data remotely: %s", data)

@@ -35,7 +35,7 @@ API documentation for the **User API**, which is responsible for managing users,
 **Redoc version at:** [{settings.USERAPI_API_V1_STR}/redoc]({settings.USERAPI_API_V1_STR}/redoc)\n
 
 #### Messages listener:
-The device messages are received in the **Device API** endpoint: **[{settings.RECEIVER_API_V1_STR}]({settings.RECEIVER_API_V1_STR})**\n
+The device messages are received in the **Device API** endpoint: **[{settings.RECEIVER_API_V1_STR}/]({settings.RECEIVER_API_V1_STR})**\n
 **Devices API docs:** [{settings.RECEIVER_API_V1_STR}/docs]({settings.RECEIVER_API_V1_STR}/docs)\n
 
 #### **See the repository at [GitHub](https://github.com/kaiosatiro/iot_server)**

@@ -12,7 +12,8 @@ DESCRIPTION = f"""
 
 API documentation for the **Device Messages API**.\n
 
-The device messages are received on this server
+The device messages are received on this server.\n
+**Endpoint**: **[{settings.RECEIVER_API_V1_STR}/]({settings.RECEIVER_API_V1_STR})**
 
 **Users API docs at:** [{settings.USERAPI_API_V1_STR}/docs]({settings.USERAPI_API_V1_STR}/docs)\n
 

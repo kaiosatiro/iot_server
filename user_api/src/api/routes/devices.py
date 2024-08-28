@@ -150,7 +150,7 @@ async def create_device(
     Create a new Device, **"name"** and **"site_id"** are required.
     """
     logger = logging.getLogger("POST devices/")
-    logger.info("Creating device %s from user %s", device_in.name, current_user)
+    logger.info("Creating device %s from user %s", device_in.name, current_user.id)
 
     site = session.get(Site, device_in.site_id)
 

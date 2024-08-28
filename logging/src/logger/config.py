@@ -2,7 +2,7 @@ from src.config import settings
 
 LOG_CONFIG = {
     "version": 1,
-    "disable_existing_loggers": False,
+    "disable_existing_loggers": True,
     "formatters": {
         "simple": {
             "format": "[ %(levelname)s | %(module)s | %(name)s | L%(lineno)d ] %(asctime)s : %(message)s",

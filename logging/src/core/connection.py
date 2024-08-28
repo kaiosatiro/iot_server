@@ -195,7 +195,6 @@ class ConnectionManager(metaclass=SingletonConnection):
             body,
         )
         try:
-            self.logger.debug("Handling message")
             self._handler.handle_message(body, properties.app_id)  # type: ignore
             self._channel.basic_ack(delivery_tag=method.delivery_tag)
         except AttributeError as e:
