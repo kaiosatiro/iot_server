@@ -7,6 +7,7 @@ from asgi_correlation_id.middleware import is_valid_uuid4
 from fastapi import FastAPI, Request
 
 import src.doc as doc
+from src.admin import admin
 from src.api.main import api_router
 from src.core.config import settings
 from src.errors import unhandled_exception_handler
@@ -33,6 +34,9 @@ app = FastAPI(
     # terms_of_service=
     contact=doc.CONTACT,
     swagger_ui_parameters={"operationsSorter": "method"},
+    swagger_static={
+        "favicon": "icon.ico",
+    },
     root_path=settings.USERAPI_API_V1_STR,
     root_path_in_servers=True,
     lifespan=lifespan,
@@ -48,6 +52,8 @@ app.add_middleware(
     validator=is_valid_uuid4,
     # transformer=lambda a: a,
 )
+# app.mount("/admin", admin)
+admin.mount_to(app)
 
 
 # Test route ---------------------------------------------------------------
