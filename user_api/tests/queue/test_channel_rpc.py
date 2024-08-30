@@ -2,6 +2,7 @@ import unittest
 from unittest.mock import patch, MagicMock
 from src.queues.channels import RpcChannel
 
+
 class TestRpcChannel(unittest.TestCase):
     @patch('src.queues.channels.get_queue_access')
     @patch('src.queues.channels.settings')

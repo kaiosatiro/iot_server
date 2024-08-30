@@ -1,8 +1,8 @@
-from src.admin.main import admin
-from src.admin.user_view import UserView
-from src.admin.site_view import SiteView
 from src.admin.device_view import DeviceView
-from src.models import User, Device, Site
+from src.admin.main import admin
+from src.admin.site_view import SiteView
+from src.admin.user_view import UserView
+from src.models import Device, Site, User
 
 
 admin.add_view(UserView(User))
@@ -21,4 +21,3 @@ admin.add_view(DeviceView(Device))
 #         ],
 #     )
 # )
-

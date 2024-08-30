@@ -26,7 +26,9 @@ class DeviceBase(SQLModel):
     type: str | None = Field(default=None, max_length=55)
     description: str | None = Field(default=None, max_length=255)
 
-    token: str | None = Field(default=None, max_length=255)
+    token: str | None = Field(
+        default=None, max_length=255
+    )  # TODO: This should not be here
 
 
 class DeviceCreation(DeviceBase):
@@ -535,120 +537,62 @@ class NewPassword(SQLModel):
 #     roles: list["Role"] = Relationship(back_populates='permissions', link_model=RolePermissionLink)
 
 
-# if __name__ == "__main__":
-#     from sqlmodel import create_engine, Session, select
-#     from sqlmodel.pool import StaticPool
-#     from datetime import datetime, timedelta
+if __name__ == "__main__":
+    from datetime import datetime, timedelta
+    from random import randint
 
-#     DATABASE_URL = "postgresql://postgres:postgres@localhost:5432/app"
+    from sqlmodel import Session, create_engine, select
 
-#     engine = create_engine(
-#         DATABASE_URL, echo=True
-#     )
+    DATABASE_URL = "postgresql://postgres:postgres@localhost:5432/app"
 
-#     SQLModel.metadata.drop_all(engine)
-#     SQLModel.metadata.create_all(engine)
-#     with Session(engine) as session:
-#         session.exec(select(1))
+    engine = create_engine(DATABASE_URL, echo=True)
 
-#     engine = create_engine(
-#         "sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool
-#         , echo=True
-#     )
-#     SQLModel.metadata.create_all(engine)
-#     with Session(engine) as session:
-#         user_in = UserCreation(
-#             email="email",
-#             username="random_lower_string()",
-#             password="random_lower_string()",
-#             about="random_lower_string()",
-#             )
-#         user = User.model_validate(user_in, update={"hashed_password": "random_lower"})
-#         session.add(user)
-#         session.commit()
-#         session.refresh(user)
+    SQLModel.metadata.drop_all(engine)
+    SQLModel.metadata.create_all(engine)
+    with Session(engine) as session:
+        session.exec(select(1))
 
-#         site_in = SiteCreation(
-#             name="random_lower_string()",
-#             description="random_lower_string()",
-#             )
-#         site = Site.model_validate(site_in, update={"user_id": user.id})
-#         session.add(site)
-#         session.commit()
-#         session.refresh(site)
+    # Create 30 Users
+    for _ in range(30):
+        user = UserCreation(
+            username=f"user{_}",
+            email=f"user{_}@example.com",
+            password="password",
+            about="I am a user",
+            is_superuser=False,
+        )
+        session.add(user)
+        session.commit()
 
-#         device_in = DeviceCreation(
-#             name="random_lower_string()",
-#             model="random_lower_string()",
-#             type="random_lower_string()",
-#             description="random_lower_string()",
-#             user_id=user.id,
-#             site_id=site.id
-#             )
+        # Create 1 to 3 Sites for each User
+        num_sites = randint(1, 3)
+        for _ in range(num_sites):
+            site = SiteCreation(
+                name=f"Site{_}",
+                description="Site description",
+            )
+            site.user_id = user.id
+            session.add(site)
+            session.commit()
 
-#         device = Device.model_validate(device_in)
-#         session.add(device)
-#         session.commit()
-#         session.refresh(device)
+            # Create between 3 to 7 Devices for each Site
+            num_devices = randint(3, 7)
+            for _ in range(num_devices):
+                device = DeviceCreation(
+                    name=f"Device{_}",
+                    description="Device description",
+                )
+                device.site_id = site.id
+                session.add(device)
+                session.commit()
 
-#         messages = []
-#         for _ in range(3):
-#             message = MessageCreation(message={
-#                 "deviceId": "12345",
-#                 "sensorId": "humiditySensor01",
-#                 "timestamp": "2024-07-12T15:00:00Z",
-#                 "type": "humidity",
-#                 "unit": "percent",
-#                 "value": 45.2
-#                 },
-#                 device_id=device.id)
-#             message_in = Message.model_validate(message)
-#             messages.append(message_in)
-
-#         session.add_all(messages)
-#         session.commit()
-
-#         user = session.get(User, user.id)
-#         print("*******")
-#         print(user.id)
-#         print("*******")
-#         session.delete(user)
-#         session.commit()
-
-#         yesterday = datetime.now() - timedelta(hours=24)
-#         now = datetime.now()
-#         print("*******")
-#         print(yesterday)
-#         print(now)
-#         print(sa.func.now())
-#         print("*******")
-
-#         statement = select(Message).where(
-#             User.id == user.id)
-#         session_messages = session.exec(statement).all()
-
-#         statement = select(Message).where(
-#             Message.created_on >= yesterday,
-#             Message.created_on <= now
-#         )
-#         session_messages = session.exec(statement).all()
-#         print(session_messages)
-
-#         SQLModel.metadata.drop_all(engine)
-#         statement = delete(Message)
-#         resulta = session.exec(statement)
-
-#         statement = delete(Device)
-#         resultb = session.exec(statement)
-
-#         statement = delete(Site)
-#         resultc = session.exec(statement)
-
-#         statement = delete(User)
-#         resultd = session.exec(statement)
-
-#         session.commit()
-#         print(resulta.rowcount)
-#         print(resultb.rowcount)
-#         print(resultc.rowcount)
-#         print(resultd.rowcount)
+                # Create between 10 to 30 Messages for each Device
+                num_messages = randint(10, 30)
+                for _ in range(num_messages):
+                    message = Message(
+                        message={"content": "Message content"},
+                        device_id=device.id,
+                        inserted_on=datetime.now() - timedelta(days=randint(1, 365)),
+                    )
+                    session.add(message)
+                    session.commit()

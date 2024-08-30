@@ -5,6 +5,8 @@ from contextlib import asynccontextmanager
 from asgi_correlation_id import CorrelationIdMiddleware
 from asgi_correlation_id.middleware import is_valid_uuid4
 from fastapi import FastAPI, Request
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 
 import src.doc as doc
 from src.admin import admin
@@ -34,9 +36,9 @@ app = FastAPI(
     # terms_of_service=
     contact=doc.CONTACT,
     swagger_ui_parameters={"operationsSorter": "method"},
-    swagger_static={
-        "favicon": "icon.ico",
-    },
+    # swagger_static={
+    #     "favicon": "icon.ico",
+    # },
     root_path=settings.USERAPI_API_V1_STR,
     root_path_in_servers=True,
     lifespan=lifespan,
@@ -53,7 +55,13 @@ app.add_middleware(
     # transformer=lambda a: a,
 )
 # app.mount("/admin", admin)
+app.mount("/static", StaticFiles(directory="src/static"), name="static")
 admin.mount_to(app)
+
+
+@app.get("/favicon.ico", include_in_schema=False)
+async def favicon() -> FileResponse:
+    return FileResponse("src/static/icon.ico")
 
 
 # Test route ---------------------------------------------------------------
@@ -68,10 +76,11 @@ async def root(request: Request) -> dict[str, str]:
         "request_id": request.headers["x-request-id"],
     }
 
-# if __name__ == "__main__":
-#     import uvicorn
 
-#     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
 
 
 # Login:

@@ -1,5 +1,5 @@
-from typing import Any, Dict
 import re
+from typing import Any
 
 import anyio
 from sqlalchemy.exc import IntegrityError
@@ -52,10 +52,10 @@ class UserView(ModelView):
         User.updated_on,
     ]
     searchable_fields = [User.id, User.username, User.email]
-    fields_default_sort = [User.username, (User.is_active, True)]
+    fields_default_sort = [(User.username, True), (User.is_active, True)]
 
-    async def validate(self, request: Request, data: Dict[str, Any]) -> None:
-        errors: Dict[str, str] = dict()
+    async def validate(self, request: Request, data: dict[str, Any]) -> None:
+        errors: dict[str, str] = dict()
         if " " in data["username"]:
             errors["username"] = "Username should not contain spaces"
         if not re.match(r"[^@]+@[^@]+\.[^@]+", data["email"]):
@@ -83,8 +83,8 @@ class UserView(ModelView):
                 await session.commit()
                 await session.refresh(obj)
             else:
-                await anyio.to_thread.run_sync(session.commit)  # type: ignore[arg-type]
-                await anyio.to_thread.run_sync(session.refresh, obj)  # type: ignore[arg-type]
+                await anyio.to_thread.run_sync(session.commit)
+                await anyio.to_thread.run_sync(session.refresh, obj)
             await self.after_create(request, obj)
             return obj
         except IntegrityError as e:
@@ -114,8 +114,8 @@ class UserView(ModelView):
                 await session.commit()
                 await session.refresh(obj)
             else:
-                await anyio.to_thread.run_sync(session.commit)  # type: ignore[arg-type]
-                await anyio.to_thread.run_sync(session.refresh, obj)  # type: ignore[arg-type]
+                await anyio.to_thread.run_sync(session.commit)
+                await anyio.to_thread.run_sync(session.refresh, obj)
             await self.after_edit(request, obj)
             return obj
         except IntegrityError as e:

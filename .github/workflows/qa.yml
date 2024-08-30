@@ -1,5 +1,12 @@
 name: Quality Assurance
-on: [pull_request, workflow_call]
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   qa:

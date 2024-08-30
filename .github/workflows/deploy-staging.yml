@@ -10,16 +10,12 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  qa:
-    name: QA
-    uses: ./.github/workflows/qa.yml
-
   tests:
     name: Tests
     uses: ./.github/workflows/tests.yml
 
 
-  # Deploy to staging
+  # # Deploy to staging
   # deploy:
   #   needs: tests
   #   runs-on: ubuntu-latest
@@ -79,6 +75,7 @@ jobs:
   #         # ...
   #         # Userapi
   #         USERS_OPEN_REGISTRATION: ${{ vars.USERS_OPEN_REGISTRATION }}
+  #         INSERT_EXAMPLE_DATA: ${{ vars.INSERT_EXAMPLE_DATA }}
   #         SMTP_PORT: ${{ vars.SMTP_PORT }}
   #         SMTP_HOST: ${{ vars.SMTP_HOST }}
   #         SMTP_USER: ${{ vars.SMTP_USER }}
@@ -132,6 +129,7 @@ jobs:
   #         echo REMOTE_LOG_PORT=$REMOTE_LOG_PORT >> .env
           
   #         echo USERS_OPEN_REGISTRATION=$USERS_OPEN_REGISTRATION >> .env
+  #         echo INSERT_EXAMPLE_DATA=$INSERT_EXAMPLE_DATA >> .env
   #         echo SMTP_PORT=$SMTP_PORT >> .env
   #         echo SMTP_HOST=$SMTP_HOST >> .env
   #         echo SMTP_USER=$SMTP_USER >> .env
@@ -175,6 +173,6 @@ jobs:
   #     - name: Clean up
   #       run: |
   #         rm .env
-  #         ssh Target "rm iot_server/.env"
+  #         # ssh Target "rm iot_server/.env"
   #         ssh Target "docker image prune -f"
           

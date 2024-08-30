@@ -1,4 +1,5 @@
 import random
+import string
 from datetime import datetime
 
 
@@ -19,3 +20,7 @@ def validate_datetime(date_str: str) -> bool:
 
 def generate_random_number(start: int, end: int) -> int:
     return random.randint(start, end)
+
+
+def random_lower_string() -> str:
+    return "".join(random.choices(string.ascii_lowercase, k=8))

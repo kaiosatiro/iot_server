@@ -250,7 +250,7 @@ class TestCreateDevice:
             "description": "Description",
         }
         response = client.post("/devices/site", headers=normal_token_headers, json=device)
- 
+
         assert response.status_code == 201
         assert response.json()["name"] == "Device"
         assert response.json()["token"]

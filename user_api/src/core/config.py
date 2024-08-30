@@ -29,6 +29,8 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # seven days
     EMAIL_RESET_TOKEN_EXPIRE_HOURS: int = 48  # 48 hours
 
+    INSERT_EXAMPLE_DATA: bool = False  # TODO: change it according to the environment
+
     @computed_field  # type: ignore
     @property
     def server_host(self) -> str:
