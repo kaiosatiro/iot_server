@@ -1,0 +1,4 @@
+
+
+class AuthProvider:
+    pass

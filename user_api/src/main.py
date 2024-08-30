@@ -68,6 +68,11 @@ async def root(request: Request) -> dict[str, str]:
         "request_id": request.headers["x-request-id"],
     }
 
+# if __name__ == "__main__":
+#     import uvicorn
+
+#     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+
 
 # Login:
 # - POST /access-token - 200 | 401
