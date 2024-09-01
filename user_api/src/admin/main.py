@@ -1,3 +1,5 @@
+import secrets
+
 from starlette.middleware import Middleware
 from starlette.middleware.sessions import SessionMiddleware
 from starlette_admin.contrib.sqlmodel import Admin
@@ -11,9 +13,9 @@ admin = Admin(
     base_url="/admin",
     route_name="Admin",
     title="IoT Server Admin Panel",
-    # logo_url="`https`://preview.tabler.io/static/logo-white.svg",
+    templates_dir="src/admin/templates",  # TODO: change to settings?
     login_logo_url="/static/icon.svg",
     auth_provider=AdminAuthProvider(allow_paths=["/static/icon.svg"]),
-    middlewares=[Middleware(SessionMiddleware, secret_key=settings.SECRET_KEY)],
+    middlewares=[Middleware(SessionMiddleware, secret_key=secrets.token_urlsafe(32))],
     debug=True if settings.ENVIRONMENT == "dev" else False,
 )

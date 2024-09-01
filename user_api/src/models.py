@@ -2,6 +2,7 @@ from datetime import datetime
 
 import sqlalchemy as sa
 from sqlmodel import Field, Relationship, SQLModel
+from starlette.requests import Request
 
 
 class BaseModel(SQLModel):
@@ -143,6 +144,9 @@ class Device(DeviceBase, BaseModel, table=True):
     messages: list["Message"] = Relationship(
         back_populates="device", cascade_delete=True
     )
+
+    async def __admin_repr__(self, request: Request) -> str:
+        return f"{self.name} {self.model}"
 
 
 # --------------------------- MESSAGE MODELS ---------------------------
@@ -330,6 +334,9 @@ class Site(SiteBase, BaseModel, table=True):
 
     devices: list["Device"] = Relationship(back_populates="site", cascade_delete=True)
 
+    async def __admin_repr__(self, request: Request) -> str:
+        return self.name
+
 
 # --------------------------- USER MODELS -----------------------------
 class UserBase(SQLModel):
@@ -491,6 +498,9 @@ class User(UserBase, BaseModel, table=True):
     devices: list["Device"] = Relationship(back_populates="user", cascade_delete=True)
     sites: list["Site"] = Relationship(back_populates="user", cascade_delete=True)
     # roles: list["Role"] = Relationship(back_populates='users', link_model=UserRoleLink)
+
+    async def __admin_repr__(self, request: Request) -> str:
+        return self.username
 
 
 # --------------------------- UTILS MODELS -----------------------------

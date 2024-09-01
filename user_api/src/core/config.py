@@ -36,7 +36,7 @@ class Settings(BaseSettings):
     def server_host(self) -> str:
         # Use HTTPS for anything other than local development
         if self.ENVIRONMENT == "dev":
-            return f"http://{self.DOMAIN}"
+            return f"http://{self.DOMAIN}:8000"
         return f"https://{self.DOMAIN}"
 
     # DB | Queue
