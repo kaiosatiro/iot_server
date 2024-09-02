@@ -37,6 +37,8 @@ class Settings(BaseSettings):
         # Use HTTPS for anything other than local development
         if self.ENVIRONMENT == "dev":
             return f"http://{self.DOMAIN}:8000"
+        elif self.ENVIRONMENT == "staging":
+            return f"https://staging.{self.DOMAIN}"
         return f"https://{self.DOMAIN}"
 
     # DB | Queue

@@ -123,6 +123,7 @@ services:
       USERAPI_API_V1_STR:
       VERSION: "0.1.0"
       USERS_OPEN_REGISTRATION:
+      INSERT_EXAMPLE_DATA:
       #Emails:
       SMTP_TLS:
       SMTP_SSL:

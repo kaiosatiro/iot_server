@@ -175,4 +175,5 @@ jobs:
           rm .env
           # ssh Target "rm iot_server/.env"
           ssh Target "docker image prune -f"
+          ssh Target "docker volume prune -f"
           
