@@ -11,6 +11,7 @@ from starlette_admin.exceptions import FormValidationError
 from starlette_admin.fields import HasOne, IntegerField, StringField, TextAreaField
 
 from src.core.config import settings
+from src.core.security import create_device_access_token
 from src.models import Device, Message, Site, User
 from src.utils import generate_random_number
 
@@ -137,6 +138,15 @@ class DeviceView(ModelView):
                 raise FormValidationError({"error": "Unknown error"})
         except Exception as e:
             return self.handle_exception(e)
+
+    async def after_create(self, request: Request, obj: Device) -> None:
+        session: Session | AsyncSession = request.state.session
+        obj.token = create_device_access_token(obj.id)
+        session.add(obj)
+        if isinstance(session, AsyncSession):
+            await session.commit()
+        else:
+            await anyio.to_thread.run_sync(session.commit)
 
     async def edit(self, request: Request, pk: Any, data: dict[str, Any]) -> Any:
         try:
