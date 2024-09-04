@@ -12,7 +12,9 @@ Whether developing a home automation system, industrial monitoring solution, or 
 
 #### Demo: 
 **Docs:** [https://staging.iotserverapp.com/userapi/v1/docs](https://staging.iotserverapp.com/userapi/v1/docs)
+
 **Admin Panel:** [https://staging.iotserverapp.com/admin](https://staging.iotserverapp.com/admin) (admin:admin)
+
 **User Dashboard:** https://dashboard.iotserverapp.com/  -- *In development* 
 
 #### Technology Stack and Features
@@ -25,6 +27,7 @@ Whether developing a home automation system, industrial monitoring solution, or 
 - 🐇 [rabbitMQ](https://www.rabbitmq.com/) for message queueing
   - 📬 [pika](https://pika.readthedocs.io/en/stable/) for python integration
 - 🐋 [Docker Compose](https://www.docker.com/) for development and production.
+- 🔗 Correlation ID shared between the services for tracking
 - 🔒 Secure password hashing by default.
 - 🔑 JWT (JSON Web Token) authentication.
 - 📫 Email based password recovery.
@@ -69,9 +72,22 @@ Then:
 - Create a **Site** ('Site' in the sense of a location, like a house, a factory, etc)
 - Create a **Device** and use its token to send a POST request to `http://localhost:8100/` with JSON data
 
+
+```bash
+# Follow the local log activity on the /logs folder
+cd /logs
+tail -f <FILE>
+```
+
+
+```bash
+# stopping cleaning the volumes
+make compose-down-dev
+```
+
 ---
 ### Documentation
-
+:construction: In progress ... :construction:
 #### Requirements
 **Functional Requirements**
 1. Receive status updates from IOT devices
