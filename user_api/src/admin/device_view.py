@@ -26,7 +26,7 @@ class CountingMessages(IntegerField):
 
 class UrlMessages(StringField):
     async def parse_obj(self, request: Request, obj: Device) -> str:
-        return f"{settings.server_host}{settings.USERAPI_API_V1_STR}/admin/messages/list?where={obj.id}"
+        return f"{settings.server_host}{settings.USERAPI_API_V1_STR}/admin/messages/list?device_id={obj.id}"
 
 
 class DeviceView(ModelView):
