@@ -1,0 +1,101 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<body>
+    <div class="container-fluid">
+        <div class="row align-items-center">
+            <div class="col">
+                <div class="page-pretitle">overview</div>
+                <h2 class="page-title">Dashboard</h2>
+            </div>
+        </div>
+    </div>
+    <div class="page-body flex-grow-1">
+        <div class="container-fluid">
+            <div class="row row-deck row-cards">
+
+                <div class="row">
+                    <div class="col-8">
+                        <div class="card">
+
+                            <div class="card-body">
+                                <div class="card-title">
+                                    Statistics
+                                </div>
+                                <div class="row row-deck">
+                                    <div class="col-md-4">
+                                        <div class="card">
+                                            <div class="card-body row">
+                                                <h3 class="col-md-6">Users</h3>
+                                                <h2 class="col-md-6">{{ users }}</h2>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="card">
+                                            <div class="card-body row">
+                                                <h3 class="col-md-6">Sites</h3>
+                                                <h2 class="col-md-6">{{ sites }}</h2>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="card">
+                                            <div class="card-body row">
+                                                <h3 class="col-md-6">Devices</h3>
+                                                <h2 class="col-md-6">{{ devices }}</h2>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+
+                                    <div>
+                                        <div class="card-title">
+                                            <h2>Messages over time:</h2>
+                                        </div>
+                                        <img src="data:image/png;base64,{{ messages_img }}">
+
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="card-title">
+                                    Admin Logs
+                                </div>
+                                <div class="divide-y">
+
+                                    <div>
+                                    </div>
+
+                                    <div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <footer class="footer footer-transparent d-print-none">
+        <div class="container">
+            <div class="row text-center align-items-center flex-row-reverse">
+                <ul class="list-inline list-inline-dots mb-0">
+                    <li class="list-inline-item">v{{ version }}</li>
+
+                    <li class="list-inline-item">
+                        <a href="https://github.com/kaiosatiro/iot_server" target="_blank" class="link-secondary" rel="noopener">Source code</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+{% endblock %}

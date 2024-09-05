@@ -15,7 +15,9 @@ admin = Admin(
     title="IoT Server Admin Panel",
     templates_dir="src/admin/templates",  # TODO: change to settings?
     statics_dir="src/admin/statics",  # TODO: change to settings?
-    login_logo_url=f"{settings.USERAPI_API_V1_STR}/static/icon.svg",
+    login_logo_url=f"{settings.USERAPI_API_V1_STR}/static/icon.ico",
+    logo_url=f"{settings.USERAPI_API_V1_STR}/static/icon.ico",
+    favicon_url=f"{settings.USERAPI_API_V1_STR}/favicon.ico",
     auth_provider=AdminAuthProvider(
         allow_paths=[f"{settings.USERAPI_API_V1_STR}/static/icon.svg"]
     ),

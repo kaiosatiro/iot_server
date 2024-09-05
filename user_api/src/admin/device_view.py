@@ -10,6 +10,7 @@ from starlette_admin.contrib.sqlmodel import ModelView
 from starlette_admin.exceptions import FormValidationError
 from starlette_admin.fields import HasOne, IntegerField, StringField, TextAreaField
 
+# from starlette_admin._types import RowActionsDisplayType
 from src.core.config import settings
 from src.core.security import create_device_access_token
 from src.models import Device, Message, Site, User
@@ -30,6 +31,7 @@ class UrlMessages(StringField):
 
 
 class DeviceView(ModelView):
+    # row_actions_display_type = RowActionsDisplayType.DROPDOWN
     detail_template = "device_detail.html"
     fields = [
         Device.id,

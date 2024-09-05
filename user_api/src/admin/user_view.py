@@ -113,7 +113,7 @@ class UserView(ModelView):
     searchable_fields = [User.id, User.username]
 
     async def validate(self, request: Request, data: dict[str, Any]) -> None:
-        errors: dict[str, str] = dict()
+        errors: dict[str, str] = {}
         if " " in data["username"]:
             errors["username"] = "Username should not contain spaces"
         if not re.match(r"[^@]+@[^@]+\.[^@]+", data["email"]):

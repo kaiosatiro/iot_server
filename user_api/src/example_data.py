@@ -67,9 +67,17 @@ def insert_example_data(session: Session) -> None:
                 # Insert example messages
                 msg_in_list = []
                 for message in MESSAGES.get(device.model):
-                    message_prep = MessageCreation(device_id=device.id, message=message)
-                    message_in = Message.model_validate(message_prep)
-                    msg_in_list.append(message_in)
+                    for _ in range(10):
+                        m = randint(6, 8)
+                        d = randint(1, 30)
+                        message_prep = MessageCreation(
+                            device_id=device.id, message=message
+                        )
+                        message_in = Message.model_validate(
+                            message_prep,
+                            update={"inserted_on": f"2024-{m}-{d}T12:00:00Z"},
+                        )
+                        msg_in_list.append(message_in)
 
                 session.add_all(msg_in_list)
                 session.commit()

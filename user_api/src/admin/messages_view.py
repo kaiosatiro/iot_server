@@ -1,5 +1,4 @@
 from starlette.requests import Request
-
 from starlette_admin.contrib.sqlmodel import ModelView
 from starlette_admin.fields import (
     HasOne,
@@ -11,7 +10,6 @@ from src.models import Message
 
 
 class MessageView(ModelView):
-    # row_actions_display_type = RowActionsDisplayType.DROPDOWN
     list_template = "message_list.html"
     detail_template = "message_detail.html"
     fields = [

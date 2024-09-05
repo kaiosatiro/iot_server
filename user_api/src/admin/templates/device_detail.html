@@ -74,6 +74,7 @@
                                                     <strong>{{ field.label }}</strong>
                                                 </div>
                                             </td>
+                                            
                                             <td data-label="Value">
                                                 {% with data=obj[field.name] %}
                                                     {% if data == None %}
@@ -84,7 +85,17 @@
                                                         {% include field.display_template %}
                                                     {% endif %}
                                                 {% endwith %}
+                                            {% if field.name == 'token' %}
+                                            <input type="text" value="{{ obj[field.name] }}" id="token" style="display: none;">
+                                                <button onclick="copyToClipboard()" class="">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-copy">
+                                                        <path d="M7 7m0 2.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667z" />
+                                                        <path d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1" />
+                                                      </svg>
+                                                </button>
+                                            {% endif %}
                                             </td>
+
                                         </tr>
                                         {% endif %}
                                     {% endfor %}
@@ -155,5 +166,27 @@
               });
             });
           });
+    
+    function copyToClipboard() {
+        var copyText = document.getElementById("token");
+        navigator.clipboard.writeText(copyText.value);
+
+        var alertBox = document.createElement("div");
+        alertBox.innerText = "Token copied to clipboard!";
+        alertBox.style.position = "fixed";
+        alertBox.style.top = "10px";
+        alertBox.style.left = "50%";
+        alertBox.style.transform = "translateX(-50%)";
+        alertBox.style.backgroundColor = "#4CAF50";
+        alertBox.style.color = "white";
+        alertBox.style.padding = "10px";
+        alertBox.style.borderRadius = "5px";
+        alertBox.style.zIndex = "1000";
+        document.body.appendChild(alertBox);
+
+        setTimeout(function() {
+            document.body.removeChild(alertBox);
+        }, 5000)
+    }
     </script>
 {% endblock %}
