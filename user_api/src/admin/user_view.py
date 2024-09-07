@@ -25,7 +25,7 @@ from src.utils import generate_random_number
 class CountingDevices(IntegerField):
     async def parse_obj(self, request: Request, obj: User) -> int:
         session: Session = request.state.session
-        stmt = select(func.count(Device.id)).where(Device.user_id == obj.id)
+        stmt = select(func.count(Device.id)).where(Device.owner_id == obj.id)
         count = session.execute(stmt).scalar_one()
         return count
 
@@ -33,7 +33,7 @@ class CountingDevices(IntegerField):
 class CountingSites(IntegerField):
     async def parse_obj(self, request: Request, obj: User) -> int:
         session: Session = request.state.session
-        stmt = select(func.count(Site.id)).where(Site.user_id == obj.id)
+        stmt = select(func.count(Site.id)).where(Site.owner_id == obj.id)
         count = session.execute(stmt).scalar_one()
         return count
 

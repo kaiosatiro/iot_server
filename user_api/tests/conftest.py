@@ -136,9 +136,9 @@ def messages_batch_fixture(db, userfix, sitefix, devicefix) -> tuple[int | None,
     user = crud.create_user(db=db, user_input=user_in)
 
     site_in = SiteCreation(**sitefix)
-    site = crud.create_site(db=db, site_input=site_in, user_id=user.id)
+    site = crud.create_site(db=db, site_input=site_in, owner_id=user.id)
 
-    device_in = DeviceCreation(**devicefix, user_id=user.id, site_id=site.id)
+    device_in = DeviceCreation(**devicefix, owner_id=user.id, site_id=site.id)
     device = crud.create_device(db=db, device_input=device_in)
 
     messages = []

@@ -49,7 +49,7 @@ def insert_example_data(session: Session) -> None:
                 name=random_site["name"],
                 description=random_site["description"],
             )
-            site = crud.create_site(db=session, site_input=site_in, user_id=user.id)
+            site = crud.create_site(db=session, site_input=site_in, owner_id=user.id)
 
             # Random number of devices for each site
             for _ in range(randint(1, 5)):
@@ -60,7 +60,7 @@ def insert_example_data(session: Session) -> None:
                     type=random_device["type"],
                     description=random_device["description"],
                     site_id=site.id,
-                    user_id=user.id,
+                    owner_id=user.id,
                 )
                 device = crud.create_device(db=session, device_input=device_in)
 

@@ -98,11 +98,11 @@ def authenticate_user(*, db: Session, username: str, password: str) -> User | No
 
 
 # -------------------------- SITE -----------------------------------
-def create_site(*, db: Session, site_input: SiteCreation, user_id: int) -> Site:
+def create_site(*, db: Session, site_input: SiteCreation, owner_id: int) -> Site:
     _id = generate_random_number(1000000, 9999999)
     while db.get(Site, _id):
         _id = generate_random_number(1000000, 9999999)
-    site = Site.model_validate(site_input, update={"user_id": user_id, "id": _id})
+    site = Site.model_validate(site_input, update={"owner_id": owner_id, "id": _id})
     db.add(site)
     db.commit()
     db.refresh(site)
@@ -124,8 +124,8 @@ def get_site_by_name(*, db: Session, name: str) -> Site | None:
     return session_site
 
 
-def get_sites_by_user_id(*, db: Session, user_id: int) -> Sequence[Site]:
-    statement = select(Site).where(Site.user_id == user_id)
+def get_sites_by_owner_id(*, db: Session, owner_id: int) -> Sequence[Site]:
+    statement = select(Site).where(Site.owner_id == owner_id)
     session_sites = db.exec(statement).all()
     return session_sites
 
@@ -135,8 +135,8 @@ def delete_site(*, db: Session, site: Site) -> None:
     db.commit()
 
 
-def delete_sites_from_user(*, db: Session, user_id: int) -> None:
-    statement = select(Site).where(Site.user_id == user_id)
+def delete_sites_from_user(*, db: Session, owner_id: int) -> None:
+    statement = select(Site).where(Site.owner_id == owner_id)
     session_sites = db.exec(statement).all()
     for site in session_sites:
         db.delete(site)
@@ -176,20 +176,20 @@ def get_device_by_name(*, db: Session, name: str) -> Device | None:
     return session_device
 
 
-def get_devices_by_type(*, db: Session, type: str, user_id: int) -> Sequence[Device]:
-    statement = select(Device).where(Device.type == type, Device.user_id == user_id)
+def get_devices_by_type(*, db: Session, type: str, owner_id: int) -> Sequence[Device]:
+    statement = select(Device).where(Device.type == type, Device.owner_id == owner_id)
     session_devices = db.exec(statement).all()
     return session_devices
 
 
-def get_devices_by_model(*, db: Session, model: str, user_id: int) -> Sequence[Device]:
-    statement = select(Device).where(Device.model == model, Device.user_id == user_id)
+def get_devices_by_model(*, db: Session, model: str, owner_id: int) -> Sequence[Device]:
+    statement = select(Device).where(Device.model == model, Device.owner_id == owner_id)
     session_devices = db.exec(statement).all()
     return session_devices
 
 
-def get_devices_by_user_id(*, db: Session, user_id: int) -> Sequence[Device]:
-    statement = select(Device).where(Device.user_id == user_id)
+def get_devices_by_owner_id(*, db: Session, owner_id: int) -> Sequence[Device]:
+    statement = select(Device).where(Device.owner_id == owner_id)
     session_devices = db.exec(statement).all()
     return session_devices
 
@@ -200,8 +200,8 @@ def get_devices_by_site_id(*, db: Session, site_id: int) -> Sequence[Device]:
     return session_devices
 
 
-def delete_devices_from_user(*, db: Session, user_id: int) -> None:
-    statement = select(Device).where(Device.user_id == user_id)
+def delete_devices_from_user(*, db: Session, owner_id: int) -> None:
+    statement = select(Device).where(Device.owner_id == owner_id)
     session_devices = db.exec(statement).all()
     for device in session_devices:
         db.delete(device)

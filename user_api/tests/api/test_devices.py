@@ -16,13 +16,13 @@ class TestGetDevices:
         site = crud.create_site(
             db=db,
             site_input=site,
-            user_id=user_id
+            owner_id=user_id
             )
 
         rng = 10
         for i in range(rng):
             device = DeviceCreation(
-                user_id=user_id,
+                owner_id=user_id,
                 site_id=site.id,
                 name=f"Device_{i}",
                 model=f"Model{i}",
@@ -48,7 +48,7 @@ class TestGetDevices:
 
         assert response.status_code == 200
         assert response.json()["count"] == devicesbatch["range"], "Define in the fixture"
-        assert response.json()["user_id"] == devicesbatch["user_id"], "Should be the last user id"
+        assert response.json()["owner_id"] == devicesbatch["user_id"], "Should be the last user id"
         assert response.json()["username"] == devicesbatch["username"], "Should be the last username"
         assert response.json()["data"], "Should return a list of devices"
 
@@ -72,11 +72,11 @@ class TestGetDevice:
         site = crud.create_site(
             db=db,
             site_input=site,
-            user_id=user_id
+            owner_id=user_id
             )
 
         device = DeviceCreation(
-            user_id=user_id,
+            owner_id=user_id,
             site_id=site.id,
             name="Device",
             model="Model",
@@ -118,10 +118,10 @@ class TestGetDevice:
         u = UserCreation(email="email", username="random_lower_string()", password="random_lower_string()")
         user = crud.create_user(db=db, user_input=u)
         s = SiteCreation(name="Site", description="Description")
-        site = crud.create_site(db=db, site_input=s, user_id=user.id)
+        site = crud.create_site(db=db, site_input=s, owner_id=user.id)
 
         d = DeviceCreation(
-            user_id=user.id,  # <<< user ID from different user to be use in the request
+            owner_id=user.id,  # <<< user ID from different user to be use in the request
             site_id=site.id,
             name="Device",
             model="Model",
@@ -144,13 +144,13 @@ class TestGetDevicePerSite:
         site = crud.create_site(
             db=db,
             site_input=site,
-            user_id=user_id
+            owner_id=user_id
             )
 
         rng = 10
         for i in range(rng):
             device = DeviceCreation(
-                user_id=user_id,
+                owner_id=user_id,
                 site_id=site.id,
                 name=f"Device_{i}",
                 model=f"Model{i}",
@@ -180,7 +180,7 @@ class TestGetDevicePerSite:
         assert response.json()["count"] == devicesbatch["range"], "Define in the fixture"
         assert response.json()["site_id"] == site_id, "Should be the last site id"
         assert response.json()["site_name"] == devicesbatch["site-name"], "Should be the last site name"
-        assert response.json()["user_id"] == devicesbatch["user_id"], "Should be the last user id"
+        assert response.json()["owner_id"] == devicesbatch["user_id"], "Should be the last user id"
         assert response.json()["username"] == devicesbatch["username"], "Should be the last username"
         assert response.json()["data"], "Should return a list of devices"
 
@@ -208,7 +208,7 @@ class TestGetDevicePerSite:
         site = crud.create_site(
             db=db,
             site_input=site,
-            user_id=user_id
+            owner_id=user_id
             )
         response = client.get(f"/devices/site/{site.id}", headers=normal_token_headers)
 
@@ -224,7 +224,7 @@ class TestCreateDevice:
         user_id = response.json()["id"]
 
         site = SiteCreation(name="Site", description="Description")
-        site = crud.create_site(db=db, site_input=site, user_id=user_id)
+        site = crud.create_site(db=db, site_input=site, owner_id=user_id)
 
         return {"site_id": site.id, "user_id": user_id}
 
@@ -238,11 +238,11 @@ class TestCreateDevice:
         site = crud.create_site(
             db=db,
             site_input=SiteCreation(name="Site", description="Description"),
-            user_id=user_id
+            owner_id=user_id
             )
 
         device = {
-            "user_id": user_id,
+            "owner_id": user_id,
             "site_id": site.id,
             "name": "Device",
             "model": "Model",
@@ -276,7 +276,7 @@ class TestCreateDevice:
     def test_create_device_site_do_not_exists(
             self, client: TestClient, normal_token_headers: dict) -> None:
         device = {
-            "user_id": 1,
+            "owner_id": 1,
             "site_id": 999,
             "name": "Device",
             "model": "Model",
@@ -294,7 +294,7 @@ class TestCreateDevice:
         u = UserCreation(email="email", username="random_lower_string()", password="random_lower_string()")
         user = crud.create_user(db=db, user_input=u)
         s = SiteCreation(name="Site", description="Description")
-        site = crud.create_site(db=db, site_input=s, user_id=user.id)
+        site = crud.create_site(db=db, site_input=s, owner_id=user.id)
 
         device = {
             "site_id": site.id,  # <<< site ID from different user
@@ -327,10 +327,10 @@ class TestUpdateDevice:
         user_id = response.json()["id"]
 
         site = SiteCreation(name="Site", description="Description")
-        site = crud.create_site(db=db, site_input=site, user_id=user_id)
+        site = crud.create_site(db=db, site_input=site, owner_id=user_id)
 
         device = DeviceCreation(
-            user_id=user_id,
+            owner_id=user_id,
             site_id=site.id,
             name="Device",
             model="Model",
@@ -365,7 +365,7 @@ class TestUpdateDevice:
         device_id = devicesbatch["device_id"]
         # Create a new site
         site = SiteCreation(name="Site", description="Description")
-        new_site = crud.create_site(db=db, site_input=site, user_id=devicesbatch["user_id"])
+        new_site = crud.create_site(db=db, site_input=site, owner_id=devicesbatch["user_id"])
 
         device = {
             "site_id": new_site.id,
@@ -410,10 +410,10 @@ class TestUpdateDevice:
         u = UserCreation(email="email", username="random_lower_string()", password="random_lower_string()")
         user = crud.create_user(db=db, user_input=u)
         s = SiteCreation(name="Site", description="Description")
-        site = crud.create_site(db=db, site_input=s, user_id=user.id)
+        site = crud.create_site(db=db, site_input=s, owner_id=user.id)
 
         d = DeviceCreation(
-            user_id=user.id,  # <<< user ID from different user to be use in the request
+            owner_id=user.id,  # <<< user ID from different user to be use in the request
             site_id=site.id,
             name="Device",
             model="Model",
@@ -433,10 +433,10 @@ class TestDeleteDevice:
         user_id = response.json()["id"]
 
         site = SiteCreation(name="Site", description="Description")
-        site = crud.create_site(db=db, site_input=site, user_id=user_id)
+        site = crud.create_site(db=db, site_input=site, owner_id=user_id)
 
         device = DeviceCreation(
-                user_id=user_id,
+                owner_id=user_id,
                 site_id=site.id,
                 name="Device",
                 model="Model",
@@ -474,10 +474,10 @@ class TestDeleteDevice:
         u = UserCreation(email="email", username="random_lower_string()", password="random_lower_string()")
         user = crud.create_user(db=db, user_input=u)
         s = SiteCreation(name="Site", description="Description")
-        site = crud.create_site(db=db, site_input=s, user_id=user.id)
+        site = crud.create_site(db=db, site_input=s, owner_id=user.id)
 
         d = DeviceCreation(
-            user_id=user.id,  # <<< user ID from different user to be use in the request
+            owner_id=user.id,  # <<< user ID from different user to be use in the request
             site_id=site.id,
             name="Device",
             model="Model",
@@ -497,12 +497,12 @@ class TestDeleteAllDevice:
         user_id = response.json()["id"]
 
         site = SiteCreation(name="Site", description="Description")
-        site = crud.create_site(db=db, site_input=site, user_id=user_id)
+        site = crud.create_site(db=db, site_input=site, owner_id=user_id)
 
         rng = 10
         for i in range(rng):
             device = DeviceCreation(
-                user_id=user_id,
+                owner_id=user_id,
                 site_id=site.id,
                 name=f"Device_{i}",
                 model=f"Model{i}",
@@ -543,10 +543,10 @@ class TestDeleteAllDevice:
         u = UserCreation(email="email", username="random_lower_string()", password="random_lower_string()")
         user = crud.create_user(db=db, user_input=u)
         s = SiteCreation(name="Site", description="Description")
-        site = crud.create_site(db=db, site_input=s, user_id=user.id)
+        site = crud.create_site(db=db, site_input=s, owner_id=user.id)
 
         d = DeviceCreation(
-            user_id=user.id,
+            owner_id=user.id,
             site_id=site.id,  # <<< user ID from different user to be use in the request
             name="Device",
             model="Model",

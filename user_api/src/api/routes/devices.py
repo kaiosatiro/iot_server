@@ -35,16 +35,16 @@ async def get_user_devices(
     count_statement = (
         select(func.count())
         .select_from(Device)
-        .where(Device.user_id == current_user.id)
+        .where(Device.owner_id == current_user.id)
     )
     count = session.exec(count_statement).one()
 
-    deviceslist = crud.get_devices_by_user_id(db=session, user_id=current_user.id)
+    deviceslist = crud.get_devices_by_owner_id(db=session, owner_id=current_user.id)
 
     # if logger.isEnabledFor(logging.DEBUG): logger.debug(f"Count: {count}")
     logger.info("Returning %s devices", count)
     return DevicesListResponse(
-        user_id=current_user.id,
+        owner_id=current_user.id,
         username=current_user.username,
         count=count,
         data=deviceslist,
@@ -77,7 +77,7 @@ async def get_device_information(
         logger.warning("Device %s not found", device_id)
         raise HTTPException(status_code=404, detail="Device not found")
 
-    if device.user_id != current_user.id:
+    if device.owner_id != current_user.id:
         logger.warning(
             "User %s does not have permissions, device_id %s",
             current_user.username,
@@ -114,7 +114,7 @@ async def get_site_devices(
     count_statement = (
         select(func.count())
         .select_from(Device)
-        .where(Device.user_id == current_user.id)
+        .where(Device.owner_id == current_user.id)
         .where(Device.site_id == site_id)
     )
     count = session.exec(count_statement).one()
@@ -123,7 +123,7 @@ async def get_site_devices(
 
     logger.info("Returning %s devices from site %s", count, site_id)
     return DevicesListResponse(
-        user_id=current_user.id,
+        owner_id=current_user.id,
         username=current_user.username,
         site_id=site_id,
         site_name=site.name,
@@ -158,14 +158,14 @@ async def create_device(
         logger.warning("Site %s not found", device_in.site_id)
         raise HTTPException(status_code=404, detail="Site not found")
 
-    if site.user_id != current_user.id:
+    if site.owner_id != current_user.id:
         logger.warning(
             "Site %s does not belong to user %s", site.id, current_user.username
         )
         raise HTTPException(status_code=403, detail="Site does not belong to user")
 
     try:
-        device_in.user_id = current_user.id
+        device_in.owner_id = current_user.id
         device = crud.create_device(db=session, device_input=device_in)
     except ValidationError as e:
         logger.error(e)
@@ -203,7 +203,7 @@ async def update_device(
         logger.warning("Device %s not found", device_id)
         raise HTTPException(status_code=404, detail="Device not found")
 
-    if device.user_id != current_user.id:
+    if device.owner_id != current_user.id:
         logger.warning(
             "User %s does not have permissions, device_id %s",
             current_user.username,
@@ -213,7 +213,7 @@ async def update_device(
 
     if device_in.site_id:
         site = session.get(Site, device_in.site_id)
-        if site is None or site.user_id != current_user.id:
+        if site is None or site.owner_id != current_user.id:
             logger.warning(
                 "Site %s not found or does not belong to user", device_in.site_id
             )
@@ -256,7 +256,7 @@ async def delete_device(
         logger.warning("Device %s not found", device_id)
         raise HTTPException(status_code=404, detail="Device not found")
 
-    if device.user_id != current_user.id:
+    if device.owner_id != current_user.id:
         logger.warning(
             "User %s does not have permissions, device_id %s",
             current_user.username,
@@ -300,7 +300,7 @@ async def delete_site_devices(
         logger.warning("Site %s not found", site_id)
         raise HTTPException(status_code=404, detail="Site not found")
 
-    if site.user_id != current_user.id:
+    if site.owner_id != current_user.id:
         logger.warning(
             "User %s does not have permissions, site_id %s",
             current_user.username,

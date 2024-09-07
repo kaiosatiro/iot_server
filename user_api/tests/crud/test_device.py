@@ -9,9 +9,9 @@ def test_create_device(db: Session, userfix: dict, sitefix: dict, devicefix) -> 
     user_in = UserCreation(**userfix)
     site_in = SiteCreation(**sitefix)
     user = crud.create_user(db=db, user_input=user_in)
-    site = crud.create_site(db=db, site_input=site_in, user_id=user.id)
+    site = crud.create_site(db=db, site_input=site_in, owner_id=user.id)
 
-    device_in = DeviceCreation(**devicefix, user_id=user.id, site_id=site.id)
+    device_in = DeviceCreation(**devicefix, owner_id=user.id, site_id=site.id)
     device = crud.create_device(db=db, device_input=device_in)
 
     assert device.token
@@ -21,7 +21,7 @@ def test_create_device(db: Session, userfix: dict, sitefix: dict, devicefix) -> 
     assert (
         device.description == device_in.description
     ), "Device description does not match"
-    assert device.user_id == user.id, "Device user_id does not match"
+    assert device.owner_id == user.id, "Device owner_id does not match"
     assert device.site_id == site.id, "Device site_id does not match"
     assert device.created_on is not None, "Device created_on is None"
 
@@ -30,9 +30,9 @@ def test_update_device(db: Session, userfix: dict, sitefix: dict, devicefix) -> 
     user_in = UserCreation(**userfix)
     site_in = SiteCreation(**sitefix)
     user = crud.create_user(db=db, user_input=user_in)
-    site = crud.create_site(db=db, site_input=site_in, user_id=user.id)
+    site = crud.create_site(db=db, site_input=site_in, owner_id=user.id)
 
-    device_in = DeviceCreation(**devicefix, user_id=user.id, site_id=site.id)
+    device_in = DeviceCreation(**devicefix, owner_id=user.id, site_id=site.id)
     device = crud.create_device(db=db, device_input=device_in)
 
     device_update = DeviceUpdate(
@@ -44,7 +44,7 @@ def test_update_device(db: Session, userfix: dict, sitefix: dict, devicefix) -> 
     assert (
         device.description == device_update.description
     ), "Device description does not match"
-    assert device.user_id == user.id, "Device user_id does not match"
+    assert device.owner_id == user.id, "Device owner_id does not match"
     assert device.site_id == site.id, "Device site_id does not match"
     assert device.created_on is not None, "Device created_on is None"
 
@@ -58,9 +58,9 @@ def test_get_device_by_name(
     user_in = UserCreation(**userfix)
     site_in = SiteCreation(**sitefix)
     user = crud.create_user(db=db, user_input=user_in)
-    site = crud.create_site(db=db, site_input=site_in, user_id=user.id)
+    site = crud.create_site(db=db, site_input=site_in, owner_id=user.id)
 
-    device_in = DeviceCreation(**devicefix, user_id=user.id, site_id=site.id)
+    device_in = DeviceCreation(**devicefix, owner_id=user.id, site_id=site.id)
     device = crud.create_device(db=db, device_input=device_in)
 
     device_seek = crud.get_device_by_name(db=db, name=devicefix["name"])
@@ -72,7 +72,7 @@ def test_get_device_by_name(
     assert (
         device_seek.description == device.description
     ), "Device description does not match"
-    assert device_seek.user_id == user.id, "Device user_id does not match"
+    assert device_seek.owner_id == user.id, "Device owner_id does not match"
     assert device_seek.site_id == site.id, "Device site_id does not match"
     assert device_seek.created_on is not None, "Device created_on is None"
 
@@ -90,18 +90,18 @@ def test_get_devices_by_type(
     user_in = UserCreation(**userfix)
     site_in = SiteCreation(**sitefix)
     user = crud.create_user(db=db, user_input=user_in)
-    site = crud.create_site(db=db, site_input=site_in, user_id=user.id)
+    site = crud.create_site(db=db, site_input=site_in, owner_id=user.id)
 
     for _ in range(5):
-        device_in = DeviceCreation(**devicefix, user_id=user.id, site_id=site.id)
+        device_in = DeviceCreation(**devicefix, owner_id=user.id, site_id=site.id)
         device = crud.create_device(db=db, device_input=device_in)
 
-    devices = crud.get_devices_by_type(db=db, type=devicefix["type"], user_id=user.id)
+    devices = crud.get_devices_by_type(db=db, type=devicefix["type"], owner_id=user.id)
 
     assert len(devices) == 5, f"devices: {devices}"
     for device in devices:
         assert device.type == devicefix["type"], f"device: {device}"
-        assert device.user_id == user.id, f"device: {device}"
+        assert device.owner_id == user.id, f"device: {device}"
         assert device.site_id == site.id, f"device: {device}"
         assert device.created_on is not None, f"device: {device}"
 
@@ -112,41 +112,41 @@ def test_get_devices_by_model(
     user_in = UserCreation(**userfix)
     site_in = SiteCreation(**sitefix)
     user = crud.create_user(db=db, user_input=user_in)
-    site = crud.create_site(db=db, site_input=site_in, user_id=user.id)
+    site = crud.create_site(db=db, site_input=site_in, owner_id=user.id)
 
     for _ in range(5):
-        device_in = DeviceCreation(**devicefix, user_id=user.id, site_id=site.id)
+        device_in = DeviceCreation(**devicefix, owner_id=user.id, site_id=site.id)
         device = crud.create_device(db=db, device_input=device_in)
 
     devices = crud.get_devices_by_model(
-        db=db, model=devicefix["model"], user_id=user.id
+        db=db, model=devicefix["model"], owner_id=user.id
     )
 
     assert len(devices) == 5, f"devices: {devices}"
     for device in devices:
         assert device.model == devicefix["model"], f"device: {device}"
-        assert device.user_id == user.id, f"device: {device}"
+        assert device.owner_id == user.id, f"device: {device}"
         assert device.site_id == site.id, f"device: {device}"
         assert device.created_on is not None, f"device: {device}"
 
 
-def test_get_devices_by_user_id(
+def test_get_devices_by_owner_id(
     db: Session, userfix: dict, sitefix: dict, devicefix
 ) -> None:
     user_in = UserCreation(**userfix)
     site_in = SiteCreation(**sitefix)
     user = crud.create_user(db=db, user_input=user_in)
-    site = crud.create_site(db=db, site_input=site_in, user_id=user.id)
+    site = crud.create_site(db=db, site_input=site_in, owner_id=user.id)
 
     for _ in range(5):
-        device_in = DeviceCreation(**devicefix, user_id=user.id, site_id=site.id)
+        device_in = DeviceCreation(**devicefix, owner_id=user.id, site_id=site.id)
         device = crud.create_device(db=db, device_input=device_in)
 
-    devices = crud.get_devices_by_user_id(db=db, user_id=user.id)
+    devices = crud.get_devices_by_owner_id(db=db, owner_id=user.id)
 
     assert len(devices) == 5, f"devices: {devices}"
     for device in devices:
-        assert device.user_id == user.id, f"device: {device}"
+        assert device.owner_id == user.id, f"device: {device}"
         assert device.site_id == site.id, f"device: {device}"
         assert device.created_on is not None, f"device: {device}"
 
@@ -157,17 +157,17 @@ def test_get_devices_by_site_id(
     user_in = UserCreation(**userfix)
     site_in = SiteCreation(**sitefix)
     user = crud.create_user(db=db, user_input=user_in)
-    site = crud.create_site(db=db, site_input=site_in, user_id=user.id)
+    site = crud.create_site(db=db, site_input=site_in, owner_id=user.id)
 
     for _ in range(5):
-        device_in = DeviceCreation(**devicefix, user_id=user.id, site_id=site.id)
+        device_in = DeviceCreation(**devicefix, owner_id=user.id, site_id=site.id)
         device = crud.create_device(db=db, device_input=device_in)
 
     devices = crud.get_devices_by_site_id(db=db, site_id=site.id)
 
     assert len(devices) == 5, f"devices: {devices}"
     for device in devices:
-        assert device.user_id == user.id, f"device: {device}"
+        assert device.owner_id == user.id, f"device: {device}"
         assert device.site_id == site.id, f"device: {device}"
         assert device.created_on is not None, f"device: {device}"
 
@@ -178,17 +178,17 @@ def test_delete_devices_from_user(
     user_in = UserCreation(**userfix)
     site_in = SiteCreation(**sitefix)
     user = crud.create_user(db=db, user_input=user_in)
-    site = crud.create_site(db=db, site_input=site_in, user_id=user.id)
+    site = crud.create_site(db=db, site_input=site_in, owner_id=user.id)
 
     for _ in range(5):
-        device_in = DeviceCreation(**devicefix, user_id=user.id, site_id=site.id)
+        device_in = DeviceCreation(**devicefix, owner_id=user.id, site_id=site.id)
         crud.create_device(db=db, device_input=device_in)
 
-    assert len(crud.get_devices_by_user_id(db=db, user_id=user.id)) == 5
+    assert len(crud.get_devices_by_owner_id(db=db, owner_id=user.id)) == 5
 
-    crud.delete_devices_from_user(db=db, user_id=user.id)
+    crud.delete_devices_from_user(db=db, owner_id=user.id)
 
-    devices = crud.get_devices_by_user_id(db=db, user_id=user.id)
+    devices = crud.get_devices_by_owner_id(db=db, owner_id=user.id)
     assert len(devices) == 0, f"devices: {devices}"
 
 
@@ -198,10 +198,10 @@ def test_delete_devices_per_site_id(
     user_in = UserCreation(**userfix)
     site_in = SiteCreation(**sitefix)
     user = crud.create_user(db=db, user_input=user_in)
-    site = crud.create_site(db=db, site_input=site_in, user_id=user.id)
+    site = crud.create_site(db=db, site_input=site_in, owner_id=user.id)
 
     for _ in range(5):
-        device_in = DeviceCreation(**devicefix, user_id=user.id, site_id=site.id)
+        device_in = DeviceCreation(**devicefix, owner_id=user.id, site_id=site.id)
         crud.create_device(db=db, device_input=device_in)
 
     assert len(crud.get_devices_by_site_id(db=db, site_id=site.id)) == 5
@@ -216,9 +216,9 @@ def test_delete_device(db: Session, userfix: dict, sitefix: dict, devicefix) -> 
     user_in = UserCreation(**userfix)
     site_in = SiteCreation(**sitefix)
     user = crud.create_user(db=db, user_input=user_in)
-    site = crud.create_site(db=db, site_input=site_in, user_id=user.id)
+    site = crud.create_site(db=db, site_input=site_in, owner_id=user.id)
 
-    device_in = DeviceCreation(**devicefix, user_id=user.id, site_id=site.id)
+    device_in = DeviceCreation(**devicefix, owner_id=user.id, site_id=site.id)
     device = crud.create_device(db=db, device_input=device_in)
 
     assert crud.get_device_by_name(db=db, name=devicefix["name"])
@@ -226,4 +226,4 @@ def test_delete_device(db: Session, userfix: dict, sitefix: dict, devicefix) -> 
     crud.delete_device(db=db, device=device)
 
     assert not crud.get_device_by_name(db=db, name=devicefix["name"])
-    assert crud.get_devices_by_user_id(db=db, user_id=user.id) == []
+    assert crud.get_devices_by_owner_id(db=db, owner_id=user.id) == []

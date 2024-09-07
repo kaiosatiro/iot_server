@@ -16,7 +16,7 @@ class TestGetSites:
         rng = 10
         for _ in range(rng):
             site = SiteCreation(name=f"Site_{_}")
-            crud.create_site(db=db, site_input=site, user_id=user_id)
+            crud.create_site(db=db, site_input=site, owner_id=user_id)
         return {
             "range": rng, "user-id": user_id, "username": username
         }
@@ -32,7 +32,7 @@ class TestGetSites:
 
         assert response.status_code == 200
         assert response.json()["count"] == sitesbatchrange["range"], "Should be the count define in the fixture"
-        assert response.json()["user_id"] == sitesbatchrange["user-id"], "Should be the last site id"
+        assert response.json()["owner_id"] == sitesbatchrange["user-id"], "Should be the last site id"
         assert response.json()["username"] == sitesbatchrange["username"], "Should be the last site name"
         assert response.json()["data"], "Should return a list of sites"
 

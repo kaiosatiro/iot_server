@@ -18,10 +18,10 @@ def create_test_data(session: Session):
     )
     session.add(user)
     session.commit()
-    site = Site(name="test_site", user_id=user.id)
+    site = Site(name="test_site", owner_id=user.id)
     session.add(site)
     session.commit()
     for i in range(100):
-        device = Device(name="{i}name", site_id=site.id, user_id=user.id)
+        device = Device(name="{i}name", site_id=site.id, owner_id=user.id)
         session.add(device)
     session.commit()

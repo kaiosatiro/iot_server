@@ -33,7 +33,7 @@ class DeviceBase(SQLModel):
 
 
 class DeviceCreation(DeviceBase):
-    user_id: int | None = None
+    owner_id: int | None = None
     site_id: int
 
     model_config = {
@@ -45,7 +45,7 @@ class DeviceCreation(DeviceBase):
                     "type": "sensor",
                     "description": "A humidity sensor for home use",
                     "site_id": 1234567,
-                    "user_id": 12345,
+                    "owner_id": 12345,
                 }
             ]
         }
@@ -73,7 +73,7 @@ class DeviceUpdate(DeviceBase):
 
 class DeviceResponse(DeviceBase):
     id: int
-    user_id: int
+    owner_id: int
     site_id: int
     token: str
     created_on: datetime
@@ -90,7 +90,7 @@ class DeviceResponse(DeviceBase):
                     "type": "sensor",
                     "description": "A humidity sensor for home use",
                     "site_id": 1234567,
-                    "user_id": 12345,
+                    "owner_id": 12345,
                     "created_on": "2024-07-12T15:00:00Z",
                     "updated_on": "2024-07-12T15:00:00Z",
                 }
@@ -100,7 +100,7 @@ class DeviceResponse(DeviceBase):
 
 
 class DevicesListResponse(SQLModel):
-    user_id: int
+    owner_id: int
     username: str
     site_id: int | None = None
     site_name: str | None = None
@@ -111,7 +111,7 @@ class DevicesListResponse(SQLModel):
         "json_schema_extra": {
             "examples": [
                 {
-                    "user_id": 12345,
+                    "owner_id": 12345,
                     "username": "user",
                     "count": 1,
                     "data": [
@@ -123,7 +123,7 @@ class DevicesListResponse(SQLModel):
                             "type": "sensor",
                             "description": "A humidity sensor for home use",
                             "site_id": 1234567,
-                            "user_id": 12345,
+                            "owner_id": 12345,
                             "created_on": "2024-07-12T15:00:00Z",
                             "updated_on": "2024-07-12T15:00:00Z",
                         }
@@ -135,7 +135,7 @@ class DevicesListResponse(SQLModel):
 
 
 class Device(DeviceBase, BaseModel, table=True):
-    user_id: int = Field(foreign_key="user.id", nullable=False, ondelete="CASCADE")
+    owner_id: int = Field(foreign_key="user.id", nullable=False, ondelete="CASCADE")
     user: "User" = Relationship(back_populates="devices")
 
     site_id: int = Field(foreign_key="site.id", nullable=False, ondelete="CASCADE")
@@ -301,7 +301,7 @@ class SiteResponse(SiteBase):
 
 
 class SitesListResponse(SQLModel):
-    user_id: int
+    owner_id: int
     username: str
     count: int
     data: list["SiteResponse"]
@@ -310,7 +310,7 @@ class SitesListResponse(SQLModel):
         "json_schema_extra": {
             "examples": [
                 {
-                    "user_id": 12345,
+                    "owner_id": 12345,
                     "username": "user",
                     "count": 1,
                     "data": [
@@ -329,7 +329,7 @@ class SitesListResponse(SQLModel):
 
 
 class Site(SiteBase, BaseModel, table=True):
-    user_id: int = Field(foreign_key="user.id", nullable=False, ondelete="CASCADE")
+    owner_id: int = Field(foreign_key="user.id", nullable=False, ondelete="CASCADE")
     user: "User" = Relationship(back_populates="sites")
 
     devices: list["Device"] = Relationship(back_populates="site", cascade_delete=True)
@@ -581,7 +581,7 @@ if __name__ == "__main__":
                 name=f"Site{_}",
                 description="Site description",
             )
-            site.user_id = user.id
+            site.owner_id = user.id
             session.add(site)
             session.commit()
 

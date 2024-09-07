@@ -33,7 +33,7 @@ async def get_message_by_id(
         raise HTTPException(status_code=404, detail="Message not found")
 
     device = session.get(Device, message.device_id)
-    if device and device.user_id != current_user.id:
+    if device and device.owner_id != current_user.id:
         logger.warning(
             "User %s does not have permissions, message_id %s",
             current_user.username,
@@ -86,7 +86,7 @@ async def get_messages_from_device(
         logger.warning("Device %s not found", device_id)
         raise HTTPException(status_code=404, detail="Device not found")
 
-    if device.user_id != current_user.id:
+    if device.owner_id != current_user.id:
         logger.warning(
             "User %s does not have permissions, device_id %s",
             current_user.username,
@@ -135,7 +135,7 @@ async def delete_message_by_id(
         raise HTTPException(status_code=404, detail="Message not found")
 
     device = session.get(Device, message.device_id)
-    if device and device.user_id != current_user.id:
+    if device and device.owner_id != current_user.id:
         logger.warning(
             "User %s does not have permissions, message_id %s",
             current_user.username,
@@ -185,7 +185,7 @@ async def delete_messages_from_device(
         logger.warning("Device %s not found", device_id)
         raise HTTPException(status_code=404, detail="Device not found")
 
-    if device.user_id != current_user.id:
+    if device.owner_id != current_user.id:
         logger.warning(
             "User %s does not have permissions, device_id %s",
             current_user.username,

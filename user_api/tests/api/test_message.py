@@ -21,10 +21,10 @@ class TestGetMessages:
         user_id = response.json()["id"]
 
         site = SiteCreation(name="Site", description="Description")
-        site = crud.create_site(db=db, site_input=site, user_id=user_id)
+        site = crud.create_site(db=db, site_input=site, owner_id=user_id)
 
         device = DeviceCreation(
-                user_id=user_id, site_id=site.id,
+                owner_id=user_id, site_id=site.id,
                 name="Device", model="Model",
                 type="Type", description="Description")
 
@@ -281,10 +281,10 @@ class TestDeleteMessage:
         user_id = response.json()["id"]
 
         site = SiteCreation(name="Site", description="Description")
-        site = crud.create_site(db=db, site_input=site, user_id=user_id)
+        site = crud.create_site(db=db, site_input=site, owner_id=user_id)
 
         device = DeviceCreation(
-                user_id=user_id, site_id=site.id,
+                owner_id=user_id, site_id=site.id,
                 name="Device", model="Model",
                 type="Type", description="Description")
 
@@ -370,10 +370,10 @@ class TestDeleteMessages:
         user_id = response.json()["id"]
 
         site = SiteCreation(name="Site", description="Description")
-        site = crud.create_site(db=db, site_input=site, user_id=user_id)
+        site = crud.create_site(db=db, site_input=site, owner_id=user_id)
 
         device = DeviceCreation(
-                user_id=user_id, site_id=site.id,
+                owner_id=user_id, site_id=site.id,
                 name="Device", model="Model",
                 type="Type", description="Description")
 
@@ -535,10 +535,10 @@ class TestGetMessage:
         user_id = response.json()["id"]
 
         site = SiteCreation(name="Site", description="Description")
-        site = crud.create_site(db=db, site_input=site, user_id=user_id)
+        site = crud.create_site(db=db, site_input=site, owner_id=user_id)
 
         device = DeviceCreation(
-                user_id=user_id, site_id=site.id,
+                owner_id=user_id, site_id=site.id,
                 name="Device", model="Model",
                 type="Type", description="Description")
 

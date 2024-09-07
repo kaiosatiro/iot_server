@@ -34,7 +34,7 @@ async def create_site(
     logger.info("User %s is creating a new site", current_user.username)
 
     try:
-        site = crud.create_site(db=session, site_input=site_in, user_id=current_user.id)
+        site = crud.create_site(db=session, site_input=site_in, owner_id=current_user.id)
     except ValidationError as e:
         logger.error(e)
         raise HTTPException(status_code=422, detail="Bad body format")
@@ -59,15 +59,15 @@ async def get_all_sites_from_user(
     logger.info("User %s is retrieving all sites", current_user.username)
 
     count_statement = (
-        select(func.count()).select_from(Site).where(Site.user_id == current_user.id)
+        select(func.count()).select_from(Site).where(Site.owner_id == current_user.id)
     )
     count = session.exec(count_statement).one()
 
-    Siteslist = crud.get_sites_by_user_id(db=session, user_id=current_user.id)
+    Siteslist = crud.get_sites_by_owner_id(db=session, owner_id=current_user.id)
 
     logger.info("Returning %s sites", count)
     return SitesListResponse(
-        user_id=current_user.id,
+        owner_id=current_user.id,
         username=current_user.username,
         count=count,
         data=Siteslist,
@@ -98,7 +98,7 @@ async def get_information_from_site(
     if not site:
         logger.warning("Site %s not found", site_id)
         raise HTTPException(status_code=404, detail="Site not found")
-    elif site.user_id != current_user.id:
+    elif site.owner_id != current_user.id:
         logger.warning(
             "User %s does not have permissions, site_id %s",
             current_user.username,
@@ -134,7 +134,7 @@ async def update_site(
         logger.warning("Site %s not found", site_id)
         raise HTTPException(status_code=404, detail="Site not found")
 
-    if site.user_id != current_user.id:
+    if site.owner_id != current_user.id:
         logger.warning(
             "User %s does not have permissions, site_id %s",
             current_user.username,
@@ -172,7 +172,7 @@ async def delete_site(
         logger.warning("Site %s not found", site_id)
         raise HTTPException(status_code=404, detail="Site not found")
 
-    if site.user_id != current_user.id:
+    if site.owner_id != current_user.id:
         logger.warning(
             "User %s does not have permissions, site_id %s",
             current_user.username,

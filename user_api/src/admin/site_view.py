@@ -28,7 +28,7 @@ class SiteView(ModelView):
         Site.name,
         HasOne(
             name="user",
-            label="Username",
+            label="Owner",
             identity="users",
             required=True,
             searchable=True,
@@ -74,7 +74,7 @@ class SiteView(ModelView):
             session: Session | AsyncSession = request.state.session
 
             data["id"] = 1
-            data["user_id"] = 1
+            data["owner_id"] = 1
             await self.validate(request, data)
 
             obj = await self._populate_obj(request, self.model(), data)
@@ -104,7 +104,7 @@ class SiteView(ModelView):
             session: Session | AsyncSession = request.state.session
 
             data["id"] = 1
-            data["user_id"] = 1
+            data["owner_id"] = 1
             await self.validate(request, data)
 
             obj = await self.find_by_pk(request, pk)
