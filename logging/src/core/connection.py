@@ -61,7 +61,7 @@ class ConnectionManager(metaclass=SingletonConnection):
             credentials=PlainCredentials(
                 settings.RABBITMQ_USER, settings.RABBITMQ_PASSWORD
             ),
-            heartbeat=3600,
+            heartbeat=0,
         )
 
         self._connection = SelectConnection(

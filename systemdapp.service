@@ -9,7 +9,7 @@ Restart=always
 WorkingDirectory=/home/ubuntu/iot_server
 
 ExecStartPre=/bin/bash -c "make compose-down"
-ExecStart=/bin/bash -c "make compose-prod"
+ExecStart=/bin/bash -c "make compose-prod-up"
 ExecStop=/bin/bash -c "make compose-down"
 RemainAfterExit=yes
 

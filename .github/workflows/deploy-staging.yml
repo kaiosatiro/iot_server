@@ -168,7 +168,7 @@ jobs:
       - name: Deploy
         if: steps.create-env.outcome == 'success'
         run: |
-            ssh Target "cd iot_server && make compose-down && make compose-prod"
+            ssh Target "cd iot_server && make compose-prod-down s="userapi handler logging receiver" && make compose-prod-up"
       
       - name: Clean up
         run: |

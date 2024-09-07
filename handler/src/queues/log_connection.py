@@ -47,7 +47,7 @@ class LogConnection(Thread):
 
         self._credentials = PlainCredentials(self._username, self._password)
         self._parameters = ConnectionParameters(
-            self._host, self._port, credentials=self._credentials, heartbeat=3600
+            self._host, self._port, credentials=self._credentials, heartbeat=0
         )
         self._message_properties = BasicProperties(
             app_id=settings.HANDLER_ID,

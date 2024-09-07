@@ -27,7 +27,7 @@ class TestLogConnection(unittest.TestCase):
             log_channel._host,
             log_channel._port,
             credentials=mock_plain_credentials.return_value,
-            heartbeat=3600,
+            heartbeat=0,
         )
         mock_blocking_connection.assert_called_once_with(
             mock_connection_parameters.return_value

@@ -51,7 +51,7 @@ class PublishingManager(Thread):
     def connect(self) -> None:
         credentials = PlainCredentials("guest", "guest")
         parameters = ConnectionParameters(
-            self.host, credentials=credentials, heartbeat=3600
+            self.host, credentials=credentials, heartbeat=0
         )
         self._connection = BlockingConnection(parameters)
 

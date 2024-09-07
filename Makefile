@@ -1,6 +1,6 @@
 .PHONY: compose-dev compose-dev-d compose-down-dev compose-down clean-cache test-local lint
 
-compose-prod:
+compose-prod-up:
 	@echo "Starting production environment..."
 	# Lazy initialization 
 	docker compose -f docker-compose.yml up rabbitmq --build -d
@@ -26,6 +26,10 @@ compose-down-dev:
 compose-down:
 	@echo "Stopping development/test environment..."
 	docker compose down --remove-orphans
+
+compose-prod-down:
+	@echo "Stopping environment..."
+	docker compose down --remove-orphans $(s)
 
 clean-cache:
 	@echo "Cleaning cache..."
