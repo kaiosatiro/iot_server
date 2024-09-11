@@ -14,7 +14,7 @@ from src.models import (
     DeviceResponse,
     DevicesListResponse,
     DeviceUpdate,
-    Site,
+    Environment,
 )
 
 router = APIRouter()
@@ -90,50 +90,54 @@ async def get_device_information(
 
 
 @router.get(
-    "/site/{site_id}",
+    "/environment/{environment_id}",
     responses={404: deps.responses_404, 403: deps.responses_403},
     response_model=DevicesListResponse,
 )
-async def get_site_devices(
-    *, site_id: int, session: deps.SessionDep, current_user: deps.CurrentUser
+async def get_environment_devices(
+    *, environment_id: int, session: deps.SessionDep, current_user: deps.CurrentUser
 ) -> DevicesListResponse | HTTPException:
     """
-    Get all devices from the specific Site.
-    The site must belong to the logged User.
+    Get all devices from the specific Environment.
+    The environment must belong to the logged User.
     """
     logger = logging.getLogger("POST devices/")
     logger.info(
-        "getting all devices from site %s from user %s", site_id, current_user.username
+        "getting all devices from environment %s from user %s",
+        environment_id,
+        current_user.username,
     )
 
-    site = session.get(Site, site_id)
-    if not site:
-        logger.warning("Site %s not found", site_id)
-        raise HTTPException(status_code=404, detail="Site not found")
+    environment = session.get(Environment, environment_id)
+    if not environment:
+        logger.warning("Environment %s not found", environment_id)
+        raise HTTPException(status_code=404, detail="Environment not found")
 
     count_statement = (
         select(func.count())
         .select_from(Device)
         .where(Device.owner_id == current_user.id)
-        .where(Device.site_id == site_id)
+        .where(Device.environment_id == environment_id)
     )
     count = session.exec(count_statement).one()
 
-    device = crud.get_devices_by_site_id(db=session, site_id=site_id)
+    device = crud.get_devices_by_environment_id(
+        db=session, environment_id=environment_id
+    )
 
-    logger.info("Returning %s devices from site %s", count, site_id)
+    logger.info("Returning %s devices from environment %s", count, environment_id)
     return DevicesListResponse(
         owner_id=current_user.id,
         username=current_user.username,
-        site_id=site_id,
-        site_name=site.name,
+        environment_id=environment_id,
+        environment_name=environment.name,
         count=count,
         data=device,
     )
 
 
 @router.post(
-    "/site",
+    "/environment",
     responses={404: deps.responses_404, 403: deps.responses_403},
     response_model=DeviceResponse,
     status_code=201,
@@ -147,22 +151,26 @@ async def create_device(
     rpcCall: rpcCall,
 ) -> Device | HTTPException:
     """
-    Create a new Device, **"name"** and **"site_id"** are required.
+    Create a new Device, **"name"** and **"environment_id"** are required.
     """
     logger = logging.getLogger("POST devices/")
     logger.info("Creating device %s from user %s", device_in.name, current_user.id)
 
-    site = session.get(Site, device_in.site_id)
+    environment = session.get(Environment, device_in.environment_id)
 
-    if site is None:
-        logger.warning("Site %s not found", device_in.site_id)
-        raise HTTPException(status_code=404, detail="Site not found")
+    if environment is None:
+        logger.warning("Environment %s not found", device_in.environment_id)
+        raise HTTPException(status_code=404, detail="Environment not found")
 
-    if site.owner_id != current_user.id:
+    if environment.owner_id != current_user.id:
         logger.warning(
-            "Site %s does not belong to user %s", site.id, current_user.username
+            "Environment %s does not belong to user %s",
+            environment.id,
+            current_user.username,
         )
-        raise HTTPException(status_code=403, detail="Site does not belong to user")
+        raise HTTPException(
+            status_code=403, detail="Environment does not belong to user"
+        )
 
     try:
         device_in.owner_id = current_user.id
@@ -192,8 +200,8 @@ async def update_device(
     current_user: deps.CurrentUser,
 ) -> Device | HTTPException:
     """
-    Update the Device information. If the **"site_id"** is changed,
-    the new Site must belong to the logged User.
+    Update the Device information. If the **"environment_id"** is changed,
+    the new Environment must belong to the logged User.
     """
     logger = logging.getLogger("PATCH devices/")
     logger.info("Updating device %s from user %s", device_id, current_user.username)
@@ -211,13 +219,14 @@ async def update_device(
         )
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
-    if device_in.site_id:
-        site = session.get(Site, device_in.site_id)
-        if site is None or site.owner_id != current_user.id:
+    if device_in.environment_id:
+        environment = session.get(Environment, device_in.environment_id)
+        if environment is None or environment.owner_id != current_user.id:
             logger.warning(
-                "Site %s not found or does not belong to user", device_in.site_id
+                "Environment %s not found or does not belong to user",
+                device_in.environment_id,
             )
-            raise HTTPException(status_code=404, detail="Site not found")
+            raise HTTPException(status_code=404, detail="Environment not found")
 
     try:
         device = crud.update_device(
@@ -275,7 +284,7 @@ async def delete_device(
 
 
 @router.delete(
-    "/site/{site_id}",
+    "/environment/{environment_id}",
     responses={
         404: deps.responses_404,
         403: deps.responses_403,
@@ -283,32 +292,34 @@ async def delete_device(
     },
     response_model=DefaultResponseMessage,
 )
-async def delete_site_devices(
-    *, session: deps.SessionDep, site_id: int, current_user: deps.CurrentUser
+async def delete_environment_devices(
+    *, session: deps.SessionDep, environment_id: int, current_user: deps.CurrentUser
 ) -> DefaultResponseMessage | HTTPException:
     """
-    Delete all Devices from a Site, **consequently** all its messages.
-    The site must belong to the logged User.
+    Delete all Devices from a Environment, **consequently** all its messages.
+    The environment must belong to the logged User.
     """
-    logger = logging.getLogger("DELETE devices/site/")
+    logger = logging.getLogger("DELETE devices/environment/")
     logger.info(
-        "Deleting all devices from site %s from user %s", site_id, current_user.username
+        "Deleting all devices from environment %s from user %s",
+        environment_id,
+        current_user.username,
     )
 
-    site = session.get(Site, site_id)
-    if not site:
-        logger.warning("Site %s not found", site_id)
-        raise HTTPException(status_code=404, detail="Site not found")
+    environment = session.get(Environment, environment_id)
+    if not environment:
+        logger.warning("Environment %s not found", environment_id)
+        raise HTTPException(status_code=404, detail="Environment not found")
 
-    if site.owner_id != current_user.id:
+    if environment.owner_id != current_user.id:
         logger.warning(
-            "User %s does not have permissions, site_id %s",
+            "User %s does not have permissions, environment_id %s",
             current_user.username,
-            site_id,
+            environment_id,
         )
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
-    crud.delete_devices_per_site_id(db=session, site_id=site_id)
+    crud.delete_devices_per_environment_id(db=session, environment_id=environment_id)
 
-    logger.info("Devices from site %s deleted", site_id)
+    logger.info("Devices from environment %s deleted", environment_id)
     return DefaultResponseMessage(message="Devices deleted")

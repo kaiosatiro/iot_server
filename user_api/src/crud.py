@@ -10,10 +10,10 @@ from .models import (
     Device,
     DeviceCreation,
     DeviceUpdate,
+    Environment,
+    EnvironmentCreation,
+    EnvironmentUpdate,
     Message,
-    Site,
-    SiteCreation,
-    SiteUpdate,
     User,
     UserCreation,
     UserRegister,
@@ -97,49 +97,60 @@ def authenticate_user(*, db: Session, username: str, password: str) -> User | No
     return db_user
 
 
-# -------------------------- SITE -----------------------------------
-def create_site(*, db: Session, site_input: SiteCreation, owner_id: int) -> Site:
+# -------------------------- ENVIRONMENT -----------------------------------
+def create_environment(
+    *, db: Session, environment_input: EnvironmentCreation, owner_id: int
+) -> Environment:
     _id = generate_random_number(1000000, 9999999)
-    while db.get(Site, _id):
+    while db.get(Environment, _id):
         _id = generate_random_number(1000000, 9999999)
-    site = Site.model_validate(site_input, update={"owner_id": owner_id, "id": _id})
-    db.add(site)
+    environment = Environment.model_validate(
+        environment_input, update={"owner_id": owner_id, "id": _id}
+    )
+    db.add(environment)
     db.commit()
-    db.refresh(site)
-    return site
+    db.refresh(environment)
+    return environment
 
 
-def update_site(*, db: Session, db_site: Site, site_new_input: SiteUpdate) -> Site:
-    site_data = site_new_input.model_dump(exclude_unset=True)
-    db_site.sqlmodel_update(site_data)
-    db.add(db_site)
+def update_environment(
+    *,
+    db: Session,
+    db_environment: Environment,
+    environment_new_input: EnvironmentUpdate,
+) -> Environment:
+    environment_data = environment_new_input.model_dump(exclude_unset=True)
+    db_environment.sqlmodel_update(environment_data)
+    db.add(db_environment)
     db.commit()
-    db.refresh(db_site)
-    return db_site
+    db.refresh(db_environment)
+    return db_environment
 
 
-def get_site_by_name(*, db: Session, name: str) -> Site | None:
-    statement = select(Site).where(Site.name == name)
-    session_site = db.exec(statement).first()
-    return session_site
+def get_environment_by_name(*, db: Session, name: str) -> Environment | None:
+    statement = select(Environment).where(Environment.name == name)
+    session_environment = db.exec(statement).first()
+    return session_environment
 
 
-def get_sites_by_owner_id(*, db: Session, owner_id: int) -> Sequence[Site]:
-    statement = select(Site).where(Site.owner_id == owner_id)
-    session_sites = db.exec(statement).all()
-    return session_sites
+def get_environments_by_owner_id(
+    *, db: Session, owner_id: int
+) -> Sequence[Environment]:
+    statement = select(Environment).where(Environment.owner_id == owner_id)
+    session_environments = db.exec(statement).all()
+    return session_environments
 
 
-def delete_site(*, db: Session, site: Site) -> None:
-    db.delete(site)
+def delete_environment(*, db: Session, environment: Environment) -> None:
+    db.delete(environment)
     db.commit()
 
 
-def delete_sites_from_user(*, db: Session, owner_id: int) -> None:
-    statement = select(Site).where(Site.owner_id == owner_id)
-    session_sites = db.exec(statement).all()
-    for site in session_sites:
-        db.delete(site)
+def delete_environments_from_user(*, db: Session, owner_id: int) -> None:
+    statement = select(Environment).where(Environment.owner_id == owner_id)
+    session_environments = db.exec(statement).all()
+    for environment in session_environments:
+        db.delete(environment)
     db.commit()
 
 
@@ -194,8 +205,10 @@ def get_devices_by_owner_id(*, db: Session, owner_id: int) -> Sequence[Device]:
     return session_devices
 
 
-def get_devices_by_site_id(*, db: Session, site_id: int) -> Sequence[Device]:
-    statement = select(Device).where(Device.site_id == site_id)
+def get_devices_by_environment_id(
+    *, db: Session, environment_id: int
+) -> Sequence[Device]:
+    statement = select(Device).where(Device.environment_id == environment_id)
     session_devices = db.exec(statement).all()
     return session_devices
 
@@ -208,8 +221,8 @@ def delete_devices_from_user(*, db: Session, owner_id: int) -> None:
     db.commit()
 
 
-def delete_devices_per_site_id(*, db: Session, site_id: int) -> None:
-    statement = select(Device).where(Device.site_id == site_id)
+def delete_devices_per_environment_id(*, db: Session, environment_id: int) -> None:
+    statement = select(Device).where(Device.environment_id == environment_id)
     session_devices = db.exec(statement).all()
     for device in session_devices:
         db.delete(device)

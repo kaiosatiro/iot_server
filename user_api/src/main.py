@@ -103,27 +103,27 @@ if __name__ == "__main__":
 # - PATCH /users/{id} - 200 | 422 | 403 | 404 | 409
 # - DELETE /users/{id} - 200 | 403 | 404
 
-# - GET /sites - 200 | 401
+# - GET /environments - 200 | 401
 # - GET /devices - 200 | 404 | 403
 
-# Sites:
-# - GET /sites/user - 200 | 401
-# - GET /sites/{site_id} - 200 | 403 | 404
-# - POST /sites - 201 | 400 | 403
-# - PATCH /sites/{site_id} - 200 | 400 | 403 | 404
-# - DELETE /sites/{site_id} - 200 | 403 | 404
+# Environments:
+# - GET /environments/user - 200 | 401
+# - GET /environments/{environment_id} - 200 | 403 | 404
+# - POST /environments - 201 | 400 | 403
+# - PATCH /environments/{environment_id} - 200 | 400 | 403 | 404
+# - DELETE /environments/{environment_id} - 200 | 403 | 404
 
 # Devices:
 # - GET /devices - 200 | 404 | 403
 # - GET /devices/{device_id} - 200 | 404 | 403
-# - GET /devices/site/{site_id} - 200 | 403 | 404
-# - POST /devices/site - 201 | 400 | 403
+# - GET /devices/environment/{environment_id} - 200 | 403 | 404
+# - POST /devices/environment - 201 | 400 | 403
 # - PATCH /devices/{device_id} - 200 | 422  | 403  | 404
 # - DELETE /devices/{device_id} - 200 | 404
-# - DELETE /devices/site/{site_id} - 200 |
-# - POST /sites - 201 | 400 | 403
-# - PATCH /sites/{site_id} - 200 | 400 | 403 | 404
-# - DELETE /sites/{site_id} - 200 | 403 | 404
+# - DELETE /devices/environment/{environment_id} - 200 |
+# - POST /environments - 201 | 400 | 403
+# - PATCH /environments/{environment_id} - 200 | 400 | 403 | 404
+# - DELETE /environments/{environment_id} - 200 | 403 | 404
 
 # Messages:
 # - GET /messages/{message_id} - 200 | 404 | 403

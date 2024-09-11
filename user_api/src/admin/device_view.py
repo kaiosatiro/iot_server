@@ -13,7 +13,7 @@ from starlette_admin.fields import HasOne, IntegerField, StringField, TextAreaFi
 # from starlette_admin._types import RowActionsDisplayType
 from src.core.config import settings
 from src.core.security import create_device_access_token
-from src.models import Device, Message, Site, User
+from src.models import Device, Environment, Message, User
 from src.utils import generate_random_number
 
 
@@ -55,9 +55,9 @@ class DeviceView(ModelView):
             exclude_from_edit=True,
         ),
         HasOne(
-            name="site",
-            label="Site",
-            identity="sites",
+            name="environment",
+            label="Environment",
+            identity="environments",
             required=True,
             searchable=True,
         ),
@@ -98,13 +98,13 @@ class DeviceView(ModelView):
         Device.type,
         Device.model,
         "user",
-        "site",
+        "environment",
         Device.created_on,
         Device.updated_on,
     ]
     sortable_field_mapping = {
         "user": User.username,
-        "site": Site.name,
+        "environment": Environment.name,
     }
     fields_default_sort = [(Device.updated_on, True)]
 
@@ -117,7 +117,7 @@ class DeviceView(ModelView):
 
             data["id"] = 1
             data["owner_id"] = 1
-            data["site_id"] = 1
+            data["environment_id"] = 1
             await self.validate(request, data)
 
             obj = await self._populate_obj(request, self.model(), data)
@@ -157,7 +157,7 @@ class DeviceView(ModelView):
 
             data["id"] = 1
             data["owner_id"] = 1
-            data["site_id"] = 1
+            data["environment_id"] = 1
             await self.validate(request, data)
 
             obj = await self.find_by_pk(request, pk)

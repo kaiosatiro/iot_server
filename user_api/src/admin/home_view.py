@@ -10,7 +10,7 @@ from starlette.templating import Jinja2Templates
 from starlette_admin import CustomView
 
 from src.core.config import settings
-from src.models import Device, Message, Site, User
+from src.models import Device, Environment, Message, User
 
 
 class HomeView(CustomView):
@@ -20,7 +20,7 @@ class HomeView(CustomView):
             name="home.html",
             context={
                 "users": await self.users_count(request, User),
-                "sites": await self.sites_count(request, Site),
+                "environments": await self.environments_count(request, Environment),
                 "devices": await self.devices_count(request, Device),
                 "version": settings.VERSION,
                 "messages_img": await self.generate_image(request),
@@ -70,9 +70,9 @@ class HomeView(CustomView):
         count = session.execute(stmt).scalar_one()
         return count
 
-    async def sites_count(self, request: Request, obj: Site) -> int:
+    async def environments_count(self, request: Request, obj: Environment) -> int:
         session: Session = request.state.session
-        stmt = select(func.count(Site.id))
+        stmt = select(func.count(Environment.id))
         count = session.execute(stmt).scalar_one()
         return count
 

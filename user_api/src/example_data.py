@@ -8,9 +8,9 @@ from sqlmodel import Session
 import src.crud as crud
 from src.models import (
     DeviceCreation,
+    EnvironmentCreation,
     Message,
     MessageCreation,
-    SiteCreation,
     UserCreation,
 )
 from src.utils import generate_random_number, random_lower_string
@@ -19,7 +19,7 @@ from src.utils import generate_random_number, random_lower_string
 def insert_example_data(session: Session) -> None:
     logger = logging.getLogger("Example Data")
     logger.info("Inserting...")
-    siteslen = len(SITES)
+    environmentslen = len(ENVIRONMENTS)
     deviceslen = len(DEVICES)
 
     if crud.get_user_by_username(db=session, username=USERS[0]["username"]):
@@ -42,16 +42,20 @@ def insert_example_data(session: Session) -> None:
             logger.warning("User %s already exists. Skipping...", user_data["username"])
             continue
 
-        # Random number of sites for each user
+        # Random number of environments for each user
         for _ in range(randint(1, 3)):
-            random_site = SITES[generate_random_number(0, siteslen - 1)]
-            site_in = SiteCreation(
-                name=random_site["name"],
-                description=random_site["description"],
+            random_environment = ENVIRONMENTS[
+                generate_random_number(0, environmentslen - 1)
+            ]
+            environment_in = EnvironmentCreation(
+                name=random_environment["name"],
+                description=random_environment["description"],
             )
-            site = crud.create_site(db=session, site_input=site_in, owner_id=user.id)
+            environment = crud.create_environment(
+                db=session, environment_input=environment_in, owner_id=user.id
+            )
 
-            # Random number of devices for each site
+            # Random number of devices for each environment
             for _ in range(randint(1, 5)):
                 random_device = DEVICES[generate_random_number(0, deviceslen - 1)]
                 device_in = DeviceCreation(
@@ -59,7 +63,7 @@ def insert_example_data(session: Session) -> None:
                     model=random_device["model"],
                     type=random_device["type"],
                     description=random_device["description"],
-                    site_id=site.id,
+                    environment_id=environment.id,
                     owner_id=user.id,
                 )
                 device = crud.create_device(db=session, device_input=device_in)
@@ -237,7 +241,7 @@ USERS = [
     },
 ]
 
-SITES = [
+ENVIRONMENTS = [
     {
         "name": "Greenhouse",
         "description": "A controlled environment used for growing plants, \

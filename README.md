@@ -69,7 +69,7 @@ Access the API DOC at `http://localhost:8000/docs` and the Admin Panel at `http:
 
 Then: 
 - Create a **User** on the admin panel or the swagger interactive docs
-- Create a **Site** ('Site' in the sense of a location, like a house, a factory, etc)
+- Create a **Environment** ('Environment' in the sense of a location, like a house, a factory, etc)
 - Create a **Device** and use its token to send a POST request to `http://localhost:8100/` with JSON data
 
 
@@ -114,7 +114,7 @@ Here is the architecture diagram:
 
 - **Receiver**: Receives status updates from devices by an exposed **REST API** and adds them to a queue for further handling.
 - **Handler**: Validates and parses the updates, converting them to a unified format per device on the DB.
-- **User API**: Exposes an API for users to signup, create Sites and Devices, and access the data stored on the DB. 
+- **User API**: Exposes an API for users to signup, create Environments and Devices, and access the data stored on the DB. 
 - ------
 - **Dashboard**: A web interface for users. (Still working on this on a separate repo)
 ---

@@ -5,7 +5,7 @@ import pytest
 
 from tests.conftest import create_test_data
 
-from src.core.database.db import engine, DB, Message, Device, Site, User
+from src.core.database.db import engine, DB, Message, Device, Environment, User
 
 
 class TestDB:
@@ -15,7 +15,7 @@ class TestDB:
             create_test_data(session)
             yield session
             session.query(User).delete()
-            session.query(Site).delete()
+            session.query(Environment).delete()
             session.query(Device).delete()
             session.query(Message).delete()
             session.commit()

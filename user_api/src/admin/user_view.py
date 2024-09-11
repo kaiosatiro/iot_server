@@ -18,7 +18,7 @@ from starlette_admin.fields import (
 )
 
 from src.core.security import get_password_hash
-from src.models import Device, Site, User
+from src.models import Device, Environment, User
 from src.utils import generate_random_number
 
 
@@ -30,10 +30,10 @@ class CountingDevices(IntegerField):
         return count
 
 
-class CountingSites(IntegerField):
+class CountingEnvironment(IntegerField):
     async def parse_obj(self, request: Request, obj: User) -> int:
         session: Session = request.state.session
-        stmt = select(func.count(Site.id)).where(Site.owner_id == obj.id)
+        stmt = select(func.count(Environment.id)).where(Environment.owner_id == obj.id)
         count = session.execute(stmt).scalar_one()
         return count
 
@@ -60,9 +60,9 @@ class UserView(ModelView):
             exclude_from_create=True,
             exclude_from_edit=True,
         ),
-        CountingSites(
-            name="numbersites",
-            label="N. Sites",
+        CountingEnvironment(
+            name="numberenvironments",
+            label="N. Environments",
             exclude_from_create=True,
             exclude_from_edit=True,
         ),
@@ -76,8 +76,8 @@ class UserView(ModelView):
             exclude_from_detail=True,
         ),
         HasMany(
-            name="sites",
-            identity="sites",
+            name="environments",
+            identity="environments",
             exclude_from_list=True,
             exclude_from_create=True,
             exclude_from_edit=True,

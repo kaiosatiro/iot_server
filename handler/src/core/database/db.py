@@ -18,8 +18,8 @@ class Device(Base):  # type: ignore
     __table__ = Base.metadata.tables["device"]
 
 
-class Site(Base):  # type: ignore
-    __table__ = Base.metadata.tables["site"]
+class Environment(Base):  # type: ignore
+    __table__ = Base.metadata.tables["environment"]
 
 
 class User(Base):  # type: ignore

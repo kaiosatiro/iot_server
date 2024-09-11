@@ -10,8 +10,8 @@ TAGS_METADATA = [
         "description": "Operations with Users. **Needs** to be authenticated.",
     },
     {
-        "name": "Sites",
-        "description": "Operations with Sites. **Needs** to be authenticated.",
+        "name": "Environments",
+        "description": "Operations with Environments. **Needs** to be authenticated.",
     },
     {
         "name": "Devices",
@@ -30,7 +30,7 @@ TAGS_METADATA = [
 DESCRIPTION = f"""
 ## IoT Server Aplication.
 
-API documentation for the **User API**, which is responsible for managing users, sites, and devices.\n
+API documentation for the **User API**, which is responsible for managing users, environments, and devices.\n
 **Swagger UI version at:** [{settings.USERAPI_API_V1_STR}/docs]({settings.USERAPI_API_V1_STR}/docs)\n
 **Redoc version at:** [{settings.USERAPI_API_V1_STR}/redoc]({settings.USERAPI_API_V1_STR}/redoc)\n
 

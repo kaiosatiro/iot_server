@@ -9,7 +9,7 @@ from src.models import (
     DeviceCreation,
     Message,
     MessageCreation,
-    SiteCreation,
+    EnvironmentCreation,
     UserCreation,
 )
 
@@ -20,11 +20,11 @@ class TestGetMessages:
         response = client.get("/users/me", headers=normal_token_headers)
         user_id = response.json()["id"]
 
-        site = SiteCreation(name="Site", description="Description")
-        site = crud.create_site(db=db, site_input=site, owner_id=user_id)
+        environment = EnvironmentCreation(name="Environment", description="Description")
+        environment = crud.create_environment(db=db, environment_input=environment, owner_id=user_id)
 
         device = DeviceCreation(
-                owner_id=user_id, site_id=site.id,
+                owner_id=user_id, environment_id=environment.id,
                 name="Device", model="Model",
                 type="Type", description="Description")
 
@@ -44,7 +44,7 @@ class TestGetMessages:
         db.commit()
 
         return {
-            "site_id": site.id,
+            "environment_id": environment.id,
             "user_id": user_id,
             "device_id": device.id,
             "device_name": device.name,
@@ -280,11 +280,11 @@ class TestDeleteMessage:
         response = client.get("/users/me", headers=normal_token_headers)
         user_id = response.json()["id"]
 
-        site = SiteCreation(name="Site", description="Description")
-        site = crud.create_site(db=db, site_input=site, owner_id=user_id)
+        environment = EnvironmentCreation(name="Environment", description="Description")
+        environment = crud.create_environment(db=db, environment_input=environment, owner_id=user_id)
 
         device = DeviceCreation(
-                owner_id=user_id, site_id=site.id,
+                owner_id=user_id, environment_id=environment.id,
                 name="Device", model="Model",
                 type="Type", description="Description")
 
@@ -303,7 +303,7 @@ class TestDeleteMessage:
         db.add_all(messages)
         db.commit()
 
-        return {"site_id": site.id, "user_id": user_id, "device_id": device.id, "range": range_number}
+        return {"environment_id": environment.id, "user_id": user_id, "device_id": device.id, "range": range_number}
 
     def test_delete_message_per_message_id(
             self, db: Session, client: TestClient,
@@ -369,11 +369,11 @@ class TestDeleteMessages:
         response = client.get("/users/me", headers=normal_token_headers)
         user_id = response.json()["id"]
 
-        site = SiteCreation(name="Site", description="Description")
-        site = crud.create_site(db=db, site_input=site, owner_id=user_id)
+        environment = EnvironmentCreation(name="Environment", description="Description")
+        environment = crud.create_environment(db=db, environment_input=environment, owner_id=user_id)
 
         device = DeviceCreation(
-                owner_id=user_id, site_id=site.id,
+                owner_id=user_id, environment_id=environment.id,
                 name="Device", model="Model",
                 type="Type", description="Description")
 
@@ -392,7 +392,7 @@ class TestDeleteMessages:
         db.add_all(messages)
         db.commit()
 
-        return {"site_id": site.id, "user_id": user_id, "device_id": device.id, "range": range_number}
+        return {"environment_id": environment.id, "user_id": user_id, "device_id": device.id, "range": range_number}
 
     def test_delete_messages_per_device_id(
             self, client: TestClient,
@@ -534,11 +534,11 @@ class TestGetMessage:
         response = client.get("/users/me", headers=normal_token_headers)
         user_id = response.json()["id"]
 
-        site = SiteCreation(name="Site", description="Description")
-        site = crud.create_site(db=db, site_input=site, owner_id=user_id)
+        environment = EnvironmentCreation(name="Environment", description="Description")
+        environment = crud.create_environment(db=db, environment_input=environment, owner_id=user_id)
 
         device = DeviceCreation(
-                owner_id=user_id, site_id=site.id,
+                owner_id=user_id, environment_id=environment.id,
                 name="Device", model="Model",
                 type="Type", description="Description")
 

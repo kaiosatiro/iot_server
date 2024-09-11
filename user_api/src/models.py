@@ -34,7 +34,7 @@ class DeviceBase(SQLModel):
 
 class DeviceCreation(DeviceBase):
     owner_id: int | None = None
-    site_id: int
+    environment_id: int
 
     model_config = {
         "json_schema_extra": {
@@ -44,7 +44,7 @@ class DeviceCreation(DeviceBase):
                     "model": "300x humidity sensor",
                     "type": "sensor",
                     "description": "A humidity sensor for home use",
-                    "site_id": 1234567,
+                    "environment_id": 1234567,
                     "owner_id": 12345,
                 }
             ]
@@ -53,7 +53,7 @@ class DeviceCreation(DeviceBase):
 
 
 class DeviceUpdate(DeviceBase):
-    site_id: int | None = None
+    environment_id: int | None = None
     name: str | None = None
 
     model_config = {
@@ -64,7 +64,7 @@ class DeviceUpdate(DeviceBase):
                     "model": "300x humidity sensor",
                     "type": "sensor",
                     "description": "A humidity sensor for home use",
-                    "site_id": 1234567,
+                    "environment_id": 1234567,
                 }
             ]
         }
@@ -74,7 +74,7 @@ class DeviceUpdate(DeviceBase):
 class DeviceResponse(DeviceBase):
     id: int
     owner_id: int
-    site_id: int
+    environment_id: int
     token: str
     created_on: datetime
     updated_on: datetime | None = None
@@ -89,7 +89,7 @@ class DeviceResponse(DeviceBase):
                     "model": "300x humidity sensor",
                     "type": "sensor",
                     "description": "A humidity sensor for home use",
-                    "site_id": 1234567,
+                    "environment_id": 1234567,
                     "owner_id": 12345,
                     "created_on": "2024-07-12T15:00:00Z",
                     "updated_on": "2024-07-12T15:00:00Z",
@@ -102,8 +102,8 @@ class DeviceResponse(DeviceBase):
 class DevicesListResponse(SQLModel):
     owner_id: int
     username: str
-    site_id: int | None = None
-    site_name: str | None = None
+    environment_id: int | None = None
+    environment_name: str | None = None
     data: list["DeviceResponse"]
     count: int
 
@@ -122,7 +122,7 @@ class DevicesListResponse(SQLModel):
                             "model": "300x humidity sensor",
                             "type": "sensor",
                             "description": "A humidity sensor for home use",
-                            "site_id": 1234567,
+                            "environment_id": 1234567,
                             "owner_id": 12345,
                             "created_on": "2024-07-12T15:00:00Z",
                             "updated_on": "2024-07-12T15:00:00Z",
@@ -138,8 +138,10 @@ class Device(DeviceBase, BaseModel, table=True):
     owner_id: int = Field(foreign_key="user.id", nullable=False, ondelete="CASCADE")
     user: "User" = Relationship(back_populates="devices")
 
-    site_id: int = Field(foreign_key="site.id", nullable=False, ondelete="CASCADE")
-    site: "Site" = Relationship(back_populates="devices")
+    environment_id: int = Field(
+        foreign_key="environment.id", nullable=False, ondelete="CASCADE"
+    )
+    environment: "Environment" = Relationship(back_populates="devices")
 
     messages: list["Message"] = Relationship(
         back_populates="device", cascade_delete=True
@@ -244,13 +246,13 @@ class Message(SQLModel, table=True):
     device: "Device" = Relationship(back_populates="messages")
 
 
-# --------------------------- SITE MODELS ------------------------------
-class SiteBase(SQLModel):
+# --------------------------- ENVIRONMENT MODELS ------------------------------
+class EnvironmentBase(SQLModel):
     name: str = Field(nullable=False)
     description: str | None = Field(default=None, max_length=255)
 
 
-class SiteCreation(SiteBase):
+class EnvironmentCreation(EnvironmentBase):
     pass
 
     model_config = {
@@ -258,14 +260,14 @@ class SiteCreation(SiteBase):
             "examples": [
                 {
                     "name": "Home",
-                    "description": "Home site",
+                    "description": "Home environment",
                 }
             ]
         }
     }
 
 
-class SiteUpdate(SiteBase):
+class EnvironmentUpdate(EnvironmentBase):
     name: str | None = None
 
     model_config = {
@@ -273,14 +275,14 @@ class SiteUpdate(SiteBase):
             "examples": [
                 {
                     "name": "Home",
-                    "description": "Home site",
+                    "description": "Home environment",
                 }
             ]
         }
     }
 
 
-class SiteResponse(SiteBase):
+class EnvironmentResponse(EnvironmentBase):
     id: int
     created_on: datetime
     updated_on: datetime | None = None
@@ -291,7 +293,7 @@ class SiteResponse(SiteBase):
                 {
                     "id": 1234567,
                     "name": "Home",
-                    "description": "Home site",
+                    "description": "Home environment",
                     "created_on": "2024-07-12T15:00:00Z",
                     "updated_on": "2024-07-12T15:00:00Z",
                 }
@@ -300,11 +302,11 @@ class SiteResponse(SiteBase):
     }
 
 
-class SitesListResponse(SQLModel):
+class EnvironmentListResponse(SQLModel):
     owner_id: int
     username: str
     count: int
-    data: list["SiteResponse"]
+    data: list["EnvironmentResponse"]
 
     model_config = {
         "json_schema_extra": {
@@ -317,7 +319,7 @@ class SitesListResponse(SQLModel):
                         {
                             "id": 1234567,
                             "name": "Home",
-                            "description": "Home site",
+                            "description": "Home environment",
                             "created_on": "2024-07-12T15:00:00Z",
                             "updated_on": "2024-07-12T15:00:00Z",
                         }
@@ -328,11 +330,13 @@ class SitesListResponse(SQLModel):
     }
 
 
-class Site(SiteBase, BaseModel, table=True):
+class Environment(EnvironmentBase, BaseModel, table=True):
     owner_id: int = Field(foreign_key="user.id", nullable=False, ondelete="CASCADE")
-    user: "User" = Relationship(back_populates="sites")
+    user: "User" = Relationship(back_populates="environments")
 
-    devices: list["Device"] = Relationship(back_populates="site", cascade_delete=True)
+    devices: list["Device"] = Relationship(
+        back_populates="environment", cascade_delete=True
+    )
 
     async def __admin_repr__(self, request: Request) -> str:
         return self.name
@@ -496,7 +500,9 @@ class User(UserBase, BaseModel, table=True):
     hashed_password: str
 
     devices: list["Device"] = Relationship(back_populates="user", cascade_delete=True)
-    sites: list["Site"] = Relationship(back_populates="user", cascade_delete=True)
+    environments: list["Environment"] = Relationship(
+        back_populates="user", cascade_delete=True
+    )
     # roles: list["Role"] = Relationship(back_populates='users', link_model=UserRoleLink)
 
     async def __admin_repr__(self, request: Request) -> str:
@@ -574,25 +580,25 @@ if __name__ == "__main__":
         session.add(user)
         session.commit()
 
-        # Create 1 to 3 Sites for each User
-        num_sites = randint(1, 3)
-        for _ in range(num_sites):
-            site = SiteCreation(
-                name=f"Site{_}",
-                description="Site description",
+        # Create 1 to 3 Environments for each User
+        num_environments = randint(1, 3)
+        for _ in range(num_environments):
+            environment = EnvironmentCreation(
+                name=f"Environment{_}",
+                description="Environment description",
             )
-            site.owner_id = user.id
-            session.add(site)
+            environment.owner_id = user.id
+            session.add(environment)
             session.commit()
 
-            # Create between 3 to 7 Devices for each Site
+            # Create between 3 to 7 Devices for each Environment
             num_devices = randint(3, 7)
             for _ in range(num_devices):
                 device = DeviceCreation(
                     name=f"Device{_}",
                     description="Device description",
                 )
-                device.site_id = site.id
+                device.environment_id = environment.id
                 session.add(device)
                 session.commit()
 

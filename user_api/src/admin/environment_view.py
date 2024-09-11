@@ -10,22 +10,22 @@ from starlette_admin.contrib.sqlmodel import ModelView
 from starlette_admin.exceptions import FormValidationError
 from starlette_admin.fields import HasMany, HasOne, IntegerField, TextAreaField
 
-from src.models import Device, Site, User
+from src.models import Device, Environment, User
 from src.utils import generate_random_number
 
 
 class CountingDevices(IntegerField):
-    async def parse_obj(self, request: Request, obj: Site) -> int:
+    async def parse_obj(self, request: Request, obj: Environment) -> int:
         session: Session = request.state.session
-        stmt = select(func.count(Device.id)).where(Device.site_id == obj.id)
+        stmt = select(func.count(Device.id)).where(Device.environment_id == obj.id)
         count = session.execute(stmt).scalar_one()
         return count
 
 
-class SiteView(ModelView):
+class EnvironmentView(ModelView):
     fields = [
-        Site.id,
-        Site.name,
+        Environment.id,
+        Environment.name,
         HasOne(
             name="user",
             label="Owner",
@@ -46,8 +46,8 @@ class SiteView(ModelView):
             exclude_from_create=True,
             exclude_from_edit=True,
         ),
-        Site.created_on,
-        Site.updated_on,
+        Environment.created_on,
+        Environment.updated_on,
         HasMany(
             name="devices",
             identity="devices",
@@ -57,16 +57,29 @@ class SiteView(ModelView):
         ),
     ]
 
-    exclude_fields_from_create = [Site.id, Site.created_on, Site.updated_on]
-    exclude_fields_from_edit = [Site.id, Site.created_on, Site.updated_on]
+    exclude_fields_from_create = [
+        Environment.id,
+        Environment.created_on,
+        Environment.updated_on,
+    ]
+    exclude_fields_from_edit = [
+        Environment.id,
+        Environment.created_on,
+        Environment.updated_on,
+    ]
 
-    sortable_fields = [Site.name, "user", Site.created_on, Site.updated_on]
+    sortable_fields = [
+        Environment.name,
+        "user",
+        Environment.created_on,
+        Environment.updated_on,
+    ]
     sortable_field_mapping = {
         "user": User.username,
     }
-    fields_default_sort = [(Site.updated_on, True)]
+    fields_default_sort = [(Environment.updated_on, True)]
 
-    searchable_fields = ["id", Site.name, "user"]
+    searchable_fields = ["id", Environment.name, "user"]
 
     async def create(self, request: Request, data: dict[str, Any]) -> Any:
         try:

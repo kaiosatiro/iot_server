@@ -13,8 +13,8 @@ from src.models import (
     DeviceCreation,
     Message,
     MessageCreation,
-    Site,
-    SiteCreation,
+    Environment,
+    EnvironmentCreation,
     User,
     UserCreation,
 )
@@ -39,7 +39,7 @@ def session_fixture() -> Generator[Session, None, None]:
         session.exec(statement)
         statement = delete(Device)
         session.exec(statement)
-        statement = delete(Site)
+        statement = delete(Environment)
         session.exec(statement)
         statement = delete(User)
         session.exec(statement)
@@ -111,8 +111,8 @@ def user_fixture() -> dict:
     }
 
 
-@pytest.fixture(name="sitefix", scope="module")
-def site_fixture() -> dict:
+@pytest.fixture(name="environmentfix", scope="module")
+def environment_fixture() -> dict:
     return {
         "name": random_lower_string(),
         "description": random_lower_string(),
@@ -131,14 +131,14 @@ def device_fixture() -> dict:
 
 # ----------------------------- For Messages --------------------------------
 @pytest.fixture(name="messagesbatchfix", scope="class")
-def messages_batch_fixture(db, userfix, sitefix, devicefix) -> tuple[int | None, int]:
+def messages_batch_fixture(db, userfix, environmentfix, devicefix) -> tuple[int | None, int]:
     user_in = UserCreation(**userfix)
     user = crud.create_user(db=db, user_input=user_in)
 
-    site_in = SiteCreation(**sitefix)
-    site = crud.create_site(db=db, site_input=site_in, owner_id=user.id)
+    environment_in = EnvironmentCreation(**environmentfix)
+    environment = crud.create_environment(db=db, environment_input=environment_in, owner_id=user.id)
 
-    device_in = DeviceCreation(**devicefix, owner_id=user.id, site_id=site.id)
+    device_in = DeviceCreation(**devicefix, owner_id=user.id, environment_id=environment.id)
     device = crud.create_device(db=db, device_input=device_in)
 
     messages = []
