@@ -1,3 +1,7 @@
+# This script is used to check if the log folder exists and if
+#   the connection to the RabbitMQ server is working, before initializing the main service.
+# The Log folder is where this service store the logs from the
+#   system locally, and it should/is binded to a folder outside the container.
 import logging
 import os
 
@@ -18,6 +22,7 @@ max_tries = 60 * 5  # 5 minutes
 wait_seconds = 1
 
 
+# Check if the connection to the RabbitMQ server is working for several times
 @retry(
     stop=stop_after_attempt(max_tries),
     wait=wait_fixed(wait_seconds),
@@ -43,6 +48,7 @@ def connect() -> None:
         raise e
 
 
+# Check if the log folder exists
 def check_log_folder() -> bool:
     return os.path.exists(settings.LOG_INFO_LOCAL_PATH)
 
