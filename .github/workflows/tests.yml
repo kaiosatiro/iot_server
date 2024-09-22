@@ -40,61 +40,61 @@ jobs:
       POSTGRES_DB: ${{ vars.POSTGRES_DB }}
       RPC_QUEUE: ${{ vars.RPC_QUEUE }}
 
-    # steps:
-    #   - name: Checkout
-    #     uses: actions/checkout@v4
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    #   - name: Create env file
-    #     id: create-env
-    #     run: |
-    #       echo ENVIRONMENT=$ENVIRONMENT >> .env
-    #       echo LOG_LEVEL=$LOG_LEVEL >> .env
-    #       echo LOGGING_EXCHANGE=$LOGGING_EXCHANGE >> .env
-    #       echo LOG_QUEUE=$LOG_QUEUE >> .env
-    #       echo RECEIVER_ID=$RECEIVER_ID >> .env
-    #       echo HANDLER_ID=$HANDLER_ID >> .env
-    #       echo USERAPI_ID=$USERAPI_ID >> .env
-    #       echo RABBITMQ_DNS=$RABBITMQ_DNS >> .env
-    #       echo LOG_INFO_LOCAL_PATH=$LOG_INFO_LOCAL_PATH >> .env
-    #       echo MESSAGES_QUEUE=$MESSAGES_QUEUE >> .env
-    #       echo HANDLER_EXCHANGE=$HANDLER_EXCHANGE >> .env
-    #       echo FIRST_SUPERUSERNAME=$FIRST_SUPERUSERNAME >> .env
-    #       echo FIRST_SUPERUSER_EMAIL=$FIRST_SUPERUSER_EMAIL >> .env
-    #       echo FIRST_SUPERUSER_PASSWORD=$FIRST_SUPERUSER_PASSWORD >> .env
-    #       echo POSTGRES_PORT=$POSTGRES_PORT >> .env
-    #       echo POSTGRES_USER=$POSTGRES_USER >> .env
-    #       echo POSTGRES_PASSWORD=$POSTGRES_PASSWORD >> .env
-    #       echo POSTGRES_DB=$POSTGRES_DB >> .env
-    #       echo USERS_OPEN_REGISTRATION=$USERS_OPEN_REGISTRATION >> .env
-    #       echo EMAILS_FROM_EMAIL=$EMAILS_FROM_EMAIL >> .env
-    #       echo RPC_QUEUE=$RPC_QUEUE >> .env
+      - name: Create env file
+        id: create-env
+        run: |
+          echo ENVIRONMENT=$ENVIRONMENT >> .env
+          echo LOG_LEVEL=$LOG_LEVEL >> .env
+          echo LOGGING_EXCHANGE=$LOGGING_EXCHANGE >> .env
+          echo LOG_QUEUE=$LOG_QUEUE >> .env
+          echo RECEIVER_ID=$RECEIVER_ID >> .env
+          echo HANDLER_ID=$HANDLER_ID >> .env
+          echo USERAPI_ID=$USERAPI_ID >> .env
+          echo RABBITMQ_DNS=$RABBITMQ_DNS >> .env
+          echo LOG_INFO_LOCAL_PATH=$LOG_INFO_LOCAL_PATH >> .env
+          echo MESSAGES_QUEUE=$MESSAGES_QUEUE >> .env
+          echo HANDLER_EXCHANGE=$HANDLER_EXCHANGE >> .env
+          echo FIRST_SUPERUSERNAME=$FIRST_SUPERUSERNAME >> .env
+          echo FIRST_SUPERUSER_EMAIL=$FIRST_SUPERUSER_EMAIL >> .env
+          echo FIRST_SUPERUSER_PASSWORD=$FIRST_SUPERUSER_PASSWORD >> .env
+          echo POSTGRES_PORT=$POSTGRES_PORT >> .env
+          echo POSTGRES_USER=$POSTGRES_USER >> .env
+          echo POSTGRES_PASSWORD=$POSTGRES_PASSWORD >> .env
+          echo POSTGRES_DB=$POSTGRES_DB >> .env
+          echo USERS_OPEN_REGISTRATION=$USERS_OPEN_REGISTRATION >> .env
+          echo EMAILS_FROM_EMAIL=$EMAILS_FROM_EMAIL >> .env
+          echo RPC_QUEUE=$RPC_QUEUE >> .env
 
-    #   - name: Build DB and Queue
-    #     run: make compose-dev-d s="rabbitmq db"
+      - name: Build DB and Queue
+        run: make compose-dev-d s="rabbitmq db"
       
-    #   - name: Tests - Logging service
-    #     run: |
-    #       make compose-dev-d s="logging"
-    #       docker compose exec -T logging bash tests-start.sh
-    #       docker compose stop logging
+      - name: Tests - Logging service
+        run: |
+          make compose-dev-d s="logging"
+          docker compose exec -T logging bash tests-start.sh
+          docker compose stop logging
       
-    #   - name: Tests - UserAPI service
-    #     run: |
-    #       make compose-dev-d s="userapi"
-    #       docker compose exec -T userapi bash tests-start.sh
-    #       docker compose stop userapi
+      - name: Tests - UserAPI service
+        run: |
+          make compose-dev-d s="userapi"
+          docker compose exec -T userapi bash tests-start.sh
+          docker compose stop userapi
       
-    #   - name: Tests - Receiver service
-    #     run: |
-    #       make compose-dev-d s="receiver"
-    #       docker compose exec -T receiver bash tests-start.sh
-    #       docker compose stop receiver
+      - name: Tests - Receiver service
+        run: |
+          make compose-dev-d s="receiver"
+          docker compose exec -T receiver bash tests-start.sh
+          docker compose stop receiver
       
-    #   - name: Tests - Handler services # Need to be after userapi for db migrations
-    #     run: |
-    #       make compose-dev-d s="handler"
-    #       docker compose exec -T handler bash tests-start.sh
-    #       docker compose stop handler
+      - name: Tests - Handler services # Need to be after userapi for db migrations
+        run: |
+          make compose-dev-d s="handler"
+          docker compose exec -T handler bash tests-start.sh
+          docker compose stop handler
   
   # delete-previous-deployment:
   #   needs: tests
