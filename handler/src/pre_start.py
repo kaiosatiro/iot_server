@@ -1,3 +1,5 @@
+# This script is used to test the connection to the RabbitMQ and the database,
+#  before the application starts.
 import logging
 
 from pika import (  # type: ignore
@@ -26,6 +28,7 @@ max_tries = 60 * 5  # 5 minutes
 wait_seconds = 1
 
 
+# Check if the connection to the RabbitMQ is working
 @retry(
     stop=stop_after_attempt(max_tries),
     wait=wait_fixed(wait_seconds),
@@ -51,6 +54,7 @@ def connect_queue() -> None:
         raise e
 
 
+# Check if the connection to the database is working
 @retry(
     stop=stop_after_attempt(max_tries),
     wait=wait_fixed(wait_seconds),
