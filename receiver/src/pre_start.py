@@ -1,3 +1,5 @@
+# This script the connection to the RabbitMQ server is working,
+#  before initializing the main service.
 import logging
 
 from pika import (  # type: ignore
