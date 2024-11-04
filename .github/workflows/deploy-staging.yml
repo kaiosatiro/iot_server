@@ -168,12 +168,12 @@ jobs:
       - name: Deploy
         if: steps.create-env.outcome == 'success'
         run: |
-            ssh Target "cd iot_server && make compose-prod-down s="userapi handler logging receiver" && make compose-prod-up"
+            ssh Target "cd iot_server && sudo make compose-prod-down s="userapi handler logging receiver" && sudo make compose-prod-up"
       
       - name: Clean up
         run: |
           rm .env
           # ssh Target "rm iot_server/.env"
-          ssh Target "docker image prune -f"
-          ssh Target "docker volume prune -f"
+          ssh Target "sudo docker image prune -f"
+          ssh Target "sudo docker volume prune -f"
           
