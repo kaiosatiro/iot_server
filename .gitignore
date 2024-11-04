@@ -11,3 +11,6 @@ userapi/htmlcov/
 **/.mypy_cache/
 logs/*
 default
+aws/letsencrypt
+aws/sites-enabled
+
