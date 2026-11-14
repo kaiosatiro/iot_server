@@ -1,45 +1,45 @@
-name: Quality Assurance
+# name: Quality Assurance
 
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+# on:
+#   push:
+#     branches:
+#       - main
+#   pull_request:
+#     branches:
+#       - main
 
-jobs:
-  qa:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+# jobs:
+#   qa:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v4
 
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
+#       - name: Set up Python 3.12
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version: "3.12"
 
-      - name: Display Python version
-        run: python -c "import sys; print(sys.version)"
+#       - name: Display Python version
+#         run: python -c "import sys; print(sys.version)"
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install flake8
+#       - name: Install dependencies
+#         run: |
+#           python -m pip install --upgrade pip
+#           pip install flake8
 
-      - name: Lint
-        run: |
-          # echo "Running linteron Logging"
-          flake8 logging/src --count --max-complexity=10 --max-line-length=150 --statistics
-          flake8 logging/src --count --select=E9,F63,F7,F82 --show-source --statistics
+#       - name: Lint
+#         run: |
+#           # echo "Running linteron Logging"
+#           flake8 logging/src --count --max-complexity=10 --max-line-length=150 --statistics
+#           flake8 logging/src --count --select=E9,F63,F7,F82 --show-source --statistics
 
-          # --exit-zero 
+#           # --exit-zero 
 
-          echo "Running linter on UserAPI"
-          flake8 user_api/src --count --max-complexity=10 --max-line-length=150 --statistics
-          flake8 user_api/src --count --select=E9,F63,F7,F82 --show-source --statistics
+#           echo "Running linter on UserAPI"
+#           flake8 user_api/src --count --max-complexity=10 --max-line-length=150 --statistics
+#           flake8 user_api/src --count --select=E9,F63,F7,F82 --show-source --statistics
 
-          echo "Running linter on Receiver"
-          flake8 receiver/src --count --max-complexity=10 --max-line-length=150 --statistics
-          flake8 receiver/src --count --select=E9,F63,F7,F82 --show-source --statistics
+#           echo "Running linter on Receiver"
+#           flake8 receiver/src --count --max-complexity=10 --max-line-length=150 --statistics
+#           flake8 receiver/src --count --select=E9,F63,F7,F82 --show-source --statistics

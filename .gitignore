@@ -4,7 +4,6 @@ del
 logs/*
 .pytest_cache/
 .venv/
-doc/schema.sql
 userapi/.coverage
 userapi/htmlcov/
 **/del.py
@@ -12,5 +11,3 @@ userapi/htmlcov/
 logs/*
 default
 aws/letsencrypt
-aws/sites-enabled
-

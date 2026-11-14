@@ -63,7 +63,7 @@ services:
       - internal_network
       - default
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080"
     depends_on:
       - db
     # environment:
@@ -117,7 +117,7 @@ services:
       - default
       - internal_network
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
     environment:
       <<: [*default-environment, *userapi_handler, *userapi_receiver]
       USERAPI_API_V1_STR:
@@ -152,7 +152,7 @@ services:
       - default
       - internal_network
     ports:
-      - "8100:8000"
+      - "127.0.0.1:8100:8000"
     environment:
       <<: [*default-environment, *userapi_receiver, *receiver_handler]
       RECEIVER_VERSION: "0.1.0"

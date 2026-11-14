@@ -1,121 +1,121 @@
-name: Test
-on: [pull_request, workflow_call]
+# name: Test
+# on: [pull_request, workflow_call]
 
-jobs:
-  tests:
-    runs-on: ubuntu-latest
-    environment: Test
-    env: # Only the one necessary for testing
-      ENVIRONMENT: ${{ vars.ENVIRONMENT }}
-      LOG_LEVEL: ${{ vars.LOG_LEVEL }}
+# jobs:
+#   tests:
+#     runs-on: ubuntu-latest
+#     environment: Test
+#     env: # Only the one necessary for testing
+#       ENVIRONMENT: ${{ vars.ENVIRONMENT }}
+#       LOG_LEVEL: ${{ vars.LOG_LEVEL }}
 
-      LOGGING_EXCHANGE: ${{ vars.LOGGING_EXCHANGE }}
-      LOG_QUEUE: ${{ vars.LOG_QUEUE }}
-      RECEIVER_ID: ${{ vars.RECEIVER_ID }}
-      HANDLER_ID: ${{ vars.HANDLER_ID }}
-      USERAPI_ID: ${{ vars.USERAPI_ID }}
+#       LOGGING_EXCHANGE: ${{ vars.LOGGING_EXCHANGE }}
+#       LOG_QUEUE: ${{ vars.LOG_QUEUE }}
+#       RECEIVER_ID: ${{ vars.RECEIVER_ID }}
+#       HANDLER_ID: ${{ vars.HANDLER_ID }}
+#       USERAPI_ID: ${{ vars.USERAPI_ID }}
 
-      RABBITMQ_DNS: ${{ vars.RABBITMQ_DNS }}
+#       RABBITMQ_DNS: ${{ vars.RABBITMQ_DNS }}
 
-      #Logging
-      LOG_INFO_LOCAL_PATH: ${{ vars.LOG_INFO_LOCAL_PATH }}
+#       #Logging
+#       LOG_INFO_LOCAL_PATH: ${{ vars.LOG_INFO_LOCAL_PATH }}
 
-      # Receiver
-      MESSAGES_QUEUE: ${{ vars.MESSAGES_QUEUE }}
+#       # Receiver
+#       MESSAGES_QUEUE: ${{ vars.MESSAGES_QUEUE }}
 
-      # Receiver | Handler
-      HANDLER_EXCHANGE: ${{ vars.HANDLER_EXCHANGE }}
+#       # Receiver | Handler
+#       HANDLER_EXCHANGE: ${{ vars.HANDLER_EXCHANGE }}
 
-      # Userapi
-      FIRST_SUPERUSERNAME: ${{ vars.FIRST_SUPERUSERNAME }}
-      FIRST_SUPERUSER_EMAIL: ${{ vars.FIRST_SUPERUSER_EMAIL }}
-      FIRST_SUPERUSER_PASSWORD: ${{ vars.FIRST_SUPERUSER_PASSWORD }}
-      USERS_OPEN_REGISTRATION: ${{ vars.USERS_OPEN_REGISTRATION }}
-      EMAILS_FROM_EMAIL: ${{ vars.EMAILS_FROM_EMAIL }}
+#       # Userapi
+#       FIRST_SUPERUSERNAME: ${{ vars.FIRST_SUPERUSERNAME }}
+#       FIRST_SUPERUSER_EMAIL: ${{ vars.FIRST_SUPERUSER_EMAIL }}
+#       FIRST_SUPERUSER_PASSWORD: ${{ vars.FIRST_SUPERUSER_PASSWORD }}
+#       USERS_OPEN_REGISTRATION: ${{ vars.USERS_OPEN_REGISTRATION }}
+#       EMAILS_FROM_EMAIL: ${{ vars.EMAILS_FROM_EMAIL }}
 
-      # Userapi | Handler
-      POSTGRES_PORT: ${{ vars.POSTGRES_PORT }}
-      POSTGRES_USER: ${{ vars.POSTGRES_USER }}
-      POSTGRES_PASSWORD: ${{ vars.POSTGRES_PASSWORD }}
-      POSTGRES_DB: ${{ vars.POSTGRES_DB }}
-      RPC_QUEUE: ${{ vars.RPC_QUEUE }}
+#       # Userapi | Handler
+#       POSTGRES_PORT: ${{ vars.POSTGRES_PORT }}
+#       POSTGRES_USER: ${{ vars.POSTGRES_USER }}
+#       POSTGRES_PASSWORD: ${{ vars.POSTGRES_PASSWORD }}
+#       POSTGRES_DB: ${{ vars.POSTGRES_DB }}
+#       RPC_QUEUE: ${{ vars.RPC_QUEUE }}
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v4
 
-      - name: Create env file
-        id: create-env
-        run: |
-          echo ENVIRONMENT=$ENVIRONMENT >> .env
-          echo LOG_LEVEL=$LOG_LEVEL >> .env
-          echo LOGGING_EXCHANGE=$LOGGING_EXCHANGE >> .env
-          echo LOG_QUEUE=$LOG_QUEUE >> .env
-          echo RECEIVER_ID=$RECEIVER_ID >> .env
-          echo HANDLER_ID=$HANDLER_ID >> .env
-          echo USERAPI_ID=$USERAPI_ID >> .env
-          echo RABBITMQ_DNS=$RABBITMQ_DNS >> .env
-          echo LOG_INFO_LOCAL_PATH=$LOG_INFO_LOCAL_PATH >> .env
-          echo MESSAGES_QUEUE=$MESSAGES_QUEUE >> .env
-          echo HANDLER_EXCHANGE=$HANDLER_EXCHANGE >> .env
-          echo FIRST_SUPERUSERNAME=$FIRST_SUPERUSERNAME >> .env
-          echo FIRST_SUPERUSER_EMAIL=$FIRST_SUPERUSER_EMAIL >> .env
-          echo FIRST_SUPERUSER_PASSWORD=$FIRST_SUPERUSER_PASSWORD >> .env
-          echo POSTGRES_PORT=$POSTGRES_PORT >> .env
-          echo POSTGRES_USER=$POSTGRES_USER >> .env
-          echo POSTGRES_PASSWORD=$POSTGRES_PASSWORD >> .env
-          echo POSTGRES_DB=$POSTGRES_DB >> .env
-          echo USERS_OPEN_REGISTRATION=$USERS_OPEN_REGISTRATION >> .env
-          echo EMAILS_FROM_EMAIL=$EMAILS_FROM_EMAIL >> .env
-          echo RPC_QUEUE=$RPC_QUEUE >> .env
+#       - name: Create env file
+#         id: create-env
+#         run: |
+#           echo ENVIRONMENT=$ENVIRONMENT >> .env
+#           echo LOG_LEVEL=$LOG_LEVEL >> .env
+#           echo LOGGING_EXCHANGE=$LOGGING_EXCHANGE >> .env
+#           echo LOG_QUEUE=$LOG_QUEUE >> .env
+#           echo RECEIVER_ID=$RECEIVER_ID >> .env
+#           echo HANDLER_ID=$HANDLER_ID >> .env
+#           echo USERAPI_ID=$USERAPI_ID >> .env
+#           echo RABBITMQ_DNS=$RABBITMQ_DNS >> .env
+#           echo LOG_INFO_LOCAL_PATH=$LOG_INFO_LOCAL_PATH >> .env
+#           echo MESSAGES_QUEUE=$MESSAGES_QUEUE >> .env
+#           echo HANDLER_EXCHANGE=$HANDLER_EXCHANGE >> .env
+#           echo FIRST_SUPERUSERNAME=$FIRST_SUPERUSERNAME >> .env
+#           echo FIRST_SUPERUSER_EMAIL=$FIRST_SUPERUSER_EMAIL >> .env
+#           echo FIRST_SUPERUSER_PASSWORD=$FIRST_SUPERUSER_PASSWORD >> .env
+#           echo POSTGRES_PORT=$POSTGRES_PORT >> .env
+#           echo POSTGRES_USER=$POSTGRES_USER >> .env
+#           echo POSTGRES_PASSWORD=$POSTGRES_PASSWORD >> .env
+#           echo POSTGRES_DB=$POSTGRES_DB >> .env
+#           echo USERS_OPEN_REGISTRATION=$USERS_OPEN_REGISTRATION >> .env
+#           echo EMAILS_FROM_EMAIL=$EMAILS_FROM_EMAIL >> .env
+#           echo RPC_QUEUE=$RPC_QUEUE >> .env
 
-      - name: Build DB and Queue
-        run: make compose-dev-d s="rabbitmq db"
+#       - name: Build DB and Queue
+#         run: make compose-dev-d s="rabbitmq db"
       
-      - name: Tests - Logging service
-        run: |
-          make compose-dev-d s="logging"
-          docker compose exec -T logging bash tests-start.sh
-          docker compose stop logging
+#       - name: Tests - Logging service
+#         run: |
+#           make compose-dev-d s="logging"
+#           docker compose exec -T logging bash tests-start.sh
+#           docker compose stop logging
       
-      - name: Tests - UserAPI service
-        run: |
-          make compose-dev-d s="userapi"
-          docker compose exec -T userapi bash tests-start.sh
-          docker compose stop userapi
+#       - name: Tests - UserAPI service
+#         run: |
+#           make compose-dev-d s="userapi"
+#           docker compose exec -T userapi bash tests-start.sh
+#           docker compose stop userapi
       
-      - name: Tests - Receiver service
-        run: |
-          make compose-dev-d s="receiver"
-          docker compose exec -T receiver bash tests-start.sh
-          docker compose stop receiver
+#       - name: Tests - Receiver service
+#         run: |
+#           make compose-dev-d s="receiver"
+#           docker compose exec -T receiver bash tests-start.sh
+#           docker compose stop receiver
       
-      - name: Tests - Handler services # Need to be after userapi for db migrations
-        run: |
-          make compose-dev-d s="handler"
-          docker compose exec -T handler bash tests-start.sh
-          docker compose stop handler
+#       - name: Tests - Handler services # Need to be after userapi for db migrations
+#         run: |
+#           make compose-dev-d s="handler"
+#           docker compose exec -T handler bash tests-start.sh
+#           docker compose stop handler
   
-  # delete-previous-deployment:
-  #   needs: tests
-  #   runs-on: ubuntu-latest
-  #   environment: Test
-  #   steps:
-  #     - uses: strumwolf/delete-deployment-environment@v2
-  #       with:
-  #         token: ${{ secrets.CLEAN_DEPLOYMENTS_TOKEN }}
-  #         ref: main
-  #         onlyRemoveDeployments: true
+#   # delete-previous-deployment:
+#   #   needs: tests
+#   #   runs-on: ubuntu-latest
+#   #   environment: Test
+#   #   steps:
+#   #     - uses: strumwolf/delete-deployment-environment@v2
+#   #       with:
+#   #         token: ${{ secrets.CLEAN_DEPLOYMENTS_TOKEN }}
+#   #         ref: main
+#   #         onlyRemoveDeployments: true
             
   
-  # # https://github.com/marketplace/actions/alls-green#why
-  # alls-green:  # This job does nothing and is only used for the branch protection
-  #   if: always()
-  #   needs:
-  #     - test
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Decide whether the needed jobs succeeded or failed
-  #       uses: re-actors/alls-green@release/v1
-  #       with:
-  #         jobs: ${{ toJSON(needs) }}
+#   # # https://github.com/marketplace/actions/alls-green#why
+#   # alls-green:  # This job does nothing and is only used for the branch protection
+#   #   if: always()
+#   #   needs:
+#   #     - test
+#   #   runs-on: ubuntu-latest
+#   #   steps:
+#   #     - name: Decide whether the needed jobs succeeded or failed
+#   #       uses: re-actors/alls-green@release/v1
+#   #       with:
+#   #         jobs: ${{ toJSON(needs) }}

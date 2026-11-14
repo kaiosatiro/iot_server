@@ -11,11 +11,12 @@ The purpose of this project is to put into practice many concepts that I've been
 Whether developing a home automation system, industrial monitoring solution, or experimenting with IoT concepts, this server may provide a scalable and flexible foundation.
 
 #### Demo: 
-**Docs:** [https://staging.iotserverapp.com/userapi/v1/docs](https://staging.iotserverapp.com/userapi/v1/docs)
+**Docs:** [https://iotserverapi.ddns.net/userapi/v1/docs](https://iotserverapi.ddns.net/userapi/v1/docs)
 
-**Admin Panel:** [https://staging.iotserverapp.com/admin](https://staging.iotserverapp.com/admin) (admin:admin)
+**Admin Panel:** [https://iotserverapi.ddns.net/admin](https://iotserverapi.ddns.net/admin) (admin:admin)
 
-**User Dashboard:** https://dashboard.iotserverapp.com/  -- *In development* 
+**User Dashboard:** https://staging.iotserverapp.com/dashboard  -- *In development*
+
 
 #### Technology Stack and Features
 
