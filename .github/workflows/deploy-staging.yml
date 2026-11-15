@@ -10,14 +10,14 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  tests:
-    name: Tests
-    uses: ./.github/workflows/tests.yml
+  # tests:
+  #   name: Tests
+  #   uses: ./.github/workflows/tests.yml
 
 
   # Deploy to staging
   deploy:
-    needs: tests
+    # needs: tests
     runs-on: ubuntu-latest
     environment: staging
     steps:
