@@ -11,3 +11,5 @@ userapi/htmlcov/
 logs/*
 default
 aws/letsencrypt
+aws/sites-enabled/staging.iotserverapp.com
+aws/sites-enabled/adminer.iotserverapp.com
