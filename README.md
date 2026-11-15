@@ -15,7 +15,7 @@ Whether developing a home automation system, industrial monitoring solution, or 
 
 **Admin Panel:** [https://iotserverapi.ddns.net/admin](https://iotserverapi.ddns.net/admin) (admin:admin)
 
-**User Dashboard:** https://staging.iotserverapp.com/dashboard  -- *In development*
+**User Dashboard:** ~~https://staging.iotserverapp.com/dashboard~  -- *In development*
 
 
 #### Technology Stack and Features
