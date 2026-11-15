@@ -17,7 +17,7 @@ jobs:
 
   # Deploy to staging
   deploy:
-    needs: testsomment
+    needs: tests
     runs-on: ubuntu-latest
     environment: staging
     steps:
